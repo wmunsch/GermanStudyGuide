@@ -14,7 +14,8 @@ public class MainActivity extends AppCompatActivity {
 
     //variables
     private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<Integer> mProgressPercents = new ArrayList<>();
+    private ArrayList<Integer> mProgressLearnedPercents = new ArrayList<>();
+    private ArrayList<Integer> mProgressMasteredPercents = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
 
     @Override
@@ -36,12 +37,21 @@ public class MainActivity extends AppCompatActivity {
         mNames.add("Advanced Level 1");
         mNames.add("Advanced Level 2");
 
-        mProgressPercents.add(78);
-        mProgressPercents.add(25);
-        mProgressPercents.add(18);
-        mProgressPercents.add(2);
-        mProgressPercents.add(0);
-        mProgressPercents.add(0);
+
+        //Test data to be replaced by SQL query
+        mProgressLearnedPercents.add(78);
+        mProgressLearnedPercents.add(25);
+        mProgressLearnedPercents.add(18);
+        mProgressLearnedPercents.add(2);
+        mProgressLearnedPercents.add(0);
+        mProgressLearnedPercents.add(0);
+
+        mProgressMasteredPercents.add(17);
+        mProgressMasteredPercents.add(5);
+        mProgressMasteredPercents.add(0);
+        mProgressMasteredPercents.add(0);
+        mProgressMasteredPercents.add(0);
+        mProgressMasteredPercents.add(0);
 
         initRecyclerView();
     }
@@ -49,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView(){
         Log.d(TAG,"initRecyclerView: init recyclerview");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressPercents,this);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
