@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     //variables
     private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<Integer> mProgressPercents = new ArrayList<>();
     private ArrayList<String> mImageUrls = new ArrayList<>();
 
     @Override
@@ -22,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate: started.");
 
-        initImageBitmaps();
+        initRecyclerViewData();
     }
 
-    private void initImageBitmaps(){
+    private void initRecyclerViewData(){
         Log.d(TAG,"initImageBitmaps: preparing bitmaps.");
 
         mNames.add("Beginner Level 1");
@@ -35,13 +36,20 @@ public class MainActivity extends AppCompatActivity {
         mNames.add("Advanced Level 1");
         mNames.add("Advanced Level 2");
 
+        mProgressPercents.add(78);
+        mProgressPercents.add(25);
+        mProgressPercents.add(18);
+        mProgressPercents.add(2);
+        mProgressPercents.add(0);
+        mProgressPercents.add(0);
+
         initRecyclerView();
     }
 
     private void initRecyclerView(){
         Log.d(TAG,"initRecyclerView: init recyclerview");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames,this);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressPercents,this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +19,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private static final String TAG = "RecyclerViewAdapter";
 
     private ArrayList<String> mListNames = new ArrayList<>();
-   // private ArrayList<String> mImages = new ArrayList<>();
     private Context mContext;
+    private ArrayList<Integer> progressPercentage = new ArrayList<>();
 
-    public RecyclerViewAdapter(ArrayList<String> mImageNames, Context mContext) {
+    public RecyclerViewAdapter(ArrayList<String> mImageNames, ArrayList<Integer> mProgressPercents, Context mContext) {
         this.mListNames = mImageNames;
-        //this.mImages = mImages;
+        this.progressPercentage = mProgressPercents;
         this.mContext = mContext;
     }
 
@@ -41,6 +42,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         Log.d(TAG, "onBindViewHolder: called.");
 
         viewHolder.listItemName.setText(mListNames.get(i));
+        viewHolder.progressBar.setProgress(progressPercentage.get(i));
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
             public void onClick(View view){
@@ -55,6 +57,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mListNames.size();
     }
 
+
     /**
      * Holds each widget in memory for it to be recycled.
      */
@@ -62,12 +65,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         ImageView image;
         TextView listItemName;
+        ProgressBar progressBar;
         RelativeLayout parentLayout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.imageView);
             listItemName = itemView.findViewById(R.id.item_name_textview);
+            progressBar = itemView.findViewById(R.id.determinateBar);
             parentLayout = itemView.findViewById(R.id.parent_layout);
+
         }
+
     }
 }
