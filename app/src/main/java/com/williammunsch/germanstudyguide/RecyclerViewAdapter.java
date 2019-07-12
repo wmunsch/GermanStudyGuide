@@ -1,6 +1,7 @@
 package com.williammunsch.germanstudyguide;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,17 +20,22 @@ import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private static final String TAG = "RecyclerViewAdapter";
+    DBManager dbManager;
 
-    private ArrayList<String> mListNames = new ArrayList<>();
+    private ArrayList<String> mListNames;
     private Context mContext;
-    private ArrayList<Integer> progressLearnedPercentage = new ArrayList<>();
-    private ArrayList<Integer> progressMasteredPercentage = new ArrayList<>();
+    private ArrayList<Integer> progressLearnedPercentage;
+    private ArrayList<Integer> progressMasteredPercentage, wordsLearned, wordsMax;
+    private RecyclerView a1List;
 
-    public RecyclerViewAdapter(ArrayList<String> mImageNames, ArrayList<Integer> mProgressLearnedPercents, ArrayList<Integer> mProgressMasteredPercents, Context mContext) {
+    public RecyclerViewAdapter(ArrayList<String> mImageNames, ArrayList<Integer> mProgressLearnedPercents, ArrayList<Integer> mProgressMasteredPercents, ArrayList<Integer> wordsLearned, ArrayList<Integer> wordsMax, Context mContext) {
+        dbManager = new DBManager(mContext);
         this.mListNames = mImageNames;
         this.progressLearnedPercentage = mProgressLearnedPercents;
         this.progressMasteredPercentage = mProgressMasteredPercents;
         this.mContext = mContext;
+        this.wordsLearned = wordsLearned;
+        this.wordsMax = wordsMax;
     }
 
     @NonNull
@@ -48,6 +54,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.listItemName.setText(mListNames.get(i));
         viewHolder.progressBar.setSecondaryProgress(progressLearnedPercentage.get(i));
         viewHolder.progressBar.setProgress(progressMasteredPercentage.get(i));
+        viewHolder.wordsLearned.setText("Words learned : " + wordsLearned.get(i) + "/" + wordsMax.get(i));
+
+        viewHolder.viewButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                System.out.println("Clicked on viewbutton");
+
+                if (i==0){
+                    Intent intent = new Intent(mContext, ViewActivity.class);
+                    intent.putExtra("table", "A1");
+                    mContext.startActivity(intent);
+                }else if (i==1){
+                    Intent intent = new Intent(mContext, ViewActivity.class);
+                    intent.putExtra("table", "A2");
+                    mContext.startActivity(intent);
+                }
+            }
+        });
+
 
         //On click, expand the layout by increase vertical size and showing buttons
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
@@ -78,11 +103,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView image;
-        TextView listItemName;
+        TextView listItemName, wordsLearned;
         ProgressBar progressBar;
         RelativeLayout parentLayout;
         boolean isExpanded = false;
         LinearLayout buttonLayout;
+        Button viewButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.imageView);
@@ -90,8 +116,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             progressBar = itemView.findViewById(R.id.determinateBar);
             parentLayout = itemView.findViewById(R.id.parent_layout);
             buttonLayout = itemView.findViewById(R.id.buttonLayout);
-
+            wordsLearned = itemView.findViewById(R.id.wordsLearnedTV);
+            viewButton = itemView.findViewById(R.id.viewButton);
         }
-
     }
 }
