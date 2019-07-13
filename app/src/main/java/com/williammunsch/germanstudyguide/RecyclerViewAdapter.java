@@ -73,6 +73,23 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         });
 
+        viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                System.out.println("Clicked on learnbutton");
+
+                if (i==0){
+                    Intent intent = new Intent(mContext, LearnActivity.class);
+                    intent.putExtra("table", "A1");
+                    mContext.startActivity(intent);
+                }else if (i==1){
+                    Intent intent = new Intent(mContext, LearnActivity.class);
+                    intent.putExtra("table", "A2");
+                    mContext.startActivity(intent);
+                }
+            }
+        });
+
 
         //On click, expand the layout by increase vertical size and showing buttons
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
@@ -108,7 +125,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         RelativeLayout parentLayout;
         boolean isExpanded = false;
         LinearLayout buttonLayout;
-        Button viewButton;
+        Button viewButton, learnButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.imageView);
@@ -118,6 +135,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             buttonLayout = itemView.findViewById(R.id.buttonLayout);
             wordsLearned = itemView.findViewById(R.id.wordsLearnedTV);
             viewButton = itemView.findViewById(R.id.viewButton);
+            learnButton = itemView.findViewById(R.id.learnButton);
         }
     }
 }

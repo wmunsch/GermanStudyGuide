@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class DBManager extends SQLiteOpenHelper{
@@ -30,6 +31,7 @@ public class DBManager extends SQLiteOpenHelper{
     private static final int DB_VERSION = 1;
     private SQLiteDatabase vocabDatabase;
     private final Context myContext;
+    private static final int newWords = 5; //use preferences to set this in options
 
     /**
      * Constructor
@@ -232,6 +234,98 @@ public class DBManager extends SQLiteOpenHelper{
         }
         mCursor.close();
         return getScoreList;
+    }
+
+    /*
+    public Cursor getWordList2(){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
+
+        Cursor mCursor = vocabDatabase.query(
+                "words",             // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                null,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                "_id"               // The sort order
+        );
+
+        return mCursor;
+    }
+*/
+    public ArrayList<Word> getWordList(String tableName){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
+        ArrayList<Word> wordList = new ArrayList<>();
+        Random random = new Random();
+
+        String selection = "studying = ?";
+        String[] selectionArgs = {"0"};
+        Cursor mCursor = vocabDatabase.query(
+                tableName,             // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                "_id"               // The sort order
+        );
+        for (int i = 0; i < newWords; i++){
+            try{
+                //mCursor.getCount();
+               // mCursor.moveToPosition(random.nextInt(mCursor.getCount()));
+                mCursor.moveToNext();
+                wordList.add(new Word(mCursor.getInt(mCursor.getColumnIndex("_id")),
+                        mCursor.getInt(mCursor.getColumnIndex("score")),
+                        mCursor.getInt(mCursor.getColumnIndex("freq")),
+                        mCursor.getString(mCursor.getColumnIndex("german")),
+                        mCursor.getString(mCursor.getColumnIndex("english")),
+                        mCursor.getString(mCursor.getColumnIndex("gsent")),
+                        mCursor.getString(mCursor.getColumnIndex("esent"))));
+            }catch(Exception e){
+                System.out.println("Reached End of list.");
+                //Set variable here to change Learn to Study
+            }
+        }
+        mCursor.close();
+
+        //Second pass for the 15 lowest score, and least frequency of those lowest scored.
+        selection = "studying = ?";
+        selectionArgs[0] = "1";
+        mCursor = vocabDatabase.query(
+                tableName,             // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                "score ASC, freq ASC"               // The sort order
+        );
+        for (int i = 0; i < 15; i++){
+            try{
+                mCursor.moveToNext();
+                wordList.add(new Word(mCursor.getInt(mCursor.getColumnIndex("_id")),
+                        mCursor.getInt(mCursor.getColumnIndex("score")),
+                        mCursor.getInt(mCursor.getColumnIndex("freq")),
+                        mCursor.getString(mCursor.getColumnIndex("german")),
+                        mCursor.getString(mCursor.getColumnIndex("english")),
+                        mCursor.getString(mCursor.getColumnIndex("gsent")),
+                        mCursor.getString(mCursor.getColumnIndex("esent"))));
+            }catch(Exception e){
+                System.out.println("Error retrieving words.");
+            }
+        }
+        mCursor.close();
+
+        return wordList;
+    }
+
+
+    public void updateWord(Word w, String tableName){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READWRITE);
+        ContentValues cv = new ContentValues();
+        cv.put("score",w.getScore());
+        cv.put("freq",w.getFreq()+1);
+        vocabDatabase.update(tableName,cv,"_id="+w.getId(),null);
     }
 
 
