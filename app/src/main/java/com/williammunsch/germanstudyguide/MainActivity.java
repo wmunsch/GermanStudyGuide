@@ -1,14 +1,13 @@
 package com.williammunsch.germanstudyguide;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,13 +22,15 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> mProgressMasteredPercents = new ArrayList<>();
     private ArrayList<Integer> mWordsLearned= new ArrayList<>();
     private ArrayList<Integer> mWordsMax = new ArrayList<>();
-    private ArrayList<String> mImageUrls = new ArrayList<>();
+    private ArrayList<String> mImages = new ArrayList<>();
     DBManager dbManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
         Log.d(TAG, "onCreate: started.");
         dbManager = new DBManager(this);
 
@@ -46,6 +47,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initRecyclerViewData(){
+        mImages.add("A1");
+        mImages.add("A2");
+        mImages.add("B1");
+        mImages.add("B2");
+        mImages.add("C1");
+        mImages.add("C2");
 
         mNames.add("Beginner Level 1");
         mNames.add("Beginner Level 2");
@@ -94,10 +101,25 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView(){
         Log.d(TAG,"initRecyclerView: init recyclerview");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, mWordsLearned, mWordsMax,this);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, mWordsLearned, mWordsMax, mImages,this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings){
+           // startSettings();
+            return true;
+        }
+        return true;
     }
 
 

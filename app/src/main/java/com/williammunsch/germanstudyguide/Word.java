@@ -1,14 +1,14 @@
 package com.williammunsch.germanstudyguide;
 
 public class Word {
-    private int score, id, freq, type; //type determines what type of activity. 0=show english, 1=test german->english, 2=test english->german
+    private int score, id, freq, type, studying; //type determines what type of activity. 0=show english, 1=test german->english, 2=test english->german
     private String german;
     private String english;
     private String gsentence;
     private String esentence;
     private Word next;
 
-    public Word(int id, int score, int freq, String german, String english, String gsentence, String esentence){
+    public Word(int id, int score, int freq, int studying, String german, String english, String gsentence, String esentence){
         this.id = id;
         this.score = score;
         this.freq = freq;
@@ -17,7 +17,10 @@ public class Word {
         this.gsentence = gsentence;
         this.esentence = esentence;
         type = 0;
+        this.studying = studying;
     }
+
+    public int getStudying(){return studying;}
 
     public void setType(int type){this.type = type;}
 

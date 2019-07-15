@@ -6,8 +6,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,11 +31,14 @@ public class LearnActivity extends AppCompatActivity {
     private static final int newWords = 5; //use preferences to set this in options
     private String tableName;
     private int nodeCount;
+    private boolean testing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn);
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
         dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
@@ -40,8 +47,8 @@ public class LearnActivity extends AppCompatActivity {
         wordList = dbManager.getWordList(tableName);
         nodeCount = wordList.size();
 
-        head = new Word(0,0,0,null,null,null,null);
-        tail = new Word(0,0,0,null,null,null,null);
+        head = new Word(0,0,0,0,null,null,null,null);
+        tail = new Word(0,0,0,0,null,null,null,null);
         createQueue();
 
         nextTest();
@@ -68,6 +75,7 @@ public class LearnActivity extends AppCompatActivity {
             public void onClick(View view) {
                 germanSentence.setVisibility(View.VISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
+                germanSentence.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in));
             }
         });
     }
@@ -120,6 +128,7 @@ public class LearnActivity extends AppCompatActivity {
         tail.setNext(null);
     }
     private void nextTest(){
+        testing = true;
         System.out.println("NODE COUNT" + nodeCount);
         System.out.println("*********printing queue************");
         Word temp1 = head.getNext();
@@ -133,6 +142,7 @@ public class LearnActivity extends AppCompatActivity {
             germanSentence.setVisibility(View.INVISIBLE);
             buttonHint.setVisibility(View.VISIBLE);
             germanSentence.setText(head.getNext().getGSentence());
+            englishSentence.setText(head.getNext().getEsentence());
             if (head.getNext().getType()==0){
                 topTestWord.setText(head.getNext().getGerman());
                 answerWord.setText(head.getNext().getEnglish());
@@ -140,6 +150,7 @@ public class LearnActivity extends AppCompatActivity {
                 entryText.setVisibility(View.INVISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
                 germanSentence.setVisibility(View.VISIBLE);
+                englishSentence.setVisibility(View.VISIBLE);
                 buttonNext.setText("Next");
                 entryText.setText("");
             }else if (head.getNext().getType()==1){
@@ -163,43 +174,53 @@ public class LearnActivity extends AppCompatActivity {
     }
 
     private void test(){
-
-        if (head.getNext().getType() == 0){
-            head.getNext().setType(1);
-            nowStudying();
-            moveNode(false);
-            nextTest();
-        }else if (head.getNext().getType()==1){
-            boolean test = false;
-            String s = entryText.getText().toString();
-            if (s.equalsIgnoreCase(head.getNext().getEnglish())){
-                test = true;
-            }
-
-            if (test){
-                updateWord(10);
-                removeNode();
+       // if (!testing){
+            if (head.getNext().getType() == 0){
+                head.getNext().setType(1);
+                moveNode(false);
                 nextTest();
-            }else{
-                wrongAnswer.setMessage("\n"+head.getNext().getEnglish());
-                wrongAnswer.show();
-            }
-        }else if (head.getNext().getType()==2){
-            boolean test = false;
-            String s = entryText.getText().toString();
-            if (s.equalsIgnoreCase(head.getNext().getGerman())){
-                test = true;
+            }else if (head.getNext().getType()==1){
+                if (head.getNext().getStudying()!=1){nowStudying();}
+                boolean test = false;
+                String s = entryText.getText().toString();
+                if (s.equalsIgnoreCase(head.getNext().getEnglish())){
+                    test = true;
+                }
+
+                if (test){
+                    updateWord(10);
+                    removeNode();
+                    nextTest();
+                }else{
+                    wrongAnswer.setMessage("\n"+head.getNext().getEnglish());
+                    wrongAnswer.show();
+                }
+            }else if (head.getNext().getType()==2){
+                boolean test = false;
+                String s = entryText.getText().toString();
+                if (s.equalsIgnoreCase(head.getNext().getGerman())){
+                    test = true;
+                }
+
+                if (test){
+                    updateWord(10);
+                    removeNode();
+                    nextTest();
+                }else{
+                    wrongAnswer.setMessage("\n"+head.getNext().getGerman());
+                    wrongAnswer.show();
+                }
             }
 
-            if (test){
-                updateWord(10);
-                removeNode();
-                nextTest();
-            }else{
-                wrongAnswer.setMessage("\n"+head.getNext().getGerman());
-                wrongAnswer.show();
-            }
-        }
+    }
+
+    private void showEnglishSentence(){
+        testing = false;
+        englishSentence.setVisibility(View.VISIBLE);
+        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        englishSentence.setText(head.getNext().getEsentence());
+        buttonHint.setVisibility(View.INVISIBLE);
+        germanSentence.setVisibility(View.VISIBLE);
     }
 
     public void wasCorrect(View view){
@@ -281,6 +302,21 @@ System.out.println("*******************");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //intent.putExtra("flashcard",maxId);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings){
+            // startSettings();
+            return true;
+        }
+        return true;
     }
 
 }
