@@ -71,8 +71,8 @@ public class DBManager extends SQLiteOpenHelper{
      */
     private boolean checkDatabase(){
         File databasePath = myContext.getDatabasePath(DB_NAME);
-        //return databasePath.exists();
-        return false;  //used for resets
+        return databasePath.exists();
+        //return false;  //used for resets
 
     }
 
@@ -236,23 +236,6 @@ public class DBManager extends SQLiteOpenHelper{
         return getScoreList;
     }
 
-    /*
-    public Cursor getWordList2(){
-        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
-
-        Cursor mCursor = vocabDatabase.query(
-                "words",             // The table to query
-                null,             // The array of columns to return (pass null to get all)
-                null,              // The columns for the WHERE clause
-                null,          // The values for the WHERE clause
-                null,                   // don't group the rows
-                null,                   // don't filter by row groups
-                "_id"               // The sort order
-        );
-
-        return mCursor;
-    }
-*/
     public ArrayList<Word> getWordList(String tableName){
         vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
         ArrayList<Word> wordList = new ArrayList<>();
@@ -325,6 +308,13 @@ public class DBManager extends SQLiteOpenHelper{
         ContentValues cv = new ContentValues();
         cv.put("score",w.getScore());
         cv.put("freq",w.getFreq()+1);
+        vocabDatabase.update(tableName,cv,"_id="+w.getId(),null);
+    }
+
+    public void setStudying(Word w, String tableName){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READWRITE);
+        ContentValues cv = new ContentValues();
+        cv.put("studying", 1);
         vocabDatabase.update(tableName,cv,"_id="+w.getId(),null);
     }
 

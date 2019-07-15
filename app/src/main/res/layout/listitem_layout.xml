@@ -77,13 +77,21 @@
 
             <Button
                 android:layout_width="100dp"
-                android:layout_height="45dp"
+                android:layout_height="30dp"
+                android:background="@drawable/button_selector"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textAllCaps="false"
                 android:text="Learn"
                 android:id="@+id/learnButton" />
 
             <Button
                 android:layout_width="100dp"
-                android:layout_height="45dp"
+                android:layout_height="30dp"
+                android:background="@drawable/button_selector"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textAllCaps="false"
                 android:text="View"
                 android:layout_marginLeft="50dp"
                 android:id="@+id/viewButton"/>

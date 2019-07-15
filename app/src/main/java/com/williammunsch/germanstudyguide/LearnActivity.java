@@ -140,25 +140,33 @@ public class LearnActivity extends AppCompatActivity {
                 entryText.setVisibility(View.INVISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
                 germanSentence.setVisibility(View.VISIBLE);
+                buttonNext.setText("Next");
+                entryText.setText("");
             }else if (head.getNext().getType()==1){
                 topTestWord.setText(head.getNext().getGerman());
                 answerWord.setVisibility(View.INVISIBLE);
                 entryText.setVisibility(View.VISIBLE);
+                buttonNext.setText("Check");
+                entryText.setText("");
             }else if (head.getNext().getType()==2){
                 topTestWord.setText(head.getNext().getEnglish());
                 answerWord.setVisibility(View.INVISIBLE);
                 entryText.setVisibility(View.VISIBLE);
+                buttonNext.setText("Check");
+                entryText.setText("");
             }
         }catch(Exception e){
-            finish();
+            backToMainActivity();
         }
 
 
     }
 
     private void test(){
+
         if (head.getNext().getType() == 0){
             head.getNext().setType(1);
+            nowStudying();
             moveNode(false);
             nextTest();
         }else if (head.getNext().getType()==1){
@@ -212,12 +220,16 @@ public class LearnActivity extends AppCompatActivity {
         dbManager.updateWord(head.getNext(),tableName);
     }
 
+    private void nowStudying(){
+        dbManager.setStudying(head.getNext(),tableName);
+    }
+
 
     private void removeNode(){
         try {
             head.setNext(head.getNext().getNext());
             nodeCount--;
-            if (nodeCount == 0){System.out.println("GOING BACK TO MAIN)");finish();}
+            if (nodeCount == 0){System.out.println("GOING BACK TO MAIN)");backToMainActivity();}
         }catch(Exception e){
             System.out.println("removeNode failed.");
             backToMainActivity();
