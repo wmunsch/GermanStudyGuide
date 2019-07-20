@@ -1,7 +1,6 @@
 package com.williammunsch.germanstudyguide;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -14,16 +13,19 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class LearnActivity extends AppCompatActivity {
 
-    private TextView answerWord, topTestWord, englishSentence, germanSentence;
+    private TextView answerWord, topTestWord, englishSentence, germanSentence, correctAnswer;
     private EditText entryText;
-    private Button buttonNext, buttonHint;
+    private Button buttonCheck, buttonHint,buttoniwasright;
+    private ImageView checkmark, xmark;
+    private LinearLayout correctLayout;
     private Word head, tail;
     DBManager dbManager;
     private ArrayList<Word> wordList;
@@ -31,7 +33,8 @@ public class LearnActivity extends AppCompatActivity {
     private static final int newWords = 5; //use preferences to set this in options
     private String tableName;
     private int nodeCount;
-    private boolean testing = true;
+    private boolean testing = true, test=false;
+    private int shortAnimationDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,10 @@ public class LearnActivity extends AppCompatActivity {
         createAlertDialogues();
         wordList = dbManager.getWordList(tableName);
         nodeCount = wordList.size();
+        // Retrieve and cache the system's default "short" animation time.
+        shortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
+
 
         head = new Word(0,0,0,0,null,null,null,null);
         tail = new Word(0,0,0,0,null,null,null,null);
@@ -60,8 +67,12 @@ public class LearnActivity extends AppCompatActivity {
         englishSentence = findViewById(R.id.textView_englishSentence);
         germanSentence = findViewById(R.id.textView_germanSentence);
         entryText = findViewById(R.id.editText_entry);
-        buttonNext = findViewById(R.id.button_next);
-        buttonNext.setOnClickListener(new View.OnClickListener(){
+        checkmark=findViewById(R.id.imageView_checkmark);
+        xmark=findViewById(R.id.imageView_xmark);
+        correctLayout=findViewById(R.id.linearLayout_correct);
+        correctAnswer=findViewById(R.id.textView_correctWord);
+        buttonCheck = findViewById(R.id.button_next);
+        buttonCheck.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 test();
@@ -78,6 +89,7 @@ public class LearnActivity extends AppCompatActivity {
                 germanSentence.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in));
             }
         });
+        buttoniwasright = findViewById(R.id.button_iwasright);
     }
     private void createAlertDialogues(){
         //Create correct alert window
@@ -143,6 +155,11 @@ public class LearnActivity extends AppCompatActivity {
             buttonHint.setVisibility(View.VISIBLE);
             germanSentence.setText(head.getNext().getGSentence());
             englishSentence.setText(head.getNext().getEsentence());
+            buttoniwasright.setVisibility(View.GONE);
+            xmark.setVisibility(View.INVISIBLE);
+            checkmark.setVisibility(View.INVISIBLE);
+            correctLayout.setVisibility(View.GONE);
+            buttonCheck.setText("Check");
             if (head.getNext().getType()==0){
                 topTestWord.setText(head.getNext().getGerman());
                 answerWord.setText(head.getNext().getEnglish());
@@ -151,19 +168,19 @@ public class LearnActivity extends AppCompatActivity {
                 buttonHint.setVisibility(View.INVISIBLE);
                 germanSentence.setVisibility(View.VISIBLE);
                 englishSentence.setVisibility(View.VISIBLE);
-                buttonNext.setText("Next");
+                buttonCheck.setText("Next");
                 entryText.setText("");
             }else if (head.getNext().getType()==1){
                 topTestWord.setText(head.getNext().getGerman());
                 answerWord.setVisibility(View.INVISIBLE);
                 entryText.setVisibility(View.VISIBLE);
-                buttonNext.setText("Check");
+                buttonCheck.setText("Check");
                 entryText.setText("");
             }else if (head.getNext().getType()==2){
                 topTestWord.setText(head.getNext().getEnglish());
                 answerWord.setVisibility(View.INVISIBLE);
                 entryText.setVisibility(View.VISIBLE);
-                buttonNext.setText("Check");
+                buttonCheck.setText("Check");
                 entryText.setText("");
             }
         }catch(Exception e){
@@ -173,45 +190,125 @@ public class LearnActivity extends AppCompatActivity {
 
     }
 
+    private void nextWord(){
+         updateWord(10);
+         removeNode();
+         nextTest();
+    }
+
     private void test(){
-       // if (!testing){
-            if (head.getNext().getType() == 0){
+        //test the correctness on first button press
+        if (testing) {
+            if (head.getNext().getType() == 0) {
                 head.getNext().setType(1);
                 moveNode(false);
                 nextTest();
-            }else if (head.getNext().getType()==1){
-                if (head.getNext().getStudying()!=1){nowStudying();}
-                boolean test = false;
+            } else if (head.getNext().getType() == 1) {
+                if (head.getNext().getStudying() != 1) {
+                    nowStudying();
+                }
+
+                //test
+                test = false;
                 String s = entryText.getText().toString();
-                if (s.equalsIgnoreCase(head.getNext().getEnglish())){
+                if (s.equalsIgnoreCase(head.getNext().getEnglish())) {
                     test = true;
                 }
 
-                if (test){
-                    updateWord(10);
-                    removeNode();
-                    nextTest();
+                if (test && !s.equals("")) {
+                    setUpCorrectAnswerViews();
+                } else if (!test && !s.equals("")) {
+                    setUpIncorrectType1AnswerViews();
                 }else{
-                    wrongAnswer.setMessage("\n"+head.getNext().getEnglish());
-                    wrongAnswer.show();
+                    //Do nothing because the edit text is empty. Prevents misclicks.
                 }
-            }else if (head.getNext().getType()==2){
-                boolean test = false;
+
+            } else if (head.getNext().getType() == 2) {
+
+                //test
+                test = false;
                 String s = entryText.getText().toString();
-                if (s.equalsIgnoreCase(head.getNext().getGerman())){
+                if (s.equalsIgnoreCase(head.getNext().getGerman())) {
                     test = true;
                 }
 
-                if (test){
-                    updateWord(10);
-                    removeNode();
-                    nextTest();
-                }else{
-                    wrongAnswer.setMessage("\n"+head.getNext().getGerman());
-                    wrongAnswer.show();
+
+                if (test) {
+                    checkmark.setVisibility(View.VISIBLE);
+                    checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    buttonCheck.setText("Next");
+                    buttonHint.setVisibility(View.INVISIBLE);
+                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+                    germanSentence.setVisibility(View.VISIBLE);
+                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    englishSentence.setVisibility(View.VISIBLE);
+                    testing=false;
+                } else {
+                    correctLayout.setAlpha(0f);
+                    correctLayout.setVisibility(View.VISIBLE);
+                    correctAnswer.setText(head.getNext().getGerman());
+                    correctLayout.animate()
+                            .alpha(1f)
+                            .setDuration(shortAnimationDuration)
+                            .setListener(null);
+
+                    buttonCheck.setText("Next");
+                    xmark.setVisibility(View.VISIBLE);
+                    xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    buttonHint.setVisibility(View.INVISIBLE);
+                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+                    germanSentence.setVisibility(View.VISIBLE);
+                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    englishSentence.setVisibility(View.VISIBLE);
+                    testing=false;
                 }
             }
+        }
+        //After showing whether the answer was correct or not, move to next activity
+        else{
+            //If answer was correct
+            if (test){
+                nextWord();
+            }
+            //If answer was wrong
+            else{
+                moveNode(true);
+                nextTest();
+            }
+        }
 
+    }
+    private void setUpCorrectAnswerViews(){
+        checkmark.setVisibility(View.VISIBLE);
+        checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        buttonCheck.setText("Next");
+        buttonHint.setVisibility(View.INVISIBLE);
+        if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+        germanSentence.setVisibility(View.VISIBLE);
+        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        englishSentence.setVisibility(View.VISIBLE);
+        testing=false;
+    }
+
+    private void setUpIncorrectType1AnswerViews(){
+        correctLayout.setAlpha(0f);
+        correctLayout.setVisibility(View.VISIBLE);
+        correctAnswer.setText(head.getNext().getEnglish());
+        correctLayout.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
+
+        buttonCheck.setText("Next");
+        xmark.setVisibility(View.VISIBLE);
+        xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        buttonHint.setVisibility(View.INVISIBLE);
+        if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+        germanSentence.setVisibility(View.VISIBLE);
+        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        englishSentence.setVisibility(View.VISIBLE);
+        buttoniwasright.setVisibility(View.VISIBLE);
+        testing=false;
     }
 
     private void showEnglishSentence(){
