@@ -162,12 +162,16 @@ public class LearnActivity extends AppCompatActivity {
             buttonCheck.setText("Check");
             if (head.getNext().getType()==0){
                 topTestWord.setText(head.getNext().getGerman());
+                topTestWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 answerWord.setText(head.getNext().getEnglish());
                 answerWord.setVisibility(View.VISIBLE);
+                answerWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 entryText.setVisibility(View.INVISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
                 germanSentence.setVisibility(View.VISIBLE);
+                germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 englishSentence.setVisibility(View.VISIBLE);
+                englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 buttonCheck.setText("Next");
                 entryText.setText("");
             }else if (head.getNext().getType()==1){
@@ -196,6 +200,27 @@ public class LearnActivity extends AppCompatActivity {
          nextTest();
     }
 
+    private void testAnswer1(){
+        test = false;
+        String enteredAnswer = entryText.getText().toString();
+        for (String s : head.getNext().getEnglishStringsArray()){
+            if (s.equalsIgnoreCase(enteredAnswer)){
+                test = true;
+            }
+        }
+
+        if (test && !enteredAnswer.equals("")) {
+            setUpCorrectAnswerViews();
+        } else if (!test && !enteredAnswer.equals("")) {
+            setUpIncorrectType1AnswerViews();
+        }else{
+            //Do nothing because the edit text is empty. Prevents misclicks.
+        }
+
+
+
+    }
+
     private void test(){
         //test the correctness on first button press
         if (testing) {
@@ -203,12 +228,14 @@ public class LearnActivity extends AppCompatActivity {
                 head.getNext().setType(1);
                 moveNode(false);
                 nextTest();
+
             } else if (head.getNext().getType() == 1) {
                 if (head.getNext().getStudying() != 1) {
                     nowStudying();
                 }
 
                 //test
+                /*
                 test = false;
                 String s = entryText.getText().toString();
                 if (s.equalsIgnoreCase(head.getNext().getEnglish())) {
@@ -222,7 +249,8 @@ public class LearnActivity extends AppCompatActivity {
                 }else{
                     //Do nothing because the edit text is empty. Prevents misclicks.
                 }
-
+*/
+                testAnswer1();
             } else if (head.getNext().getType() == 2) {
 
                 //test
@@ -309,15 +337,6 @@ public class LearnActivity extends AppCompatActivity {
         englishSentence.setVisibility(View.VISIBLE);
         buttoniwasright.setVisibility(View.VISIBLE);
         testing=false;
-    }
-
-    private void showEnglishSentence(){
-        testing = false;
-        englishSentence.setVisibility(View.VISIBLE);
-        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-        englishSentence.setText(head.getNext().getEsentence());
-        buttonHint.setVisibility(View.INVISIBLE);
-        germanSentence.setVisibility(View.VISIBLE);
     }
 
     public void wasCorrect(View view){

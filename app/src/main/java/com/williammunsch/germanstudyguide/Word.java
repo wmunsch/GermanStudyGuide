@@ -7,6 +7,7 @@ public class Word {
     private String gsentence;
     private String esentence;
     private Word next;
+    private String[] englishStringsArray;
 
     public Word(int id, int score, int freq, int studying, String german, String english, String gsentence, String esentence){
         this.id = id;
@@ -18,6 +19,9 @@ public class Word {
         this.esentence = esentence;
         type = 0;
         this.studying = studying;
+        if (english!=null){
+            this.englishStringsArray = english.split(",");
+        }
     }
 
     public int getStudying(){return studying;}
@@ -34,7 +38,7 @@ public class Word {
         this.next = next;
     }
 
-    public String getEnglish(){return english;}
+    //public String getEnglish(){return english;}
 
     public void setEnglish(String e){this.english = e;}
 
@@ -86,4 +90,20 @@ public class Word {
         this.esentence = esentence;
     }
 
+    public String[] getEnglishStringsArray() {
+        return englishStringsArray;
+    }
+
+    public void setEnglishStringsArray(String[] englishStringsArray) {
+        this.englishStringsArray = englishStringsArray;
+    }
+
+    public String getEnglish(){
+        String t = "";
+        for (int i = 0 ; i < englishStringsArray.length; i++){
+            t = t +englishStringsArray[i];
+            if (englishStringsArray.length>1 && i<englishStringsArray.length-1){t = t + ", ";}
+        }
+        return t;
+    }
 }

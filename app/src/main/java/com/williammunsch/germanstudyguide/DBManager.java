@@ -71,8 +71,8 @@ public class DBManager extends SQLiteOpenHelper{
      */
     private boolean checkDatabase(){
         File databasePath = myContext.getDatabasePath(DB_NAME);
-        return databasePath.exists();
-        //return false;  //used for resets
+        //return databasePath.exists();
+        return false;  //used for resets
 
     }
 
