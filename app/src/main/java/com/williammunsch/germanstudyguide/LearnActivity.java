@@ -1,5 +1,6 @@
 package com.williammunsch.germanstudyguide;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,10 +8,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,7 +34,6 @@ public class LearnActivity extends AppCompatActivity {
     private Word head, tail;
     DBManager dbManager;
     private ArrayList<Word> wordList;
-    private AlertDialog  wrongAnswer, englishSentenceAlert;
     private static final int newWords = 5; //use preferences to set this in options
     private String tableName;
     private int nodeCount;
@@ -46,7 +50,6 @@ public class LearnActivity extends AppCompatActivity {
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         bindViews();
-        createAlertDialogues();
         wordList = dbManager.getWordList(tableName);
         nodeCount = wordList.size();
         // Retrieve and cache the system's default "short" animation time.
@@ -67,6 +70,18 @@ public class LearnActivity extends AppCompatActivity {
         englishSentence = findViewById(R.id.textView_englishSentence);
         germanSentence = findViewById(R.id.textView_germanSentence);
         entryText = findViewById(R.id.editText_entry);
+        entryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                boolean handled =false;
+                if (i == EditorInfo.IME_ACTION_DONE){
+                    test();
+                    handled = true;
+                }
+                return handled;
+            }
+        });
+
         checkmark=findViewById(R.id.imageView_checkmark);
         xmark=findViewById(R.id.imageView_xmark);
         correctLayout=findViewById(R.id.linearLayout_correct);
@@ -76,6 +91,7 @@ public class LearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 test();
+
             }
         });
 
@@ -90,52 +106,28 @@ public class LearnActivity extends AppCompatActivity {
             }
         });
         buttoniwasright = findViewById(R.id.button_iwasright);
+        buttoniwasright.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                test=true;
+                test();
+            }
+        });
     }
-    private void createAlertDialogues(){
-        //Create correct alert window
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.alert_window);
 
-        TextView title = new TextView(this);
-        title.setPadding(10, 10, 10, 10);
-        title.setGravity(Gravity.CENTER);
-        title.setTextColor(Color.BLACK);
-        title.setTextSize(20);
-        builder.setCustomTitle(title);
-
-        title.setText("Wrong!");
-        wrongAnswer=builder.create();
-        wrongAnswer.setCanceledOnTouchOutside(false);
-
-        builder.setView(R.layout.alert_correct);
-        TextView title2 = new TextView(this);
-        title2.setPadding(10, 10, 10, 10);
-        title2.setGravity(Gravity.CENTER);
-        title2.setTextColor(Color.BLACK);
-        title2.setTextSize(20);
-        builder.setCustomTitle(title2);
-        title2.setText("English Translation:");
-        englishSentenceAlert=builder.create();
-        englishSentenceAlert.setCanceledOnTouchOutside(false);
-
-        //sentence.setVisibility(View.INVISIBLE);
-        //reveal.setVisibility(View.INVISIBLE);
-    }
 
     private void createQueue(){
         head.setNext(wordList.get(0));
-        tail = head.getNext();System.out.println(tail.getGerman());
+        tail = head.getNext();
         for (int i = 1; i < newWords; i++){
             tail.setNext(wordList.get(i));
             tail=tail.getNext();
-            System.out.println(tail.getGerman());
         }
         for (int i = newWords; i < wordList.size();i++){
             if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
             else{wordList.get(i).setType(1);}
             tail.setNext(wordList.get(i));
             tail=tail.getNext();
-            System.out.println(tail.getGerman());
         }
         tail.setNext(null);
     }
@@ -145,7 +137,7 @@ public class LearnActivity extends AppCompatActivity {
         System.out.println("*********printing queue************");
         Word temp1 = head.getNext();
         while (temp1!=null){
-            System.out.println(temp1.getGerman() + " " + temp1.getType());
+            System.out.println(temp1.getGerman() + " " + temp1.getType() + "  score: " + temp1.getScore());
             temp1 = temp1.getNext();
         }
 
@@ -203,6 +195,8 @@ public class LearnActivity extends AppCompatActivity {
     private void testAnswer1(){
         test = false;
         String enteredAnswer = entryText.getText().toString();
+
+        //test entered answer against all possible answers in database
         for (String s : head.getNext().getEnglishStringsArray()){
             if (s.equalsIgnoreCase(enteredAnswer)){
                 test = true;
@@ -216,9 +210,21 @@ public class LearnActivity extends AppCompatActivity {
         }else{
             //Do nothing because the edit text is empty. Prevents misclicks.
         }
+    }
 
+    private void setStudying(){
+        if (head.getNext().getStudying() != 1) {
+            nowStudying();
+        }
+    }
 
-
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+    }
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(entryText.getWindowToken(), 0);
     }
 
     private void test(){
@@ -230,27 +236,9 @@ public class LearnActivity extends AppCompatActivity {
                 nextTest();
 
             } else if (head.getNext().getType() == 1) {
-                if (head.getNext().getStudying() != 1) {
-                    nowStudying();
-                }
-
-                //test
-                /*
-                test = false;
-                String s = entryText.getText().toString();
-                if (s.equalsIgnoreCase(head.getNext().getEnglish())) {
-                    test = true;
-                }
-
-                if (test && !s.equals("")) {
-                    setUpCorrectAnswerViews();
-                } else if (!test && !s.equals("")) {
-                    setUpIncorrectType1AnswerViews();
-                }else{
-                    //Do nothing because the edit text is empty. Prevents misclicks.
-                }
-*/
+                setStudying();
                 testAnswer1();
+
             } else if (head.getNext().getType() == 2) {
 
                 //test
@@ -306,6 +294,75 @@ public class LearnActivity extends AppCompatActivity {
         }
 
     }
+
+    private void test(View view){
+        //test the correctness on first button press
+        if (testing) {
+            if (head.getNext().getType() == 0) {
+                head.getNext().setType(1);
+                moveNode(false);
+                nextTest();
+
+            } else if (head.getNext().getType() == 1) {
+                setStudying();
+                testAnswer1();
+
+            } else if (head.getNext().getType() == 2) {
+
+                //test
+                test = false;
+                String s = entryText.getText().toString();
+                if (s.equalsIgnoreCase(head.getNext().getGerman())) {
+                    test = true;
+                }
+
+
+                if (test) {
+                    checkmark.setVisibility(View.VISIBLE);
+                    checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    buttonCheck.setText("Next");
+                    buttonHint.setVisibility(View.INVISIBLE);
+                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+                    germanSentence.setVisibility(View.VISIBLE);
+                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    englishSentence.setVisibility(View.VISIBLE);
+                    testing=false;
+                } else {
+                    correctLayout.setAlpha(0f);
+                    correctLayout.setVisibility(View.VISIBLE);
+                    correctAnswer.setText(head.getNext().getGerman());
+                    correctLayout.animate()
+                            .alpha(1f)
+                            .setDuration(shortAnimationDuration)
+                            .setListener(null);
+
+                    buttonCheck.setText("Next");
+                    xmark.setVisibility(View.VISIBLE);
+                    xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    buttonHint.setVisibility(View.INVISIBLE);
+                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
+                    germanSentence.setVisibility(View.VISIBLE);
+                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                    englishSentence.setVisibility(View.VISIBLE);
+                    testing=false;
+                }
+            }
+        }
+        //After showing whether the answer was correct or not, move to next activity
+        else{
+            //If answer was correct
+            if (test){
+                nextWord();
+            }
+            //If answer was wrong
+            else{
+                moveNode(true);
+                nextTest();
+            }
+        }
+
+    }
+
     private void setUpCorrectAnswerViews(){
         checkmark.setVisibility(View.VISIBLE);
         checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
@@ -339,18 +396,6 @@ public class LearnActivity extends AppCompatActivity {
         testing=false;
     }
 
-    public void wasCorrect(View view){
-        updateWord(10);
-        wrongAnswer.dismiss();
-        removeNode();
-        nextTest();
-    }
-
-    public void unloadAlert(View view){
-        wrongAnswer.dismiss();
-        moveNode(true);
-        nextTest();
-    }
 
     public void updateWord(int s){
         head.getNext().setScore(head.getNext().getScore()+s);
@@ -374,6 +419,7 @@ public class LearnActivity extends AppCompatActivity {
 
     }
 
+    //Moves the current first node in the queue either 5 down or to the end.
     private void moveNode(boolean b){
         if (b) {updateWord(-7);}
         entryText.setText("");
@@ -385,24 +431,25 @@ public class LearnActivity extends AppCompatActivity {
         }
         else if (nodeCount == 5){
             head.setNext(head.getNext().getNext());
-            temp.setNext(head.getNext().getNext().getNext().getNext());
-            head.getNext().getNext().getNext().setNext(temp);
+            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext().getNext().getNext());
+            head.getNext().getNext().getNext().getNext().setNext(temp);
         }
         else if (nodeCount == 4){
             head.setNext(head.getNext().getNext());
-            temp.setNext(head.getNext().getNext().getNext());
-            head.getNext().getNext().setNext(temp);
-        }else if (nodeCount == 3){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(null);
-            head.getNext().getNext().setNext(temp);
+            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext().getNext());
+            head.getNext().getNext().getNext().setNext(temp);
         }
-        else if (nodeCount == 2){
+        else if (nodeCount == 3){
+            head.setNext(head.getNext().getNext());
+            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext());
+            head.getNext().getNext().setNext(temp);
+        }else if (nodeCount == 2){
             head.setNext(head.getNext().getNext());
             temp.setNext(null);
             head.getNext().setNext(temp);
-        }else{
-
+        }
+        else{
+            //Do nothing because its the last node.
         }
 
 System.out.println("*******************");
