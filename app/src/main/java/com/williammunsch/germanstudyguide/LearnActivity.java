@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class LearnActivity extends AppCompatActivity {
@@ -37,7 +39,7 @@ public class LearnActivity extends AppCompatActivity {
     private static final int newWords = 5; //use preferences to set this in options
     private String tableName;
     private int nodeCount;
-    private boolean testing = true, test=false;
+    private boolean testing = true, test=false, finishedWithAll = false, learnedAll = false;
     private int shortAnimationDuration;
 
     @Override
@@ -50,11 +52,11 @@ public class LearnActivity extends AppCompatActivity {
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         bindViews();
-        wordList = dbManager.getWordList(tableName);
-        nodeCount = wordList.size();
+
         // Retrieve and cache the system's default "short" animation time.
-        shortAnimationDuration = getResources().getInteger(
-                android.R.integer.config_shortAnimTime);
+       // shortAnimationDuration = getResources().getInteger(
+        //        android.R.integer.config_shortAnimTime);
+        shortAnimationDuration = 500;
 
 
         head = new Word(0,0,0,0,null,null,null,null);
@@ -102,7 +104,7 @@ public class LearnActivity extends AppCompatActivity {
             public void onClick(View view) {
                 germanSentence.setVisibility(View.VISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
-                germanSentence.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in));
+                fadeIn(germanSentence,0);
             }
         });
         buttoniwasright = findViewById(R.id.button_iwasright);
@@ -117,18 +119,56 @@ public class LearnActivity extends AppCompatActivity {
 
 
     private void createQueue(){
-        head.setNext(wordList.get(0));
-        tail = head.getNext();
-        for (int i = 1; i < newWords; i++){
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
+
+        if (dbManager.getWordsLearned(tableName) < dbManager.getWordsMax(tableName)){
+            wordList = dbManager.getWordList(tableName);
+            nodeCount = wordList.size();
+            head.setNext(wordList.get(0));
+            tail = head.getNext();
+            //Set up the intro flash cards
+            for (int i = 1; i < newWords; i++){
+                tail.setNext(wordList.get(i));
+                tail=tail.getNext();
+            }
+            //Set up 15 cards after the new ones
+            for (int i = newWords; i < wordList.size();i++){
+                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+                else{wordList.get(i).setType(1);}
+                tail.setNext(wordList.get(i));
+                tail=tail.getNext();
+            }
         }
-        for (int i = newWords; i < wordList.size();i++){
-            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-            else{wordList.get(i).setType(1);}
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
+
+        else if (dbManager.getWordsLearned(tableName) >= dbManager.getWordsMax(tableName) && dbManager.getWordsMastered(tableName) < dbManager.getWordsMax(tableName)){
+            learnedAll = true;
+            wordList = dbManager.getWordListAllLearned(tableName);
+            nodeCount = wordList.size();
+            head.setNext(wordList.get(0));
+            tail = head.getNext();
+            //Set up 20 cards to review based on score and frequency
+            for (int i = 0; i < wordList.size();i++){
+                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+                else{wordList.get(i).setType(1);}
+                tail.setNext(wordList.get(i));
+                tail=tail.getNext();
+            }
         }
+
+        else {
+            learnedAll = true;
+            wordList = dbManager.getWordListAllMastered(tableName);
+            nodeCount = wordList.size();
+            head.setNext(wordList.get(0));
+            tail = head.getNext();
+            //Set up randomized review
+            for (int i = 0; i < wordList.size();i++){
+                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+                else{wordList.get(i).setType(1);}
+                tail.setNext(wordList.get(i));
+                tail=tail.getNext();
+            }
+        }
+
         tail.setNext(null);
     }
     private void nextTest(){
@@ -152,18 +192,38 @@ public class LearnActivity extends AppCompatActivity {
             checkmark.setVisibility(View.INVISIBLE);
             correctLayout.setVisibility(View.GONE);
             buttonCheck.setText("Check");
+            topTestWord.setAlpha(0f);
+            answerWord.setAlpha(0f);
+            germanSentence.setAlpha(0f);
+            englishSentence.setAlpha(0f);
+            entryText.setAlpha(0f);
+            buttonHint.setAlpha(0f);
+            buttonCheck.setAlpha(0f);
+
+
             if (head.getNext().getType()==0){
                 topTestWord.setText(head.getNext().getGerman());
-                topTestWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 answerWord.setText(head.getNext().getEnglish());
                 answerWord.setVisibility(View.VISIBLE);
-                answerWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 entryText.setVisibility(View.INVISIBLE);
                 buttonHint.setVisibility(View.INVISIBLE);
                 germanSentence.setVisibility(View.VISIBLE);
-                germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 englishSentence.setVisibility(View.VISIBLE);
-                englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+              //  englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                //topTestWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                //answerWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+                //germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+
+                delayButtonCheck();
+                fadeIn(buttonCheck,2100);
+
+                fadeIn(topTestWord,100);
+                fadeIn(answerWord,1100);
+                fadeIn(germanSentence,2100);
+                fadeIn(englishSentence,2100);
+
+
+
                 buttonCheck.setText("Next");
                 entryText.setText("");
             }else if (head.getNext().getType()==1){
@@ -172,12 +232,23 @@ public class LearnActivity extends AppCompatActivity {
                 entryText.setVisibility(View.VISIBLE);
                 buttonCheck.setText("Check");
                 entryText.setText("");
+                fadeIn(topTestWord,50);
+                fadeIn(entryText,50);
+                fadeIn(buttonHint,50);
+                fadeIn(buttonCheck,50);
+
             }else if (head.getNext().getType()==2){
                 topTestWord.setText(head.getNext().getEnglish());
+                englishSentence.setText(head.getNext().getGSentence());
+                germanSentence.setText(head.getNext().getEsentence());
                 answerWord.setVisibility(View.INVISIBLE);
                 entryText.setVisibility(View.VISIBLE);
                 buttonCheck.setText("Check");
                 entryText.setText("");
+                fadeIn(topTestWord,50);
+                fadeIn(entryText,50);
+                fadeIn(buttonHint,50);
+                fadeIn(buttonCheck,50);
             }
         }catch(Exception e){
             backToMainActivity();
@@ -186,10 +257,39 @@ public class LearnActivity extends AppCompatActivity {
 
     }
 
+    private void delayButtonCheck(){
+        buttonCheck.setEnabled(false);
+        new CountDownTimer(2100, 10) { //Set Timer for 5 seconds
+            public void onTick(long millisUntilFinished) {
+            }
+
+            @Override
+            public void onFinish() {
+                buttonCheck.setEnabled(true);
+            }
+        }.start();
+    }
+
+    private void fadeIn(View view, int time){
+        view.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null)
+                .setStartDelay(time);
+    }
+
+    private void fadeOut(View view){
+        view.animate()
+                .alpha(0f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null)
+                .setStartDelay(0);
+    }
+
     private void nextWord(){
          updateWord(10);
          removeNode();
-         nextTest();
+         if (!finishedWithAll){nextTest();}
     }
 
     private void testAnswer1(){
@@ -201,6 +301,21 @@ public class LearnActivity extends AppCompatActivity {
             if (s.equalsIgnoreCase(enteredAnswer)){
                 test = true;
             }
+        }
+
+        if (test && !enteredAnswer.equals("")) {
+            setUpCorrectAnswerViews();
+        } else if (!test && !enteredAnswer.equals("")) {
+            setUpIncorrectType1AnswerViews();
+        }else{
+            //Do nothing because the edit text is empty. Prevents misclicks.
+        }
+    }
+    private void testAnswer2(){
+        test = false;
+        String enteredAnswer = entryText.getText().toString();
+        if (enteredAnswer.equalsIgnoreCase(head.getNext().getGerman())) {
+            test = true;
         }
 
         if (test && !enteredAnswer.equals("")) {
@@ -228,169 +343,73 @@ public class LearnActivity extends AppCompatActivity {
     }
 
     private void test(){
-        //test the correctness on first button press
-        if (testing) {
-            if (head.getNext().getType() == 0) {
-                head.getNext().setType(1);
-                moveNode(false);
-                nextTest();
+        if (finishedWithAll){backToMainActivity();}
 
-            } else if (head.getNext().getType() == 1) {
-                setStudying();
-                testAnswer1();
-
-            } else if (head.getNext().getType() == 2) {
-
-                //test
-                test = false;
-                String s = entryText.getText().toString();
-                if (s.equalsIgnoreCase(head.getNext().getGerman())) {
-                    test = true;
-                }
-
-
-                if (test) {
-                    checkmark.setVisibility(View.VISIBLE);
-                    checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    buttonCheck.setText("Next");
-                    buttonHint.setVisibility(View.INVISIBLE);
-                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
-                    germanSentence.setVisibility(View.VISIBLE);
-                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    englishSentence.setVisibility(View.VISIBLE);
-                    testing=false;
-                } else {
-                    correctLayout.setAlpha(0f);
-                    correctLayout.setVisibility(View.VISIBLE);
-                    correctAnswer.setText(head.getNext().getGerman());
-                    correctLayout.animate()
-                            .alpha(1f)
-                            .setDuration(shortAnimationDuration)
-                            .setListener(null);
-
-                    buttonCheck.setText("Next");
-                    xmark.setVisibility(View.VISIBLE);
-                    xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    buttonHint.setVisibility(View.INVISIBLE);
-                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
-                    germanSentence.setVisibility(View.VISIBLE);
-                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    englishSentence.setVisibility(View.VISIBLE);
-                    testing=false;
-                }
-            }
-        }
-        //After showing whether the answer was correct or not, move to next activity
         else{
-            //If answer was correct
-            if (test){
-                nextWord();
-            }
-            //If answer was wrong
-            else{
-                moveNode(true);
-                nextTest();
-            }
-        }
+            //test the correctness on first button press
+            if (testing) {
+                if (head.getNext().getType() == 0) {
+                    head.getNext().setType(1);
+                    moveNode(false);
+                    nextTest();
 
-    }
+                } else if (head.getNext().getType() == 1) {
+                    setStudying();
+                    testAnswer1();
 
-    private void test(View view){
-        //test the correctness on first button press
-        if (testing) {
-            if (head.getNext().getType() == 0) {
-                head.getNext().setType(1);
-                moveNode(false);
-                nextTest();
-
-            } else if (head.getNext().getType() == 1) {
-                setStudying();
-                testAnswer1();
-
-            } else if (head.getNext().getType() == 2) {
-
-                //test
-                test = false;
-                String s = entryText.getText().toString();
-                if (s.equalsIgnoreCase(head.getNext().getGerman())) {
-                    test = true;
-                }
-
-
-                if (test) {
-                    checkmark.setVisibility(View.VISIBLE);
-                    checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    buttonCheck.setText("Next");
-                    buttonHint.setVisibility(View.INVISIBLE);
-                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
-                    germanSentence.setVisibility(View.VISIBLE);
-                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    englishSentence.setVisibility(View.VISIBLE);
-                    testing=false;
-                } else {
-                    correctLayout.setAlpha(0f);
-                    correctLayout.setVisibility(View.VISIBLE);
-                    correctAnswer.setText(head.getNext().getGerman());
-                    correctLayout.animate()
-                            .alpha(1f)
-                            .setDuration(shortAnimationDuration)
-                            .setListener(null);
-
-                    buttonCheck.setText("Next");
-                    xmark.setVisibility(View.VISIBLE);
-                    xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    buttonHint.setVisibility(View.INVISIBLE);
-                    if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
-                    germanSentence.setVisibility(View.VISIBLE);
-                    englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                    englishSentence.setVisibility(View.VISIBLE);
-                    testing=false;
+                } else if (head.getNext().getType() == 2) {
+                    testAnswer2();
                 }
             }
-        }
-        //After showing whether the answer was correct or not, move to next activity
-        else{
-            //If answer was correct
-            if (test){
-                nextWord();
-            }
-            //If answer was wrong
+            //After showing whether the answer was correct or not, move to next word
             else{
-                moveNode(true);
-                nextTest();
+                //If answer was correct
+                if (test){
+                    nextWord();
+                }
+                //If answer was wrong
+                else{
+                    moveNode(true);
+                    nextTest();
+                }
             }
+
         }
 
     }
 
     private void setUpCorrectAnswerViews(){
+        germanSentence.setText(head.getNext().getGSentence());
+        englishSentence.setText(head.getNext().getEsentence());
         checkmark.setVisibility(View.VISIBLE);
-        checkmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        checkmark.setAlpha(0f);
+        fadeIn(checkmark,0);
         buttonCheck.setText("Next");
         buttonHint.setVisibility(View.INVISIBLE);
-        if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
         germanSentence.setVisibility(View.VISIBLE);
-        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         englishSentence.setVisibility(View.VISIBLE);
+        fadeIn(germanSentence,0);
+        fadeIn(englishSentence,0);
         testing=false;
     }
 
     private void setUpIncorrectType1AnswerViews(){
-        correctLayout.setAlpha(0f);
-        correctLayout.setVisibility(View.VISIBLE);
-        correctAnswer.setText(head.getNext().getEnglish());
-        correctLayout.animate()
-                .alpha(1f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null);
-
-        buttonCheck.setText("Next");
         xmark.setVisibility(View.VISIBLE);
-        xmark.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        xmark.setAlpha(0f);
+        correctLayout.setAlpha(0f);
+        fadeIn(xmark,0);
+        fadeIn(correctLayout,0);
+        correctLayout.setVisibility(View.VISIBLE);
+        if (head.getNext().getType()==1){
+            correctAnswer.setText(head.getNext().getEnglish());
+        }else{
+            correctAnswer.setText(head.getNext().getGerman());
+        }
+        buttonCheck.setText("Next");
         buttonHint.setVisibility(View.INVISIBLE);
-        if(germanSentence.getVisibility()!=View.VISIBLE){germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));}
         germanSentence.setVisibility(View.VISIBLE);
-        englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        fadeIn(germanSentence,0);
+        fadeIn(englishSentence,0);
         englishSentence.setVisibility(View.VISIBLE);
         buttoniwasright.setVisibility(View.VISIBLE);
         testing=false;
@@ -411,10 +430,43 @@ public class LearnActivity extends AppCompatActivity {
         try {
             head.setNext(head.getNext().getNext());
             nodeCount--;
-            if (nodeCount == 0){System.out.println("GOING BACK TO MAIN)");backToMainActivity();}
+            if (nodeCount == 0){
+                System.out.println("finished");
+                    topTestWord.setText("Finished!");
+                    topTestWord.setAlpha(0f);
+                    fadeIn(topTestWord,0);
+
+                    if (!learnedAll){
+                        int numWordsLearned = dbManager.getWordsLearned(tableName);
+                        int totalWords = dbManager.getWordsMax(tableName);
+                        double percent = ((double)numWordsLearned/totalWords)*100;
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        answerWord.setText(df.format(percent)+ "% of " + tableName + " words learned.");
+                    }else{
+                        int numWordsMastered = dbManager.getWordsMastered(tableName);
+                        int totalWords = dbManager.getWordsMax(tableName);
+                        double percent = ((double)numWordsMastered/totalWords)*100;
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        answerWord.setText(df.format(percent)+ "% of " + tableName + " words mastered.");
+                    }
+
+                    answerWord.setVisibility(View.VISIBLE);
+                    answerWord.setAlpha(0f);
+                    fadeIn(answerWord,0);
+                    finishedWithAll = true;
+                    buttonHint.setVisibility(View.INVISIBLE);
+                    englishSentence.setVisibility(View.INVISIBLE);
+                    germanSentence.setVisibility(View.INVISIBLE);
+                    buttoniwasright.setVisibility(View.GONE);
+                    correctLayout.setVisibility(View.GONE);
+                    xmark.setVisibility(View.INVISIBLE);
+                    checkmark.setVisibility(View.INVISIBLE);
+                    entryText.setVisibility(View.INVISIBLE);
+                    buttonCheck.setText("Done");
+                }
         }catch(Exception e){
             System.out.println("removeNode failed.");
-            backToMainActivity();
+            //backToMainActivity();
         }
 
     }

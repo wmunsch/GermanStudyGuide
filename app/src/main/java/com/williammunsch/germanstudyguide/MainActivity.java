@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> mWordsLearned= new ArrayList<>();
     private ArrayList<Integer> mWordsMax = new ArrayList<>();
     private ArrayList<String> mImages = new ArrayList<>();
+    private ArrayList<Integer> mWordsMastered = new ArrayList<>();
     DBManager dbManager;
 
     @Override
@@ -81,6 +82,13 @@ public class MainActivity extends AppCompatActivity {
         mWordsMax.add(0);
         mWordsMax.add(0);
 
+        mWordsMastered.add(a1Mastered);
+        mWordsMastered.add(0);
+        mWordsMastered.add(0);
+        mWordsMastered.add(0);
+        mWordsMastered.add(0);
+        mWordsMastered.add(0);
+
         mProgressLearnedPercents.add((int)(((double)a1Learned/a1Max)*100));
         mProgressLearnedPercents.add(0);
         mProgressLearnedPercents.add(0);
@@ -101,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView(){
         Log.d(TAG,"initRecyclerView: init recyclerview");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, mWordsLearned, mWordsMax, mImages,this);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, mWordsLearned, mWordsMastered, mWordsMax, mImages,this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 

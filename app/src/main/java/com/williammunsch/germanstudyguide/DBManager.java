@@ -239,7 +239,6 @@ public class DBManager extends SQLiteOpenHelper{
     public ArrayList<Word> getWordList(String tableName){
         vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
         ArrayList<Word> wordList = new ArrayList<>();
-        Random random = new Random();
 
         String selection = "studying = ?";
         String[] selectionArgs = {"0"};
@@ -282,7 +281,7 @@ public class DBManager extends SQLiteOpenHelper{
                 selectionArgs,          // The values for the WHERE clause
                 null,                   // don't group the rows
                 null,                   // don't filter by row groups
-                "score ASC, freq ASC"               // The sort order
+                "score ASC, freq ASC, _id ASC"               // The sort order
         );
         for (int i = 0; i < 15; i++){
             try{
@@ -304,6 +303,71 @@ public class DBManager extends SQLiteOpenHelper{
         return wordList;
     }
 
+    public ArrayList<Word> getWordListAllLearned(String tableName){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
+        ArrayList<Word> wordList = new ArrayList<>();
+        Cursor mCursor = vocabDatabase.query(
+                tableName,             // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                null,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                "score ASC, freq ASC, _id ASC"               // The sort order
+        );
+        for (int i = 0; i < 20; i++){
+            try{
+                mCursor.moveToNext();
+                wordList.add(new Word(mCursor.getInt(mCursor.getColumnIndex("_id")),
+                        mCursor.getInt(mCursor.getColumnIndex("score")),
+                        mCursor.getInt(mCursor.getColumnIndex("freq")),
+                        mCursor.getInt(mCursor.getColumnIndex("studying")),
+                        mCursor.getString(mCursor.getColumnIndex("german")),
+                        mCursor.getString(mCursor.getColumnIndex("english")),
+                        mCursor.getString(mCursor.getColumnIndex("gsent")),
+                        mCursor.getString(mCursor.getColumnIndex("esent"))));
+            }catch(Exception e){
+                System.out.println("Error retrieving words.");
+            }
+        }
+        mCursor.close();
+
+        return wordList;
+    }
+
+    public ArrayList<Word> getWordListAllMastered(String tableName){
+        vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
+        ArrayList<Word> wordList = new ArrayList<>();
+        Cursor mCursor = vocabDatabase.query(
+                tableName,             // The table to query
+                null,             // The array of columns to return (pass null to get all)
+                null,              // The columns for the WHERE clause
+                null,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                "_id ASC"               // The sort order
+        );
+        Random random = new Random();
+        int rowCount = getWordsMax(tableName);
+        for (int i = 0; i < 20; i++){
+            try{
+                mCursor.moveToPosition(random.nextInt(rowCount)+1);
+                wordList.add(new Word(mCursor.getInt(mCursor.getColumnIndex("_id")),
+                        mCursor.getInt(mCursor.getColumnIndex("score")),
+                        mCursor.getInt(mCursor.getColumnIndex("freq")),
+                        mCursor.getInt(mCursor.getColumnIndex("studying")),
+                        mCursor.getString(mCursor.getColumnIndex("german")),
+                        mCursor.getString(mCursor.getColumnIndex("english")),
+                        mCursor.getString(mCursor.getColumnIndex("gsent")),
+                        mCursor.getString(mCursor.getColumnIndex("esent"))));
+            }catch(Exception e){
+                System.out.println("Error retrieving words.");
+            }
+        }
+        mCursor.close();
+
+        return wordList;
+    }
 
     public void updateWord(Word w, String tableName){
         vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READWRITE);
