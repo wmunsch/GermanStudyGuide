@@ -2,19 +2,14 @@ package com.williammunsch.germanstudyguide;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -52,12 +47,7 @@ public class LearnActivity extends AppCompatActivity {
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         bindViews();
-
-        // Retrieve and cache the system's default "short" animation time.
-       // shortAnimationDuration = getResources().getInteger(
-        //        android.R.integer.config_shortAnimTime);
         shortAnimationDuration = 500;
-
 
         head = new Word(0,0,0,0,null,null,null,null);
         tail = new Word(0,0,0,0,null,null,null,null);
@@ -118,59 +108,67 @@ public class LearnActivity extends AppCompatActivity {
     }
 
 
+
     private void createQueue(){
-
         if (dbManager.getWordsLearned(tableName) < dbManager.getWordsMax(tableName)){
-            wordList = dbManager.getWordList(tableName);
-            nodeCount = wordList.size();
-            head.setNext(wordList.get(0));
-            tail = head.getNext();
-            //Set up the intro flash cards
-            for (int i = 1; i < newWords; i++){
-                tail.setNext(wordList.get(i));
-                tail=tail.getNext();
-            }
-            //Set up 15 cards after the new ones
-            for (int i = newWords; i < wordList.size();i++){
-                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-                else{wordList.get(i).setType(1);}
-                tail.setNext(wordList.get(i));
-                tail=tail.getNext();
-            }
+            setUpQueueType0();
         }
-
         else if (dbManager.getWordsLearned(tableName) >= dbManager.getWordsMax(tableName) && dbManager.getWordsMastered(tableName) < dbManager.getWordsMax(tableName)){
-            learnedAll = true;
-            wordList = dbManager.getWordListAllLearned(tableName);
-            nodeCount = wordList.size();
-            head.setNext(wordList.get(0));
-            tail = head.getNext();
-            //Set up 20 cards to review based on score and frequency
-            for (int i = 0; i < wordList.size();i++){
-                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-                else{wordList.get(i).setType(1);}
-                tail.setNext(wordList.get(i));
-                tail=tail.getNext();
-            }
+            setUpQueueType1();
         }
-
         else {
-            learnedAll = true;
-            wordList = dbManager.getWordListAllMastered(tableName);
-            nodeCount = wordList.size();
-            head.setNext(wordList.get(0));
-            tail = head.getNext();
-            //Set up randomized review
-            for (int i = 0; i < wordList.size();i++){
-                if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-                else{wordList.get(i).setType(1);}
-                tail.setNext(wordList.get(i));
-                tail=tail.getNext();
-            }
+            setUpQueueType2();
         }
-
         tail.setNext(null);
     }
+    private void setUpQueueType0(){
+        wordList = dbManager.getWordList(tableName);
+        nodeCount = wordList.size();
+        head.setNext(wordList.get(0));
+        tail = head.getNext();
+        //Set up the intro flash cards
+        for (int i = 1; i < newWords; i++){
+            tail.setNext(wordList.get(i));
+            tail=tail.getNext();
+        }
+        //Set up 15 cards after the new ones
+        for (int i = newWords; i < wordList.size();i++){
+            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+            else{wordList.get(i).setType(1);}
+            tail.setNext(wordList.get(i));
+            tail=tail.getNext();
+        }
+    }
+    private void setUpQueueType1(){
+        learnedAll = true;
+        wordList = dbManager.getWordListAllLearned(tableName);
+        nodeCount = wordList.size();
+        head.setNext(wordList.get(0));
+        tail = head.getNext();
+        //Set up 20 cards to review based on score and frequency
+        for (int i = 0; i < wordList.size();i++){
+            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+            else{wordList.get(i).setType(1);}
+            tail.setNext(wordList.get(i));
+            tail=tail.getNext();
+        }
+    }
+    private void setUpQueueType2(){
+        learnedAll = true;
+        wordList = dbManager.getWordListAllMastered(tableName);
+        nodeCount = wordList.size();
+        head.setNext(wordList.get(0));
+        tail = head.getNext();
+        //Set up randomized review
+        for (int i = 0; i < wordList.size();i++){
+            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
+            else{wordList.get(i).setType(1);}
+            tail.setNext(wordList.get(i));
+            tail=tail.getNext();
+        }
+    }
+
+
     private void nextTest(){
         testing = true;
         System.out.println("NODE COUNT" + nodeCount);
@@ -180,81 +178,78 @@ public class LearnActivity extends AppCompatActivity {
             System.out.println(temp1.getGerman() + " " + temp1.getType() + "  score: " + temp1.getScore());
             temp1 = temp1.getNext();
         }
-
         try{
-            englishSentence.setVisibility(View.INVISIBLE);
-            germanSentence.setVisibility(View.INVISIBLE);
-            buttonHint.setVisibility(View.VISIBLE);
-            germanSentence.setText(head.getNext().getGSentence());
-            englishSentence.setText(head.getNext().getEsentence());
-            buttoniwasright.setVisibility(View.GONE);
-            xmark.setVisibility(View.INVISIBLE);
-            checkmark.setVisibility(View.INVISIBLE);
-            correctLayout.setVisibility(View.GONE);
-            buttonCheck.setText("Check");
-            topTestWord.setAlpha(0f);
-            answerWord.setAlpha(0f);
-            germanSentence.setAlpha(0f);
-            englishSentence.setAlpha(0f);
-            entryText.setAlpha(0f);
-            buttonHint.setAlpha(0f);
-            buttonCheck.setAlpha(0f);
-
-
+            setUpNextWord();
             if (head.getNext().getType()==0){
-                topTestWord.setText(head.getNext().getGerman());
-                answerWord.setText(head.getNext().getEnglish());
-                answerWord.setVisibility(View.VISIBLE);
-                entryText.setVisibility(View.INVISIBLE);
-                buttonHint.setVisibility(View.INVISIBLE);
-                germanSentence.setVisibility(View.VISIBLE);
-                englishSentence.setVisibility(View.VISIBLE);
-              //  englishSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                //topTestWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                //answerWord.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                //germanSentence.startAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-
-                delayButtonCheck();
-                fadeIn(buttonCheck,2100);
-
-                fadeIn(topTestWord,100);
-                fadeIn(answerWord,1100);
-                fadeIn(germanSentence,2100);
-                fadeIn(englishSentence,2100);
-
-
-
-                buttonCheck.setText("Next");
-                entryText.setText("");
+                setUpType0();
             }else if (head.getNext().getType()==1){
-                topTestWord.setText(head.getNext().getGerman());
-                answerWord.setVisibility(View.INVISIBLE);
-                entryText.setVisibility(View.VISIBLE);
-                buttonCheck.setText("Check");
-                entryText.setText("");
-                fadeIn(topTestWord,50);
-                fadeIn(entryText,50);
-                fadeIn(buttonHint,50);
-                fadeIn(buttonCheck,50);
-
+                setUpType1();
             }else if (head.getNext().getType()==2){
-                topTestWord.setText(head.getNext().getEnglish());
-                englishSentence.setText(head.getNext().getGSentence());
-                germanSentence.setText(head.getNext().getEsentence());
-                answerWord.setVisibility(View.INVISIBLE);
-                entryText.setVisibility(View.VISIBLE);
-                buttonCheck.setText("Check");
-                entryText.setText("");
-                fadeIn(topTestWord,50);
-                fadeIn(entryText,50);
-                fadeIn(buttonHint,50);
-                fadeIn(buttonCheck,50);
+                setUpType2();
             }
         }catch(Exception e){
             backToMainActivity();
         }
-
-
+    }
+    private void setUpNextWord(){
+        englishSentence.setVisibility(View.INVISIBLE);
+        germanSentence.setVisibility(View.INVISIBLE);
+        buttonHint.setVisibility(View.VISIBLE);
+        germanSentence.setText(head.getNext().getGSentence());
+        englishSentence.setText(head.getNext().getEsentence());
+        buttoniwasright.setVisibility(View.GONE);
+        xmark.setVisibility(View.INVISIBLE);
+        checkmark.setVisibility(View.INVISIBLE);
+        correctLayout.setVisibility(View.GONE);
+        buttonCheck.setText("Check");
+        topTestWord.setAlpha(0f);
+        answerWord.setAlpha(0f);
+        germanSentence.setAlpha(0f);
+        englishSentence.setAlpha(0f);
+        entryText.setAlpha(0f);
+        buttonHint.setAlpha(0f);
+        buttonCheck.setAlpha(0f);
+    }
+    private void setUpType0(){
+        topTestWord.setText(head.getNext().getGerman());
+        answerWord.setText(head.getNext().getEnglish());
+        answerWord.setVisibility(View.VISIBLE);
+        entryText.setVisibility(View.INVISIBLE);
+        buttonHint.setVisibility(View.INVISIBLE);
+        germanSentence.setVisibility(View.VISIBLE);
+        englishSentence.setVisibility(View.VISIBLE);
+        delayButtonCheck();
+        fadeIn(buttonCheck,2100);
+        fadeIn(topTestWord,100);
+        fadeIn(answerWord,1100);
+        fadeIn(germanSentence,2100);
+        fadeIn(englishSentence,2100);
+        buttonCheck.setText("Next");
+        entryText.setText("");
+    }
+    private void setUpType1(){
+        topTestWord.setText(head.getNext().getGerman());
+        answerWord.setVisibility(View.INVISIBLE);
+        entryText.setVisibility(View.VISIBLE);
+        buttonCheck.setText("Check");
+        entryText.setText("");
+        fadeIn(topTestWord,50);
+        fadeIn(entryText,50);
+        fadeIn(buttonHint,50);
+        fadeIn(buttonCheck,50);
+    }
+    private void setUpType2(){
+        topTestWord.setText(head.getNext().getEnglish());
+        englishSentence.setText(head.getNext().getGSentence());
+        germanSentence.setText(head.getNext().getEsentence());
+        answerWord.setVisibility(View.INVISIBLE);
+        entryText.setVisibility(View.VISIBLE);
+        buttonCheck.setText("Check");
+        entryText.setText("");
+        fadeIn(topTestWord,50);
+        fadeIn(entryText,50);
+        fadeIn(buttonHint,50);
+        fadeIn(buttonCheck,50);
     }
 
     private void delayButtonCheck(){
@@ -270,21 +265,7 @@ public class LearnActivity extends AppCompatActivity {
         }.start();
     }
 
-    private void fadeIn(View view, int time){
-        view.animate()
-                .alpha(1f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
-                .setStartDelay(time);
-    }
 
-    private void fadeOut(View view){
-        view.animate()
-                .alpha(0f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
-                .setStartDelay(0);
-    }
 
     private void nextWord(){
          updateWord(10);
@@ -333,18 +314,10 @@ public class LearnActivity extends AppCompatActivity {
         }
     }
 
-    private void showKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
-    }
-    private void hideKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(entryText.getWindowToken(), 0);
-    }
+
 
     private void test(){
         if (finishedWithAll){backToMainActivity();}
-
         else{
             //test the correctness on first button press
             if (testing) {
@@ -517,6 +490,31 @@ System.out.println("*******************");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         //intent.putExtra("flashcard",maxId);
         startActivity(intent);
+    }
+
+    private void fadeIn(View view, int time){
+        view.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null)
+                .setStartDelay(time);
+    }
+
+    //Unused useful methods
+    private void fadeOut(View view){
+        view.animate()
+                .alpha(0f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null)
+                .setStartDelay(0);
+    }
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+    }
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(entryText.getWindowToken(), 0);
     }
 
     @Override
