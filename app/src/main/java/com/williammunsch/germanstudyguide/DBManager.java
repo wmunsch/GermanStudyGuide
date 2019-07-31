@@ -170,7 +170,7 @@ public class DBManager extends SQLiteOpenHelper{
         return count;
     }
 
-    public ArrayList<String> getGermanList(String tableName){
+    public ArrayList<SimpleWord> getSimpleWordList(String tableName){
         String myPath = DB_PATH;
         vocabDatabase = SQLiteDatabase.openDatabase(myPath, null,SQLiteDatabase.OPEN_READONLY);
         Cursor mCursor = vocabDatabase.query(
@@ -182,59 +182,18 @@ public class DBManager extends SQLiteOpenHelper{
                 null,
                 "_id"
         );
-        ArrayList<String> germanList = new ArrayList<>();
+        ArrayList<SimpleWord> simpleWordList = new ArrayList<>();
         for (int i = 0; i < mCursor.getCount(); i++){
             mCursor.moveToNext();
-            germanList.add(mCursor.getString(mCursor.getColumnIndex("german")));
-
+            simpleWordList.add(new SimpleWord(mCursor.getString(mCursor.getColumnIndex("german")),
+                    mCursor.getString(mCursor.getColumnIndex("english")),
+                    mCursor.getInt(mCursor.getColumnIndex("score"))));
         }
         mCursor.close();
-        return germanList;
+        return simpleWordList;
     }
 
-    public ArrayList<String> getEnglishList(String tableName){
-        String myPath = DB_PATH;
-        vocabDatabase = SQLiteDatabase.openDatabase(myPath, null,SQLiteDatabase.OPEN_READONLY);
-        Cursor mCursor = vocabDatabase.query(
-                tableName,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "_id"
-        );
-        ArrayList<String> englishList = new ArrayList<>();
-        for (int i = 0; i < mCursor.getCount(); i++){
-            mCursor.moveToNext();
-            englishList.add(mCursor.getString(mCursor.getColumnIndex("english")));
 
-        }
-        mCursor.close();
-        return englishList;
-    }
-
-    public ArrayList<Integer> getScoreList(String tableName){
-        String myPath = DB_PATH;
-        vocabDatabase = SQLiteDatabase.openDatabase(myPath, null,SQLiteDatabase.OPEN_READONLY);
-        Cursor mCursor = vocabDatabase.query(
-                tableName,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "_id"
-        );
-        ArrayList<Integer> getScoreList = new ArrayList<>();
-        for (int i = 0; i < mCursor.getCount(); i++){
-            mCursor.moveToNext();
-            getScoreList.add(mCursor.getInt(mCursor.getColumnIndex("score")));
-
-        }
-        mCursor.close();
-        return getScoreList;
-    }
 
     public ArrayList<Word> getWordList(String tableName){
         vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);

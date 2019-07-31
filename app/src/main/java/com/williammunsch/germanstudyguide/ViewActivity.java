@@ -6,12 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.SearchView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -19,7 +17,8 @@ public class ViewActivity extends AppCompatActivity {
     private ArrayList<String> germWordList = new ArrayList<>();
     private ArrayList<String> engWordList = new ArrayList<>();
     private ArrayList<Integer> scoreList = new ArrayList<>();
-    RecyclerView2Adapter adapter2;
+    private ArrayList<SimpleWord> wordList = new ArrayList<>();
+    RecyclerViewFilterAdapter adapter3;
     DBManager dbManager;
 
 
@@ -48,16 +47,19 @@ public class ViewActivity extends AppCompatActivity {
 
         System.out.println("tableNAme string = " +tableName);
 
-        germWordList = dbManager.getGermanList(tableName);
-        engWordList = dbManager.getEnglishList(tableName);
-        scoreList = dbManager.getScoreList(tableName);
+        wordList = dbManager.getSimpleWordList(tableName);
+
+        //germWordList = dbManager.getGermanList(tableName);
+        //engWordList = dbManager.getEnglishList(tableName);
+        //scoreList = dbManager.getScoreList(tableName);
 
         //TextView tv = findViewById(R.id.tableNameLabel);
        // tv.setText(tableName + " Word List");
 
         RecyclerView recyclerView2 = findViewById(R.id.recycler_list);
-        adapter2 = new RecyclerView2Adapter(this, germWordList, engWordList, scoreList);
-        recyclerView2.setAdapter(adapter2);
+        //adapter2 = new RecyclerViewFilterAdapter(this, germWordList, engWordList, scoreList);
+        adapter3 = new RecyclerViewFilterAdapter(wordList);
+        recyclerView2.setAdapter(adapter3);
         recyclerView2.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -75,7 +77,7 @@ public class ViewActivity extends AppCompatActivity {
             }
             @Override
             public boolean onQueryTextChange(String newText){
-                adapter2.getFilter().filter(newText);
+                adapter3.getFilter().filter(newText);
                 return true;
             }
         });
