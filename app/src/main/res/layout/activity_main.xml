@@ -80,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="35sp"
                     android:background="@drawable/button_selector"
-                    android:text="Study All"
+                    android:text="Review All"
                     android:textAllCaps="false"
                     android:textColor="#ffffff"
                     android:textSize="20sp" />
