@@ -29,7 +29,8 @@
             android:layout_height="22dp"
             android:layout_marginStart="10dp"
             android:text="die Katze"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#242424"/>
 
         <TextView
             android:id="@+id/tvenglish"
@@ -37,7 +38,8 @@
             android:layout_height="22dp"
             android:layout_marginStart="0dp"
             android:text="cat"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#242424"/>
 
         <TextView
             android:id="@+id/tvscore"
@@ -47,7 +49,8 @@
             android:layout_marginStart="0dp"
             android:gravity="end"
             android:text="77"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#242424"/>
 
 
     </LinearLayout>

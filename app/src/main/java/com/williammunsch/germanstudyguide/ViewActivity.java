@@ -3,6 +3,7 @@ package com.williammunsch.germanstudyguide;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -31,7 +32,14 @@ public class ViewActivity extends AppCompatActivity {
         String tableName =bIntent.getStringExtra("table");
         Toolbar myToolbar = findViewById(R.id.toolbar_search);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setTitle(tableName+" Word List");
+
+        try {
+            getSupportActionBar().setTitle(tableName+" Word List");
+        }catch(NullPointerException e){
+            throw new Error("Null icon");
+        }
+
+
 
 
 
@@ -61,6 +69,7 @@ public class ViewActivity extends AppCompatActivity {
         adapter3 = new RecyclerViewFilterAdapter(wordList);
         recyclerView2.setAdapter(adapter3);
         recyclerView2.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView2.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 
 
