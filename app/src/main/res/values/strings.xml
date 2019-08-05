@@ -3,4 +3,6 @@
     <string name="title_home">Vocabulary</string>
     <string name="title_dashboard">Stories</string>
     <string name="title_notifications">Settings</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

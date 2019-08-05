@@ -2,15 +2,15 @@ package com.williammunsch.germanstudyguide;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.williammunsch.germanstudyguide.ui.SectionsPagerAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,22 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> mWordsMastered = new ArrayList<>();
     DBManager dbManager;
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    return true;
-                case R.id.navigation_dashboard:
-                    return true;
-                case R.id.navigation_notifications:
-                    return true;
-            }
-            return false;
-        }
-    };
+    ViewPager viewPager;
+    BottomNavigationView navView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +46,57 @@ public class MainActivity extends AppCompatActivity {
             throw new Error("Null icon");
         }
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView = findViewById(R.id.nav_view);
+
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setAdapter(sectionsPagerAdapter);
+
+
+
+        BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+                = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        viewPager.setCurrentItem(0);
+                        return true;
+                    case R.id.navigation_dashboard:
+                        viewPager.setCurrentItem(1);
+                        return true;
+                    case R.id.navigation_notifications:
+                        viewPager.setCurrentItem(2);
+                        return true;
+                }
+                return false;
+            }
+        };
+
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                navView.getMenu().getItem(i).setChecked(true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+
+
         Log.d(TAG, "onCreate: started.");
         dbManager = new DBManager(this);
 
@@ -133,9 +168,9 @@ public class MainActivity extends AppCompatActivity {
         mProgressMasteredPercents.add(0);
         mProgressMasteredPercents.add(0);
 
-        initRecyclerView();
+        //initRecyclerView();
     }
-
+/*
     private void initRecyclerView(){
         Log.d(TAG,"initRecyclerView: init recyclerview");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
@@ -145,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
     }
-
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.main_menu,menu);
