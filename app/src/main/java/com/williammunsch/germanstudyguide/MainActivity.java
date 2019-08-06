@@ -6,27 +6,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.williammunsch.germanstudyguide.ui.SectionsPagerAdapter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
-
-    //variables
-    private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<Integer> mProgressLearnedPercents = new ArrayList<>();
-    private ArrayList<Integer> mProgressMasteredPercents = new ArrayList<>();
-    private ArrayList<Integer> mWordsLearned= new ArrayList<>();
-    private ArrayList<Integer> mWordsMax = new ArrayList<>();
-    private ArrayList<String> mImages = new ArrayList<>();
-    private ArrayList<Integer> mWordsMastered = new ArrayList<>();
     DBManager dbManager;
 
     ViewPager viewPager;
@@ -97,9 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        Log.d(TAG, "onCreate: started.");
-        dbManager = new DBManager(this);
+       // Log.d(TAG, "onCreate: started.");
+        //dbManager = new DBManager(this);
 
+
+        /*
         //tests to see if DB was copied (only happens once per install)
         try {
             System.out.println("creating database");
@@ -108,79 +96,10 @@ public class MainActivity extends AppCompatActivity {
             throw new Error("Unable to create database");
         }
 
-
-        initRecyclerViewData();
-    }
-
-    private void initRecyclerViewData(){
-        mImages.add("A1");
-        mImages.add("A2");
-        mImages.add("B1");
-        mImages.add("B2");
-        mImages.add("C1");
-        mImages.add("C2");
-
-        mNames.add("Beginner Level 1");
-        mNames.add("Beginner Level 2");
-        mNames.add("Intermediate Level 1");
-        mNames.add("Intermediate Level 2");
-        mNames.add("Advanced Level 1");
-        mNames.add("Advanced Level 2");
-
-        //SQL Query
-        int a1Max = dbManager.getWordsMax("A1");
-        int a1Learned = dbManager.getWordsLearned("A1");
-        int a1Mastered = dbManager.getWordsMastered("A1");
-
-        //Filling data with SQL Query
-        mWordsLearned.add(a1Learned);
-        mWordsLearned.add(0);
-        mWordsLearned.add(0);
-        mWordsLearned.add(0);
-        mWordsLearned.add(0);
-        mWordsLearned.add(0);
-
-        mWordsMax.add(a1Max);
-        mWordsMax.add(0);
-        mWordsMax.add(0);
-        mWordsMax.add(0);
-        mWordsMax.add(0);
-        mWordsMax.add(0);
-
-        mWordsMastered.add(a1Mastered);
-        mWordsMastered.add(0);
-        mWordsMastered.add(0);
-        mWordsMastered.add(0);
-        mWordsMastered.add(0);
-        mWordsMastered.add(0);
-
-        mProgressLearnedPercents.add((int)(((double)a1Learned/a1Max)*100));
-        mProgressLearnedPercents.add(0);
-        mProgressLearnedPercents.add(0);
-        mProgressLearnedPercents.add(0);
-        mProgressLearnedPercents.add(0);
-        mProgressLearnedPercents.add(0);
-
-        mProgressMasteredPercents.add((int)(((double)a1Mastered/a1Max)*100));
-        mProgressMasteredPercents.add(0);
-        mProgressMasteredPercents.add(0);
-        mProgressMasteredPercents.add(0);
-        mProgressMasteredPercents.add(0);
-        mProgressMasteredPercents.add(0);
-
-        //initRecyclerView();
-    }
-/*
-    private void initRecyclerView(){
-        Log.d(TAG,"initRecyclerView: init recyclerview");
-        RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(mNames, mProgressLearnedPercents, mProgressMasteredPercents, mWordsLearned, mWordsMastered, mWordsMax, mImages,this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-    }
 */
+       // initRecyclerViewData();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.main_menu,menu);
@@ -194,6 +113,17 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
 

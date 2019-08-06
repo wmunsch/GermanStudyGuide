@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.SearchView;
 
+import com.williammunsch.germanstudyguide.adapters.RecyclerViewFilterAdapter;
+
 import java.util.ArrayList;
 
 public class ViewActivity extends AppCompatActivity {
@@ -27,7 +29,7 @@ public class ViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-        dbManager = new DBManager(this);
+        //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         String tableName =bIntent.getStringExtra("table");
         Toolbar myToolbar = findViewById(R.id.toolbar_search);

@@ -1,47 +1,37 @@
-package com.williammunsch.germanstudyguide;
+package com.williammunsch.germanstudyguide.adapters;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.williammunsch.germanstudyguide.DBManager;
+import com.williammunsch.germanstudyguide.FlashcardActivity;
+import com.williammunsch.germanstudyguide.R;
+import com.williammunsch.germanstudyguide.ViewActivity;
+import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
-    private static final String TAG = "RecyclerViewAdapter";
-    DBManager dbManager;
-
-    private ArrayList<String> mListNames;
+    private List<VocabListItem> mVocabList;
     private Context mContext;
-    private ArrayList<Integer> progressLearnedPercentage;
-    private ArrayList<Integer> progressMasteredPercentage, wordsLearned, wordsMax, wordsMastered;
-    private RecyclerView a1List;
-    private ArrayList<String> mImages = new ArrayList<>();
 
-    public RecyclerViewAdapter(ArrayList<String> mNames, ArrayList<Integer> mProgressLearnedPercents, ArrayList<Integer> mProgressMasteredPercents, ArrayList<Integer> wordsLearned, ArrayList<Integer> wordsMastered, ArrayList<Integer> wordsMax, ArrayList<String> mImages, Context mContext) {
-        dbManager = new DBManager(mContext);
-        this.mListNames = mNames;
-        this.progressLearnedPercentage = mProgressLearnedPercents;
-        this.progressMasteredPercentage = mProgressMasteredPercents;
+    public RecyclerViewAdapter(Context mContext, List<VocabListItem> mVocabList){
+        this.mVocabList = mVocabList;
         this.mContext = mContext;
-        this.wordsLearned = wordsLearned;
-        this.wordsMax = wordsMax;
-        this.mImages = mImages;
-        this.wordsMastered = wordsMastered;
     }
+
 
     @NonNull
     @Override
@@ -54,15 +44,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, final int i) {
-        Log.d(TAG, "onBindViewHolder: called.");
+        viewHolder.listItemName.setText(mVocabList.get(i).getName());
+        viewHolder.image.setText(mVocabList.get(i).getImage());
+        viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
+        viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
 
-        viewHolder.listItemName.setText(mListNames.get(i));
-        viewHolder.image.setText(mImages.get(i));
-        viewHolder.progressBar.setSecondaryProgress(progressLearnedPercentage.get(i));
-        viewHolder.progressBar.setProgress(progressMasteredPercentage.get(i));
-
-        if ((int)progressLearnedPercentage.get(i)==100){viewHolder.wordsLearned.setText("Words mastered : " + wordsMastered.get(i) + "/" + wordsMax.get(i));}
-        else{ viewHolder.wordsLearned.setText("Words learned : " + wordsLearned.get(i) + "/" + wordsMax.get(i)); }
+        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + mVocabList.get(i).getWordsMax());}
+        else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + mVocabList.get(i).getWordsMax()); }
 
         if (i==0 || i ==1){
             viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle,null));
@@ -72,8 +60,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ccircle,null));
         }
 
-        if ((int)progressLearnedPercentage.get(i)==100){viewHolder.learnButton.setText("Study");}
-        if ((int)progressMasteredPercentage.get(i)==100){viewHolder.learnButton.setText("Review");}
+        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.learnButton.setText("Study");}
+        if ((int)mVocabList.get(i).getMasteredPercent()==100){viewHolder.learnButton.setText("Review");}
 
 
         viewHolder.viewButton.setOnClickListener(new View.OnClickListener(){
@@ -81,11 +69,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             public void onClick(View view) {
                 System.out.println("Clicked on viewbutton");
 
-                if (i==0){
+                if (viewHolder.getAdapterPosition()==0){
                     Intent intent = new Intent(mContext, ViewActivity.class);
                     intent.putExtra("table", "A1");
                     mContext.startActivity(intent);
-                }else if (i==1){
+                }else if (viewHolder.getAdapterPosition()==1){
                     Intent intent = new Intent(mContext, ViewActivity.class);
                     intent.putExtra("table", "A2");
                     mContext.startActivity(intent);
@@ -102,12 +90,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
 
-                if (i==0){
-                    Intent intent = new Intent(mContext, LearnActivity.class);
+                if (viewHolder.getAdapterPosition()==0){
+                    Intent intent = new Intent(mContext, FlashcardActivity.class);
                     intent.putExtra("table", "A1");
                     mContext.startActivity(intent);
-                }else if (i==1){
-                    Intent intent = new Intent(mContext, LearnActivity.class);
+                }else if (viewHolder.getAdapterPosition()==1){
+                    Intent intent = new Intent(mContext, FlashcardActivity.class);
                     intent.putExtra("table", "A2");
                     mContext.startActivity(intent);
                 }
@@ -119,7 +107,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
             public void onClick(View view){
-                      Log.d(TAG, "onClick: clicked on: " + mListNames.get(i));
                       if (!viewHolder.isExpanded){
                           viewHolder.parentLayout.setMinimumHeight(500);
                           viewHolder.buttonLayout.setVisibility(View.VISIBLE);
@@ -134,7 +121,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return mListNames.size();
+        return mVocabList.size();
     }
 
 
@@ -144,12 +131,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public class ViewHolder extends RecyclerView.ViewHolder{
 
 
-        TextView listItemName, wordsLearned, image;
-        ProgressBar progressBar;
-        RelativeLayout parentLayout;
+        private TextView listItemName, wordsLearned, image;
+        private ProgressBar progressBar;
+        private RelativeLayout parentLayout;
         boolean isExpanded = false;
-        LinearLayout buttonLayout;
-        Button viewButton, learnButton;
+        private LinearLayout buttonLayout;
+        private Button viewButton, learnButton;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             image = itemView.findViewById(R.id.imageView);

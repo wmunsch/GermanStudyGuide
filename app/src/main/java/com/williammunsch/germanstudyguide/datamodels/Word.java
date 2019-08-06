@@ -1,4 +1,8 @@
-package com.williammunsch.germanstudyguide;
+package com.williammunsch.germanstudyguide.datamodels;
+
+/**
+ * Data model for the words used in the flashcard activity.
+ */
 
 public class Word {
     private int score, id, freq, type, studying; //type determines what type of activity. 0=show english, 1=test german->english, 2=test english->german

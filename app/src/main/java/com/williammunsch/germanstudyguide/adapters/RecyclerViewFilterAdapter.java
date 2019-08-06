@@ -1,6 +1,5 @@
-package com.williammunsch.germanstudyguide;
+package com.williammunsch.germanstudyguide.adapters;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+
+import com.williammunsch.germanstudyguide.R;
+import com.williammunsch.germanstudyguide.SimpleWord;
 
 import java.util.ArrayList;
 

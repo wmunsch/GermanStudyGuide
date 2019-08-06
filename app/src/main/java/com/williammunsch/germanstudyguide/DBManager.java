@@ -4,10 +4,10 @@ package com.williammunsch.germanstudyguide;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.williammunsch.germanstudyguide.datamodels.Word;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +19,15 @@ import java.util.Random;
 
 
 public class DBManager extends SQLiteOpenHelper{
+
+    private static DBManager sInstance;
+
+    public static synchronized DBManager getInstance(Context context) {
+        if (sInstance == null){
+            sInstance = new DBManager(context.getApplicationContext());
+        }
+        return sInstance;
+    }
 
     //Store the db on github and dl from thre instead of from the assets folder?
 
@@ -38,7 +47,7 @@ public class DBManager extends SQLiteOpenHelper{
      * Takes and keeps a reference of the passed context in order to access to the application assets and resources.
      * @param context
      */
-    public DBManager(Context context){
+    private DBManager(Context context){
         super(context, DB_NAME, null, 1);
         this.myContext = context;
          DB_PATH = myContext.getDatabasePath(DB_NAME).getPath();

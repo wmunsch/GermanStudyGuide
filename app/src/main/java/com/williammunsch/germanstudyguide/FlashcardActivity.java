@@ -18,10 +18,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.williammunsch.germanstudyguide.datamodels.Word;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class LearnActivity extends AppCompatActivity {
+public class FlashcardActivity extends AppCompatActivity {
 
     private TextView answerWord, topTestWord, englishSentence, germanSentence, correctAnswer;
     private EditText entryText;
@@ -43,7 +45,7 @@ public class LearnActivity extends AppCompatActivity {
         setContentView(R.layout.activity_learn);
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
-        dbManager = new DBManager(this);
+        //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         bindViews();
