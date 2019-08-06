@@ -29,8 +29,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // Return a VocabFragment (defined as a static inner class below).
         if (position==0){
             return VocabFragment.newInstance(position + 1);
-        }else{
+        }else if (position==1){
             return StoriesFragment.newInstance(position + 1);
+        }else{
+            return OptionsFragment.newInstance(position + 1);
         }
 
     }
