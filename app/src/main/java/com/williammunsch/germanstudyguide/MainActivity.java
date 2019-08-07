@@ -11,6 +11,8 @@ import android.view.MenuItem;
 
 import com.williammunsch.germanstudyguide.ui.SectionsPagerAdapter;
 
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     DBManager dbManager;
@@ -81,13 +83,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
+        dbManager = DBManager.getInstance(this);
 
        // Log.d(TAG, "onCreate: started.");
-        //dbManager = new DBManager(this);
 
 
-        /*
+
+
+
+
         //tests to see if DB was copied (only happens once per install)
         try {
             System.out.println("creating database");
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             throw new Error("Unable to create database");
         }
 
-*/
+
        // initRecyclerViewData();
     }
 

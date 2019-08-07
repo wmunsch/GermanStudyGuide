@@ -8,26 +8,25 @@ import android.graphics.drawable.Drawable;
 /**
  * Data model for each story in the recyclerView.
  */
+@Entity(tableName = "story")
+public class Story {
 
-public class StoriesListItem {
+    @PrimaryKey() //false by default
+    @ColumnInfo(name="_id")
     private int id;
+    @ColumnInfo(name="title")
     private String title;
+    @ColumnInfo(name="author")
     private String author;
-    private Drawable icon;
+    @ColumnInfo(name="content")
     private String content;
+    //private Drawable icon;
 
-    public StoriesListItem(int id, String nTitle, String nAuthor, String content){//, Drawable nIcon){
-        this.title = nTitle;
-        this.author = nAuthor;
+    public Story(int id, String title, String author, String content){//, Drawable nIcon){
+        this.title = title;
+        this.author = author;
         this.content = content;
-        this.id = id;
-        this.icon = null;
         //this.icon = nIcon;
-    }
-
-    public StoriesListItem(String nTitle, String nAuthor){//, Drawable nIcon){
-        this.title = nTitle;
-        this.author = nAuthor;
     }
 
     public String getTitle() {
@@ -46,21 +45,12 @@ public class StoriesListItem {
         this.author = author;
     }
 
-    public Drawable getIcon() {
-        return icon;
-    }
+    // public Drawable getIcon() {
+    // return icon;
+    // }
 
     public void setIcon(Drawable icon) {
-        this.icon = icon;
-    }
-
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+        //this.icon = icon;
     }
     public int getId() {
         return id;
@@ -70,4 +60,11 @@ public class StoriesListItem {
         this.id = id;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

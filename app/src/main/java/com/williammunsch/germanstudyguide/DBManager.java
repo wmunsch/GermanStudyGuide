@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.williammunsch.germanstudyguide.datamodels.SimpleWord;
+import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
 import com.williammunsch.germanstudyguide.datamodels.Word;
 
 import java.io.File;
@@ -109,6 +111,32 @@ public class DBManager extends SQLiteOpenHelper{
         myOutput.close();
         is.close();
     }
+
+   public ArrayList<StoriesListItem> getStories(){
+       vocabDatabase = SQLiteDatabase.openDatabase(DB_PATH,null,SQLiteDatabase.OPEN_READONLY);
+       Cursor mCursor = vocabDatabase.query(
+               "Story",             // The table to query
+               null,             // The array of columns to return (pass null to get all)
+               null,              // The columns for the WHERE clause
+               null,          // The values for the WHERE clause
+               null,                   // don't group the rows
+               null,                   // don't filter by row groups
+               "_id"               // The sort order
+       );
+       //mCursor.moveToFirst();
+       ArrayList<StoriesListItem> storyList = new ArrayList<>();
+       for (int i = 0; i < mCursor.getCount(); i++){
+           mCursor.moveToNext();
+           storyList.add(new StoriesListItem(mCursor.getInt(mCursor.getColumnIndex("_id")),
+                   mCursor.getString(mCursor.getColumnIndex("title")),
+                   mCursor.getString(mCursor.getColumnIndex("author")),
+                   mCursor.getString(mCursor.getColumnIndex("content"))));
+       }
+       mCursor.close();
+       return storyList;
+   }
+
+
 
 
 

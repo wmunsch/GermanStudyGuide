@@ -1,4 +1,4 @@
-package com.williammunsch.germanstudyguide;
+package com.williammunsch.germanstudyguide.datamodels;
 
 public class SimpleWord {
     private String german,english;

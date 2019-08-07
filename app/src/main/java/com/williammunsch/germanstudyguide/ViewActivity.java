@@ -1,7 +1,10 @@
 package com.williammunsch.germanstudyguide;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,25 +14,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v7.widget.SearchView;
-
 import com.williammunsch.germanstudyguide.adapters.RecyclerViewFilterAdapter;
-
-import java.util.ArrayList;
+import com.williammunsch.germanstudyguide.datamodels.SimpleWord;
+import com.williammunsch.germanstudyguide.viewmodels.ViewAllViewModel;
+import java.util.List;
 
 public class ViewActivity extends AppCompatActivity {
-    private ArrayList<String> germWordList = new ArrayList<>();
-    private ArrayList<String> engWordList = new ArrayList<>();
-    private ArrayList<Integer> scoreList = new ArrayList<>();
-    private ArrayList<SimpleWord> wordList = new ArrayList<>();
     RecyclerViewFilterAdapter adapter3;
-    DBManager dbManager;
+    private ViewAllViewModel viewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-        //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         String tableName =bIntent.getStringExtra("table");
         Toolbar myToolbar = findViewById(R.id.toolbar_search);
@@ -41,13 +39,6 @@ public class ViewActivity extends AppCompatActivity {
             throw new Error("Null icon");
         }
 
-
-
-
-
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-       // getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         myToolbar.setNavigationOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -55,20 +46,18 @@ public class ViewActivity extends AppCompatActivity {
             }
         });
 
-        System.out.println("tableNAme string = " +tableName);
+        viewModel = ViewModelProviders.of(this).get(ViewAllViewModel.class);
+        viewModel.init();//retrieve data from repository
 
-        wordList = dbManager.getSimpleWordList(tableName);
-
-        //germWordList = dbManager.getGermanList(tableName);
-        //engWordList = dbManager.getEnglishList(tableName);
-        //scoreList = dbManager.getScoreList(tableName);
-
-        //TextView tv = findViewById(R.id.tableNameLabel);
-       // tv.setText(tableName + " Word List");
+        viewModel.getSimpleWordListItems().observe(this, new Observer<List<SimpleWord>>() {
+            @Override
+            public void onChanged(@Nullable List<SimpleWord> wordList) {
+               adapter3.notifyDataSetChanged();
+            }
+        });
 
         RecyclerView recyclerView2 = findViewById(R.id.recycler_list);
-        //adapter2 = new RecyclerViewFilterAdapter(this, germWordList, engWordList, scoreList);
-        adapter3 = new RecyclerViewFilterAdapter(wordList);
+        adapter3 = new RecyclerViewFilterAdapter(viewModel.getSimpleWordListItems().getValue());
         recyclerView2.setAdapter(adapter3);
         recyclerView2.setLayoutManager(new LinearLayoutManager(this));
         recyclerView2.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));

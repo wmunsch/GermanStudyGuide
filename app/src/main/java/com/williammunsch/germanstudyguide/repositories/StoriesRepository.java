@@ -1,22 +1,24 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 import android.arch.lifecycle.MutableLiveData;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.support.v4.content.res.ResourcesCompat;
 
+import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
+import com.williammunsch.germanstudyguide.room.GermanDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.Module;
+
+
 public class StoriesRepository {
     private static StoriesRepository instance;
     private ArrayList<StoriesListItem> dataSet = new ArrayList<>();
-
 
     public static StoriesRepository getInstance(){
         if (instance ==null){
@@ -26,23 +28,28 @@ public class StoriesRepository {
     }
 
     //Get data from a web service or online source
-    public MutableLiveData<List<StoriesListItem>> getStoriesListItems(){
-        setStoriesListItems();
+    public MutableLiveData<List<StoriesListItem>> getStoriesListItems(Context context){
+        setStoriesListItems(context);
         MutableLiveData<List<StoriesListItem>> data = new MutableLiveData<>();
         data.setValue(dataSet);
         return data;
     }
 
-    private void setStoriesListItems(){
+    private void setStoriesListItems(Context context){
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
-        //dbManager = DBManager.getInstance();
 
-        //Resources res = getResources();
-        //Drawable drawable = res.getDrawable(R.drawable.ic_frog);
+        DBManager db = DBManager.getInstance(context);
+        dataSet = db.getStories();
 
-        //Need to add the image here as well
-        dataSet.add(new StoriesListItem("Der Froschkönig oder der eiserne Heinrich","Brüder Grimm"));//, drawable));
-        dataSet.add(new StoriesListItem("Hänsel und Gretel","Brüder Grimm"));//,ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_frog,null));));//, drawable));
+        for (int i = 0; i < dataSet.size(); i++){
+            if (dataSet.get(i).getId()==1){
+                dataSet.get(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_frog,null));
+            }else if (dataSet.get(i).getId()==2){
+                dataSet.get(i).setIcon(ResourcesCompat.getDrawable(context.getResources(), R.drawable.ic_hansel,null));
+            }
+        }
+
+
     }
 }

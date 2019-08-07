@@ -40,13 +40,14 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
     public void onBindViewHolder(@NonNull final StoriesRecyclerViewAdapter.ViewHolder viewHolder, final int i) {
         viewHolder.titleTextView.setText(mStoriesList.get(i).getTitle());
         viewHolder.authorTextView.setText(mStoriesList.get(i).getAuthor());
-        //viewHolder.image.setText(mVocabList.get(i).getImage());
+        viewHolder.icon.setBackground(mStoriesList.get(i).getIcon());//ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_frog,null));//mStoriesList.get(i).getIcon());
+        /*
         if (i==0){
             viewHolder.icon.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_frog,null));//setImageDrawable(mContext.getDrawable(R.drawable.ic_frog));
         }else if (i==1){
             viewHolder.icon.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_hansel,null));
         }
-
+*/
     }
 
     @Override
@@ -59,8 +60,6 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
      * Holds each widget in memory for it to be recycled.
      */
     public class ViewHolder extends RecyclerView.ViewHolder{
-
-
         private TextView titleTextView, authorTextView;
         private ImageView icon;
         public ViewHolder(@NonNull View itemView) {

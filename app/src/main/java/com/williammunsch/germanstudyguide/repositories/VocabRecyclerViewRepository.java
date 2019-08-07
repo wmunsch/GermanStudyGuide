@@ -1,6 +1,7 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 
 import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
@@ -17,7 +18,6 @@ public class VocabRecyclerViewRepository {
 
     private static VocabRecyclerViewRepository instance;
     private ArrayList<VocabListItem> dataSet = new ArrayList<>();
-    //private DBManager dbManager;
 
     public static VocabRecyclerViewRepository getInstance(){
         if (instance ==null){
@@ -28,32 +28,27 @@ public class VocabRecyclerViewRepository {
 
 
     //Get data from a web service or online source
-    public MutableLiveData<List<VocabListItem>> getVocabListItems(){
-        setVocabListItems();
+    public MutableLiveData<List<VocabListItem>> getVocabListItems(Context context){
+        setVocabListItems(context);
         MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
         data.setValue(dataSet);
         return data;
     }
 
-    private void setVocabListItems(){
+    private void setVocabListItems(Context context){
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
-        //dbManager = DBManager.getInstance();
+        DBManager db = DBManager.getInstance(context);
 
-        /*
 
-       //SQL Query
-        int a1Max = dbManager.getWordsMax("A1");
-        int a1Learned = dbManager.getWordsLearned("A1");
-        int a1Mastered = dbManager.getWordsMastered("A1");
-         */
-
-        dataSet.add(new VocabListItem("Beginner Level 1","A1",500,700,100));
-        dataSet.add(new VocabListItem("Beginner Level 2","A2",500,700,100));
-        dataSet.add(new VocabListItem("Intermediate Level 1","B1",500,1400,100));
-        dataSet.add(new VocabListItem("Intermediate Level 2","B2",0,1400,0));
-        dataSet.add(new VocabListItem("Advanced Level 1","C1",0,2000,0));
-        dataSet.add(new VocabListItem("Advanced Level 2","C2",0,2000,0));
+        dataSet.add(new VocabListItem("Beginner Level 1","A1",db.getWordsLearned("A1"),db.getWordsMax("A1"),db.getWordsMastered("A1")));
+        //dataSet.add(new VocabListItem("Beginner Level 2","A2",db.getWordsLearned("A2"),db.getWordsMax("A2"),db.getWordsMastered("A2")));
+        //dataSet.add(new VocabListItem("Intermediate Level 1","B1",db.getWordsLearned("B1"),db.getWordsMax("B1"),db.getWordsMastered("B1")));
+        dataSet.add(new VocabListItem("Beginner Level 2","A2",0,0,0));
+        dataSet.add(new VocabListItem("Intermediate Level 1","B1",0,0,0));
+        dataSet.add(new VocabListItem("Intermediate Level 2","B2",0,0,0));
+        dataSet.add(new VocabListItem("Advanced Level 1","C1",0,0,0));
+        dataSet.add(new VocabListItem("Advanced Level 2","C2",0,0,0));
     }
 }
 

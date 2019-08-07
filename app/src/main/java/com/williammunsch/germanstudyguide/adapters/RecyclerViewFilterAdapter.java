@@ -10,9 +10,10 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.williammunsch.germanstudyguide.R;
-import com.williammunsch.germanstudyguide.SimpleWord;
+import com.williammunsch.germanstudyguide.datamodels.SimpleWord;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * RecyclerView adapter with filtering capabilities,
@@ -20,9 +21,9 @@ import java.util.ArrayList;
  */
 
 public class RecyclerViewFilterAdapter extends RecyclerView.Adapter<RecyclerViewFilterAdapter.ViewHolder> implements Filterable {
-    public ArrayList<SimpleWord> wordList, filteredList;
+    public List<SimpleWord> wordList, filteredList;
 
-    public RecyclerViewFilterAdapter(ArrayList<SimpleWord> simpleList) {
+    public RecyclerViewFilterAdapter(List<SimpleWord> simpleList) {
         this.wordList=simpleList;
         this.filteredList=this.wordList;
         getFilter();
