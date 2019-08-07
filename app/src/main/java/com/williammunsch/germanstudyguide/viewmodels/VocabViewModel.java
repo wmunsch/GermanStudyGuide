@@ -22,7 +22,8 @@ public class VocabViewModel extends ViewModel {
         if (mVocabListItems != null){
             return;
         }
-        mRepo = VocabRecyclerViewRepository.getInstance(); //Storing all data in the repository in this viewModel
+        //Storing all data in the repository in this viewModel
+        mRepo = VocabRecyclerViewRepository.getInstance();
         mVocabListItems = mRepo.getVocabListItems();
     }
 

@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -103,6 +105,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
 
 
+        final Animation slideDown = AnimationUtils.loadAnimation(mContext,R.anim.slide_down);
         //On click, expand the layout by increase vertical size and showing buttons
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
@@ -110,6 +113,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                       if (!viewHolder.isExpanded){
                           viewHolder.parentLayout.setMinimumHeight(500);
                           viewHolder.buttonLayout.setVisibility(View.VISIBLE);
+                          viewHolder.buttonLayout.startAnimation(slideDown);
                           viewHolder.isExpanded=true;}
                       else{
                           viewHolder.parentLayout.setMinimumHeight(100);
