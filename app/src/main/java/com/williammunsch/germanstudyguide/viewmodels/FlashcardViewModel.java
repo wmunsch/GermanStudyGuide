@@ -11,7 +11,7 @@ import com.williammunsch.germanstudyguide.repositories.WordRepository;
 import java.util.List;
 
 public class FlashcardViewModel extends AndroidViewModel {
-    private MutableLiveData<List<Word>> wordList;
+    private MutableLiveData<List<Word>> wordList; //shouldnt be takign a list of Word objects, but rather the queue.
     private WordRepository mRepo;
 
     public FlashcardViewModel(@NonNull Application application) {

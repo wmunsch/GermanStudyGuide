@@ -2,11 +2,7 @@ package com.williammunsch.germanstudyguide.repositories;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.support.v4.content.res.ResourcesCompat;
-
 import com.williammunsch.germanstudyguide.DBManager;
-import com.williammunsch.germanstudyguide.R;
-import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
 import com.williammunsch.germanstudyguide.datamodels.Word;
 
 import java.util.ArrayList;
