@@ -1,6 +1,6 @@
 package com.williammunsch.germanstudyguide.repositories;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.datamodels.Word;

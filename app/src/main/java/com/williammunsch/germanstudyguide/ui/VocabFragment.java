@@ -1,24 +1,32 @@
 package com.williammunsch.germanstudyguide.ui;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.williammunsch.germanstudyguide.DBManager;
+import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.adapters.RecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
+import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.di.AppComponent;
+import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
 import com.williammunsch.germanstudyguide.viewmodels.VocabViewModel;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Fragment for the vocabulary recyclerView which is the first page.
@@ -29,8 +37,9 @@ public class VocabFragment extends Fragment {
 
     private VocabViewModel mVocabViewModel;
     private RecyclerViewAdapter mAdapter;
+    @Inject
+    ViewModelFactory viewModelFactory;
 
-    DBManager dbManager;
 
 
     public static VocabFragment newInstance(int index) {
@@ -41,20 +50,42 @@ public class VocabFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        ((GermanApp) context.getApplicationContext()).getAppComponent().inject(this);
+        super.onAttach(context);
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initializing the view model
-        mVocabViewModel = ViewModelProviders.of(this).get(VocabViewModel.class);
-        mVocabViewModel.init();//retrieve data from repository
+       // mVocabViewModel = ViewModelProviders.of(this).get(VocabViewModel.class);
+        //mVocabViewModel.init();//retrieve data from repository
 
-        mVocabViewModel.getVocabListItems().observe(this, new Observer<List<VocabListItem>>() {
+        //AppComponent component = ((GermanApp)getApplicationContext()).getAppComponent();
+        //component.inject(getContext());
+
+        mVocabViewModel = ViewModelProviders.of(this,viewModelFactory).get(VocabViewModel.class);
+
+
+
+        mVocabViewModel.getAllVocab().observe(this, new Observer<List<VocabModel>>(){
+
             @Override
-            public void onChanged(@Nullable List<VocabListItem> vocabListItems) {
+            public void onChanged(List<VocabModel> vocabModels) {
+                StringBuilder b = new StringBuilder();
+                String all = "";
+                for (int i = 0; i < vocabModels.size(); i++){
+                    b.append(vocabModels.get(i).toString() + " \n");
+                }
+                all=b.toString();
+                //mDataText.setText(all);
                 mAdapter.notifyDataSetChanged();
             }
         });
+
     }
 
 

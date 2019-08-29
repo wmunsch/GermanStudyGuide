@@ -2,9 +2,9 @@ package com.williammunsch.germanstudyguide.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,13 +16,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.FlashcardActivity;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.ViewActivity;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{

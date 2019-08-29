@@ -1,19 +1,14 @@
 package com.williammunsch.germanstudyguide.repositories;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.room.Room;
+import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
 import android.content.Context;
-import android.support.v4.content.res.ResourcesCompat;
+import androidx.core.content.res.ResourcesCompat;
 
-import com.williammunsch.germanstudyguide.DBManager;
-import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.room.GermanDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import dagger.Module;
 
 
 public class StoriesRepository {
@@ -39,6 +34,7 @@ public class StoriesRepository {
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
 
+        /*
         DBManager db = DBManager.getInstance(context);
         dataSet = db.getStories();
 
@@ -50,6 +46,6 @@ public class StoriesRepository {
             }
         }
 
-
+*/
     }
 }

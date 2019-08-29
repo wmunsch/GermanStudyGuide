@@ -1,6 +1,6 @@
 package com.williammunsch.germanstudyguide.repositories;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 
 import com.williammunsch.germanstudyguide.DBManager;
@@ -41,7 +41,7 @@ public class VocabRecyclerViewRepository {
         DBManager db = DBManager.getInstance(context);
 
 
-        dataSet.add(new VocabListItem("Beginner Level 1","A1",db.getWordsLearned("A1"),db.getWordsMax("A1"),db.getWordsMastered("A1")));
+        dataSet.add(new VocabListItem("Beginner Level 1","A1",0,0,0));//db.getWordsLearned("A1"),db.getWordsMax("A1"),db.getWordsMastered("A1")));
         //dataSet.add(new VocabListItem("Beginner Level 2","A2",db.getWordsLearned("A2"),db.getWordsMax("A2"),db.getWordsMastered("A2")));
         //dataSet.add(new VocabListItem("Intermediate Level 1","B1",db.getWordsLearned("B1"),db.getWordsMax("B1"),db.getWordsMastered("B1")));
         dataSet.add(new VocabListItem("Beginner Level 2","A2",0,0,0));

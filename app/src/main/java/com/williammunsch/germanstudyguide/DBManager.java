@@ -33,7 +33,7 @@ public class DBManager extends SQLiteOpenHelper{
 
     //Store the db on github and dl from thre instead of from the assets folder?
 
-    private static String DB_PATH;// = "/data/data/com.williammunsch.ascend/databases/"; //path to copy the DB to on device to be used in code
+    private static String DB_PATH= "/data/data/com.williammunsch.ascend/databases/"; //path to copy the DB to on device to be used in code
     //private static String DB_PATH = "";
     //private static String DB_PATH = Context.getApplicationInfo().dataDir+"/databases/";
     private static String DB_PATH2 = "Context.getFilesDir().getPath()";
@@ -52,7 +52,7 @@ public class DBManager extends SQLiteOpenHelper{
     private DBManager(Context context){
         super(context, DB_NAME, null, 1);
         this.myContext = context;
-         DB_PATH = myContext.getDatabasePath(DB_NAME).getPath();
+        // DB_PATH = myContext.getDatabasePath(DB_NAME).getPath();
     }
 
     /**
@@ -68,6 +68,7 @@ public class DBManager extends SQLiteOpenHelper{
             System.out.println("Got writable database");
             try {
                 copyDatabase();
+                System.out.println("copied database");
             }catch (IOException e){
                 throw new Error("Error copying database");
             }
@@ -95,7 +96,7 @@ public class DBManager extends SQLiteOpenHelper{
         InputStream is = myContext.getAssets().open(DB_NAME);
 
         // Path to the just created empty db
-        String outFile = DB_PATH;//+DB_NAME;
+        String outFile = DB_PATH+DB_NAME;
 
         //Open the empty db as the output stream
         OutputStream myOutput = new FileOutputStream(outFile);
