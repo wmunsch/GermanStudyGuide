@@ -67,20 +67,10 @@ public class Repository {
 
         setVocabListItems();
 
-        //a1Max = mVocabDao.count();
-       // List<VocabModel> mylist = mAllVocab.getValue();
-        //System.out.println("0 : " + mylist.get(0));
-        //System.out.println("mallvocab = " + mAllVocab.getValue());
 
-         //dataSet = new ArrayList<>();
-        //dataSet = mVocabListDao.getAllVocabLists();
-
-        /**
-         * Need to make a new table in the database to hold the various list displays for the first fragment
-         * instead of creating them below?
-         */
-
-
+/**
+ * Calls the MySQL database A1 table and inserts all the rows into the ROOM database locally
+ */
         Call<List<VocabModel>> call = apiService.vocabList();
         call.enqueue(new Callback<List<VocabModel>>() {
             @Override
@@ -88,9 +78,13 @@ public class Repository {
                 System.out.println("Response to call: ");
                 int statusCode = response.code();
                 List<VocabModel> vocabList = response.body();
+
+                //Delete all current entries in the A1 table so it doesn't give non unique errors while testing
+                deleteAll();
+
                 for (int i = 0; i < vocabList.size();i++){
                     System.out.println(vocabList.get(i).toString());
-                   //insert(vocabList.get(i));
+                   insert(vocabList.get(i));
                 }
 
             }
