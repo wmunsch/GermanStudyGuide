@@ -16,8 +16,8 @@ public abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(VocabViewModel.class)
-    abstract ViewModel bindVocabViewModel(VocabViewModel vocabViewModel);
+    @ViewModelKey(VocabListViewModel.class)
+    abstract ViewModel bindVocabViewModel(VocabListViewModel vocabListViewModel);
 
 
     @Binds

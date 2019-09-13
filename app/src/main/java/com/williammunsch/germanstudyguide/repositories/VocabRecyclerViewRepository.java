@@ -3,7 +3,6 @@ package com.williammunsch.germanstudyguide.repositories;
 import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 
-import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class VocabRecyclerViewRepository {
     private void setVocabListItems(Context context){
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
-        DBManager db = DBManager.getInstance(context);
+        //DBManager db = DBManager.getInstance(context);
 
 
         dataSet.add(new VocabListItem("Beginner Level 1","A1",0,0,0));//db.getWordsLearned("A1"),db.getWordsMax("A1"),db.getWordsMastered("A1")));

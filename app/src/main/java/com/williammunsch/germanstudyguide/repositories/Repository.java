@@ -1,18 +1,23 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
-import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
 import com.williammunsch.germanstudyguide.room.VocabDao;
+import com.williammunsch.germanstudyguide.room.VocabListDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +41,13 @@ import retrofit2.Response;
 public class Repository {
 
     private VocabDao mVocabDao;
+    private VocabListDao mVocabListDao;
     private LiveData<List<VocabModel>> mAllVocab;
+   // private List<VocabListItem> dataSet;
+    //private LiveData<Integer> a1Max;
+    //private LiveData<List<VocabListItem>> dataSet;
     private List<VocabListItem> dataSet;
+    private MediatorLiveData<List<VocabListItem>> mObservableListItems;
 
     DatabaseService apiService;
 
@@ -52,17 +62,25 @@ public class Repository {
         this.db = db;
 
         mVocabDao = db.vocabDao();
+        mVocabListDao = db.vocabListDao();
         mAllVocab = mVocabDao.getAllVocabs();
 
-        dataSet = new ArrayList<>();
-       // dataSet = mVocabDao.getVocabListItems();
+        setVocabListItems();
+
+        //a1Max = mVocabDao.count();
+       // List<VocabModel> mylist = mAllVocab.getValue();
+        //System.out.println("0 : " + mylist.get(0));
+        //System.out.println("mallvocab = " + mAllVocab.getValue());
+
+         //dataSet = new ArrayList<>();
+        //dataSet = mVocabListDao.getAllVocabLists();
 
         /**
          * Need to make a new table in the database to hold the various list displays for the first fragment
-         * instead of creating them below
+         * instead of creating them below?
          */
 
-/*
+
         Call<List<VocabModel>> call = apiService.vocabList();
         call.enqueue(new Callback<List<VocabModel>>() {
             @Override
@@ -72,7 +90,7 @@ public class Repository {
                 List<VocabModel> vocabList = response.body();
                 for (int i = 0; i < vocabList.size();i++){
                     System.out.println(vocabList.get(i).toString());
-                    insert(vocabList.get(i));
+                   //insert(vocabList.get(i));
                 }
 
             }
@@ -82,30 +100,83 @@ public class Repository {
                 System.out.println("Error on call");
             }
         });
-        */
+
+/*
+        mObservableListItems = new MediatorLiveData<>();
+
+        mObservableListItems.addSource(mVocabListDao.getAllVocabLists(), productEntities -> {
+                    if (db.getDatabaseCreated().getValue() != null) {
+                        mObservableListItems.postValue(productEntities);
+                    }
+                });
+
+*/
+/*
+        if (mVocabListDao.getAllVocabLists().getValue() == null){
+            System.out.println(" VOCABLIST TABLE IS EMPTY");
+            //insertList(new VocabListItem("Beginner Level 1","A1",0,0,0));
+        }else{
+            System.out.println(" VOCABLIST TABLE IS NOT EMPTY");
+            for (int i = 0 ; i < mVocabListDao.getAllVocabLists().getValue().size(); i ++ ){
+                System.out.println( mVocabListDao.getAllVocabLists().getValue().get(i));
+            }
+        }
+*/
+
+
 
     }
 
-    private void setVocabListItems(Context context){
+    private void setVocabListItems(){
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
+       // System.out.println("Checking database for listitems");
+       // System.out.println("total words: " + mVocabDao.count().getValue());
+        //System.out.println("anything?: " + mVocabDao.getAllVocabs().getValue());
 
+        /*
+        List<VocabListItem> vl = mVocabListDao.getAllVocabLists().getValue();
+        if (vl == null || vl.isEmpty()){
+            insertList(new VocabListItem("Beginner Level 1","A1",mVocabDao.countLearned().getValue(),mVocabDao.count().getValue(),mVocabDao.countMastered().getValue()));
+        }
+        /*
+        try{
+            for (int i = 0 ; i < vl.size();i++){
+                if (vl.get(i) !=)
+            }
+        }catch(NullPointerException e){
+            System.out.println("null vocablistitem");
+        }
+       */
+        dataSet = new ArrayList<>();
         dataSet.add(new VocabListItem("Beginner Level 1","A1",0,0,0));
         dataSet.add(new VocabListItem("Beginner Level 2","A2",0,0,0));
         dataSet.add(new VocabListItem("Intermediate Level 1","B1",0,0,0));
-        dataSet.add(new VocabListItem("Intermediate Level 2","B2",0,0,0));
-        dataSet.add(new VocabListItem("Advanced Level 1","C1",0,0,0));
-        dataSet.add(new VocabListItem("Advanced Level 2","C2",0,0,0));
+       // dataSet.add(new VocabListItem("Intermediate Level 2","B2",0,0,0));
+       // dataSet.add(new VocabListItem("Advanced Level 1","C1",0,0,0));
+       // dataSet.add(new VocabListItem("Advanced Level 2","C2",0,0,0));
     }
 
-    public MutableLiveData<List<VocabListItem>> getVocabListItems(Context context){
-        setVocabListItems(context);
+/*
+    public MutableLiveData<List<VocabListItem>> getVocabListItems(){
+        setVocabListItems();
+        MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
+        data.setValue(dataSet);
+        return data;
+    }
+*/
+    public LiveData<List<VocabListItem>> getVocabListItems(){
         MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
         data.setValue(dataSet);
         return data;
     }
 
 
+    public LiveData<Integer> getA1Max(){
+        return mVocabDao.count();
+    }
+
+   // public LiveData<Integer> getA1Max() {return a1Max;}
     public LiveData<List<VocabModel>> getAll() { return mAllVocab; }
 
     LiveData<VocabModel> getOne(){return mVocabDao.getOneVocab();}
@@ -114,19 +185,44 @@ public class Repository {
         new insertAsyncTask(mVocabDao).execute(vocabModel);
     }
 
+    public void update (VocabModel vocabModel) {
+        new updateAsyncTask(mVocabDao).execute(vocabModel);
+    }
+
     public void deleteAll(){
         new deleteAsyncTask(mVocabDao).execute();
     }
 
-    public Integer count() {
-        return mVocabDao.count().getValue();
+    public LiveData<Integer> count() {
+        return mVocabDao.count();
     }
+
+    public void insertList (VocabListItem vocabListItem){
+        new insertListAsyncTask(mVocabListDao).execute(vocabListItem);
+    }
+
+
+    private static class insertListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
+
+        private VocabListDao mAsyncTaskDao;
+
+        insertListAsyncTask(VocabListDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabListItem... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
+
 
 
 
 
     private static class insertAsyncTask extends AsyncTask<VocabModel, Void, Void> {
-
         private VocabDao mAsyncTaskDao;
 
         insertAsyncTask(VocabDao dao) {
@@ -141,7 +237,6 @@ public class Repository {
     }
 
     private static class deleteAsyncTask extends AsyncTask<Void, Void, Void> {
-
         private VocabDao mAsyncTaskDao;
 
         deleteAsyncTask(VocabDao dao) {
@@ -155,5 +250,20 @@ public class Repository {
         }
 
     }
+
+    private static class updateAsyncTask extends AsyncTask<VocabModel, Void, Void> {
+        private VocabDao mAsyncTaskDao;
+
+        updateAsyncTask(VocabDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabModel... params) {
+          //  mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
 
 }

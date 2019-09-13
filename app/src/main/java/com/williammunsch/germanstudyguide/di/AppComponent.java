@@ -7,7 +7,7 @@ import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.MainActivity;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 import com.williammunsch.germanstudyguide.ui.VocabFragment;
-import com.williammunsch.germanstudyguide.viewmodels.VocabViewModel;
+import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import javax.inject.Singleton;
 
@@ -28,7 +28,7 @@ public interface AppComponent {
 
     }
 
-    VocabViewModel getViewModel();
+    VocabListViewModel getViewModel();
 
     void inject(Repository repository);
 

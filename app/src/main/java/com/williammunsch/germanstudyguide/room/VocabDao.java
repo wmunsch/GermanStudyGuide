@@ -34,4 +34,18 @@ public interface VocabDao {
     @Query("SELECT COUNT(*) FROM  vocab_table")
     LiveData<Integer> count();
 
+    /**
+     * Counts the number of learned words in the table.
+     * @return The number of learned words.
+     */
+    @Query("SELECT COUNT(*) FROM  vocab_table WHERE studying = 1")
+    LiveData<Integer> countLearned();
+
+    /**
+     * Counts the number of mastered words in the table.
+     * @return The number of mastered words.
+     */
+    @Query("SELECT COUNT(*) FROM  vocab_table WHERE score = 100")
+    LiveData<Integer> countMastered();
+
 }

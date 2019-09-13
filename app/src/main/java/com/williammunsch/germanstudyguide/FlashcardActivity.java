@@ -24,14 +24,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class FlashcardActivity extends AppCompatActivity {
-
+/*
     private TextView answerWord, topTestWord, englishSentence, germanSentence, correctAnswer;
     private EditText entryText;
     private Button buttonCheck, buttonHint,buttoniwasright;
     private ImageView checkmark, xmark;
     private LinearLayout correctLayout;
     private Word head, tail;
-    DBManager dbManager;
     private ArrayList<Word> wordList;
     private static final int newWords = 5; //use preferences to set this in options
     private String tableName;
@@ -111,6 +110,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
     //These need to be in the flashcardqueue class?
+
     private void createQueue(){
         if (dbManager.getWordsLearned(tableName) < dbManager.getWordsMax(tableName)){
             setUpQueueType0();
@@ -527,5 +527,5 @@ public class FlashcardActivity extends AppCompatActivity {
         }
         return true;
     }
-
+*/
 }

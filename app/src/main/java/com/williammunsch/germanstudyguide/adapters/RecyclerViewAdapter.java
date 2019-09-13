@@ -21,15 +21,23 @@ import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.ViewActivity;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
+    private Integer a1Max;
     private Context mContext;
+   // private int a1Max;
 
-    public RecyclerViewAdapter(Context mContext, List<VocabListItem> mVocabList){
-        this.mVocabList = mVocabList;
+    public RecyclerViewAdapter(Context mContext){
+   // public RecyclerViewAdapter(Context mContext, List<VocabListItem> mVocabList){
+       // this.mVocabList = mVocabList;
         this.mContext = mContext;
+       // this.a1Max = a1Max;
+        //System.out.println("In recyclerviewadapter constructor : " + this.a1Max + " " + a1Max);
+       // mVocabList = new ArrayList<>();
+
     }
 
 
@@ -49,8 +57,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
         viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
 
-        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + mVocabList.get(i).getWordsMax());}
-        else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + mVocabList.get(i).getWordsMax()); }
+
+
+
+        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + a1Max);}
+       else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + a1Max); }
+
+
 
         if (i==0 || i ==1){
             viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle,null));
@@ -103,7 +116,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         });
 
 
-        final Animation slideDown = AnimationUtils.loadAnimation(mContext,R.anim.slide_down);
+       // final Animation slideDown = AnimationUtils.loadAnimation(mContext,R.anim.slide_down);
         //On click, expand the layout by increase vertical size and showing buttons
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
@@ -111,7 +124,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                       if (!viewHolder.isExpanded){
                           viewHolder.parentLayout.setMinimumHeight(500);
                           viewHolder.buttonLayout.setVisibility(View.VISIBLE);
-                          viewHolder.buttonLayout.startAnimation(slideDown);
+                          //viewHolder.buttonLayout.startAnimation(slideDown);
                           viewHolder.isExpanded=true;}
                       else{
                           viewHolder.parentLayout.setMinimumHeight(100);
@@ -123,7 +136,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return mVocabList.size();
+        if (mVocabList != null){
+            return mVocabList.size();
+        }
+        else{
+            return 0;
+        }
+    }
+
+    /**
+     * This method allows the recyclerview to be updated with livedata in the fragment while observing
+     */
+    public void setVocabList(List<VocabListItem> vocabList){
+        this.mVocabList = vocabList;
+        notifyDataSetChanged();
+    }
+
+    public void setA1Max(Integer i){
+        this.a1Max = i;
+        notifyDataSetChanged();
     }
 
 

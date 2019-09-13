@@ -15,22 +15,27 @@ import javax.inject.Inject;
 /**
  * Never pass context into a viewmodel. Application context is ok as is used here.
  */
-public class VocabViewModel extends ViewModel {
+public class VocabListViewModel extends ViewModel {
     private Repository mRepository;//injected
 
     private LiveData<List<VocabModel>> mAllVocab;
-    private MutableLiveData<List<VocabListItem>> mVocabListItems;
+    private LiveData<List<VocabListItem>> mVocabListItems;
+    private LiveData<Integer> a1Max;
+   // private LiveData<Integer> wordCount;
 
     @Inject
-    public VocabViewModel(Repository repository){
+    public VocabListViewModel(Repository repository){
         this.mRepository = repository;
 
         mVocabListItems = mRepository.getVocabListItems();
+        a1Max = mRepository.getA1Max();
+     //  wordCount = mRepository.count();
 
-        mAllVocab = mRepository.getAll();//this is the entire vocabmodel table from the ROOM database.
+      //  mAllVocab = mRepository.getAll();//this is the entire vocabmodel table from the ROOM database.
 
     }
 
+   // public LiveData<Integer> getA1Max() {return a1Max;}
 
 
     /**
@@ -45,12 +50,16 @@ public class VocabViewModel extends ViewModel {
         return mVocabListItems;
     }
 
+    public LiveData<Integer> getA1Max(){return a1Max;}
+
+    //public LiveData<Integer> getA1Count(){ return wordCount;}
+
     /**
      * wrapper insert() method that calls the Repository's insert() method. In this way, the implementation of insert() is completely hidden from the UI.
      */
     public void insert(VocabModel vocabModel) {mRepository.insert(vocabModel);}
 
-    public Integer count() {return mRepository.count();}
+  //  public Integer count() {return mRepository.count();}
 
     public void deleteAllFromDatabase(){
         mRepository.deleteAll();

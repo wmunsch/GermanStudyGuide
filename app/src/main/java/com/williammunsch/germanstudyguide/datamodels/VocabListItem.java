@@ -1,26 +1,36 @@
 package com.williammunsch.germanstudyguide.datamodels;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 /**
- * Data model for each item in the vocabulary recyclerView.
+ * Data model for each item in the vocabulary recyclerView (page 1 of the sectionsPageAdapter).
  */
 
+@Entity(tableName = "vocab_list_table")
 public class VocabListItem {
-    private String name,image;
+    @PrimaryKey@NonNull
+    private String name;
+
+    private String image;
     private int learnedPercent;
     private int masteredPercent;
     private int wordsLearned;
     private int wordsMax;
     private int wordsMastered;
 
-    public VocabListItem(String mName, String mImage, int mWordsLearned, int mWordsMax, int mWordsMastered){
-        this.name = mName;
-        this.image = mImage;
-        this.wordsLearned = mWordsLearned;
-        this.wordsMax = mWordsMax;
-        this.wordsMastered = mWordsMastered;
+    public VocabListItem(String name, String image, int wordsLearned, int wordsMax, int wordsMastered){
+        this.name = name;
+        this.image = image;
+        this.wordsLearned = wordsLearned;
+        this.wordsMax = wordsMax;
+        this.wordsMastered = wordsMastered;
         this.learnedPercent = (int)(((double)wordsLearned/wordsMax)*100);
         this.masteredPercent = (int)(((double)wordsMastered/wordsMax)*100);
     }
+
+    public String toString(){return name + " : " + wordsLearned + " / " + wordsMax;}
 
     public String getName() {
         return name;

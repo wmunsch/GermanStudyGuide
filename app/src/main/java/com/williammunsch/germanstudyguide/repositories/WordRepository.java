@@ -2,7 +2,7 @@ package com.williammunsch.germanstudyguide.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import com.williammunsch.germanstudyguide.DBManager;
+
 import com.williammunsch.germanstudyguide.datamodels.Word;
 
 import java.util.ArrayList;
@@ -31,8 +31,8 @@ public class WordRepository {
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
 
-        DBManager db = DBManager.getInstance(context);
-        dataSet = db.getWordList("A1");
-        db.getWordListAllLearned("A1");
+        //DBManager db = DBManager.getInstance(context);
+        //dataSet = db.getWordList("A1");
+       // db.getWordListAllLearned("A1");
     }
 }

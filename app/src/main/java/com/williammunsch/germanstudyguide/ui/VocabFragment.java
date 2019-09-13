@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,15 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.williammunsch.germanstudyguide.DBManager;
 import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.adapters.RecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
-import com.williammunsch.germanstudyguide.di.AppComponent;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
-import com.williammunsch.germanstudyguide.viewmodels.VocabViewModel;
+import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -35,8 +33,9 @@ public class VocabFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    private VocabViewModel mVocabViewModel;
+    private VocabListViewModel mVocabListViewModel;
     private RecyclerViewAdapter mAdapter;
+    private int a1Max;
     @Inject
     ViewModelFactory viewModelFactory;
 
@@ -61,28 +60,49 @@ public class VocabFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initializing the view model
-       // mVocabViewModel = ViewModelProviders.of(this).get(VocabViewModel.class);
-        //mVocabViewModel.init();//retrieve data from repository
+       // mVocabListViewModel = ViewModelProviders.of(this).get(VocabListViewModel.class);
+        //mVocabListViewModel.init();//retrieve data from repository
 
         //AppComponent component = ((GermanApp)getApplicationContext()).getAppComponent();
         //component.inject(getContext());
 
-        mVocabViewModel = ViewModelProviders.of(this,viewModelFactory).get(VocabViewModel.class);
+        mVocabListViewModel = ViewModelProviders.of(this,viewModelFactory).get(VocabListViewModel.class);
 
-
-
-        mVocabViewModel.getAllVocab().observe(this, new Observer<List<VocabModel>>(){
+/*
+        mVocabListViewModel.getA1Max().observe(this, new Observer<Integer>(){
 
             @Override
-            public void onChanged(List<VocabModel> vocabModels) {
+            public void onChanged(Integer a1WordsMax) {
+                a1Max = a1WordsMax;
+                System.out.println("ONCHANGED " + a1Max + " " + a1WordsMax); //it works here
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+*/
+
+        mVocabListViewModel.getVocabListItems().observe(this, new Observer<List<VocabListItem>>(){
+
+            @Override
+            public void onChanged(List<VocabListItem> vocabListItems) {
+                mAdapter.setVocabList(vocabListItems);
                 StringBuilder b = new StringBuilder();
                 String all = "";
-                for (int i = 0; i < vocabModels.size(); i++){
-                    b.append(vocabModels.get(i).toString() + " \n");
+                for (int i = 0; i < vocabListItems.size(); i++){
+                    b.append(vocabListItems.get(i).toString() + " \n");
                 }
                 all=b.toString();
+                System.out.println("OBSERVING");
+                System.out.println(all);
                 //mDataText.setText(all);
-                mAdapter.notifyDataSetChanged();
+                //mAdapter.notifyDataSetChanged();
+            }
+        });
+
+
+        mVocabListViewModel.getA1Max().observe(this, new Observer<Integer>(){
+            @Override
+            public void onChanged(Integer num) {
+                mAdapter.setA1Max(num);
             }
         });
 
@@ -98,7 +118,9 @@ public class VocabFragment extends Fragment {
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mAdapter = new RecyclerViewAdapter(getContext(),mVocabViewModel.getVocabListItems().getValue());
+      //  mAdapter = new RecyclerViewAdapter(getContext(), mVocabListViewModel.getVocabListItems().getValue());
+       // mAdapter = new RecyclerViewAdapter(getContext(), mVocabListViewModel.getVocabListItems().getValue()); //should this be observed instead?
+        mAdapter = new RecyclerViewAdapter(getContext());
         recyclerView.setAdapter(mAdapter);
 
         try {
@@ -107,15 +129,6 @@ public class VocabFragment extends Fragment {
             //throw new Error
         }
 
-        /*
-        final TextView textView = root.findViewById(R.id.section_label);
-        pageViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        */
         return root;
     }
 }

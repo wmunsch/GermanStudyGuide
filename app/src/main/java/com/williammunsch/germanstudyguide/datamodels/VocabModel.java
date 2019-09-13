@@ -3,6 +3,8 @@ package com.williammunsch.germanstudyguide.datamodels;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+
+
 @Entity(tableName = "vocab_table")
 public class VocabModel {
     @PrimaryKey

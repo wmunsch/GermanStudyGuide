@@ -2,7 +2,7 @@ package com.williammunsch.germanstudyguide.repositories;
 
 import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
-import com.williammunsch.germanstudyguide.DBManager;
+
 import com.williammunsch.germanstudyguide.datamodels.SimpleWord;
 
 import java.util.ArrayList;
@@ -32,8 +32,8 @@ public class SimpleWordRepository {
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
 
-        DBManager db = DBManager.getInstance(context);
-        dataSet = db.getSimpleWordList("A1");
+       // DBManager db = DBManager.getInstance(context);
+        //dataSet = db.getSimpleWordList("A1");
 
 
     }
