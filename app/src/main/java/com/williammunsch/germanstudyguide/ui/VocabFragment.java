@@ -66,6 +66,9 @@ public class VocabFragment extends Fragment {
         //AppComponent component = ((GermanApp)getApplicationContext()).getAppComponent();
         //component.inject(getContext());
 
+        if (viewModelFactory == null){System.out.println("NULL FACTORY IN VOCABFRAGMENT");}
+        else{ System.out.println("NONNULL FACTORY IN VOCABFRAGMENT"); }
+
         mVocabListViewModel = ViewModelProviders.of(this,viewModelFactory).get(VocabListViewModel.class);
 
 /*

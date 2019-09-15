@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,13 +21,29 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.datamodels.Word;
+import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
+import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
+import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Queue;
 
+import javax.inject.Inject;
+
+
+/**
+ * The queue for the flashcards will need to be stored in the repository,
+ * and observed from a view model.  (notifydatasetchanged)?
+ * After testing a flashcard, the entity's value in the database will be
+ * changed directly, and observed by the view model.
+ * Queue item removal and move will be called from the activity -> viewmodel -> repository
+ * All of the findviewbyid stuff needs to be replaced with databinding.
+ */
 public class FlashcardActivity extends AppCompatActivity {
-/*
+
     private TextView answerWord, topTestWord, englishSentence, germanSentence, correctAnswer;
     private EditText entryText;
     private Button buttonCheck, buttonHint,buttoniwasright;
@@ -38,25 +57,54 @@ public class FlashcardActivity extends AppCompatActivity {
     private boolean testing = true, test=false, finishedWithAll = false, learnedAll = false;
     private int shortAnimationDuration;
 
+
+    @Inject ViewModelFactory viewModelFactory;
+
+
+    FlashcardViewModel flashcardViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn);
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
+
+        ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
+
+        if (viewModelFactory == null){System.out.println("NULL FACTORY IN FLASHCARDACTIVITY");}
+        else{ System.out.println("NONNULL FACTORY IN FLASHCARDACTIVITY"); }
+        flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
+
+
         //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
-        bindViews();
+        //bindViews();
         shortAnimationDuration = 500;
 
-        head = new Word(0,0,0,0,null,null,null,null);
-        tail = new Word(0,0,0,0,null,null,null,null);
-        createQueue();
 
-        nextTest();
+
+        /*
+        flashcardViewModel.getWordQueue().observe(this, new Observer<Queue<VocabModel>>() {
+            @Override
+            public void onChanged(Queue<VocabModel> vocabModels) {
+                System.out.println(vocabModels.peek());
+            }
+        });
+*/
+
+
     }
 
+
+
+
+
+
+
+    //REPLACE ALL OF THIS WITH DATABINDING
+    /*
     private void bindViews(){
         topTestWord = findViewById(R.id.textView_germanWord);
         answerWord = findViewById(R.id.textView_englishWord);
@@ -107,259 +155,10 @@ public class FlashcardActivity extends AppCompatActivity {
             }
         });
     }
+*/
 
 
-    //These need to be in the flashcardqueue class?
 
-    private void createQueue(){
-        if (dbManager.getWordsLearned(tableName) < dbManager.getWordsMax(tableName)){
-            setUpQueueType0();
-        }
-        else if (dbManager.getWordsLearned(tableName) >= dbManager.getWordsMax(tableName) && dbManager.getWordsMastered(tableName) < dbManager.getWordsMax(tableName)){
-            setUpQueueType1();
-        }
-        else {
-            setUpQueueType2();
-        }
-        tail.setNext(null);
-    }
-    private void setUpQueueType0(){
-        wordList = dbManager.getWordList(tableName);
-        nodeCount = wordList.size();
-        head.setNext(wordList.get(0));
-        tail = head.getNext();
-        //Set up the intro flash cards
-        for (int i = 1; i < newWords; i++){
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
-        }
-        //Set up 15 cards after the new ones
-        for (int i = newWords; i < wordList.size();i++){
-            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-            else{wordList.get(i).setType(1);}
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
-        }
-    }
-    private void setUpQueueType1(){
-        learnedAll = true;
-        wordList = dbManager.getWordListAllLearned(tableName);
-        nodeCount = wordList.size();
-        head.setNext(wordList.get(0));
-        tail = head.getNext();
-        //Set up 20 cards to review based on score and frequency
-        for (int i = 0; i < wordList.size();i++){
-            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-            else{wordList.get(i).setType(1);}
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
-        }
-    }
-    private void setUpQueueType2(){
-        learnedAll = true;
-        wordList = dbManager.getWordListAllMastered(tableName);
-        nodeCount = wordList.size();
-        head.setNext(wordList.get(0));
-        tail = head.getNext();
-        //Set up randomized review
-        for (int i = 0; i < wordList.size();i++){
-            if (wordList.get(i).getScore()>0){wordList.get(i).setType(2);}
-            else{wordList.get(i).setType(1);}
-            tail.setNext(wordList.get(i));
-            tail=tail.getNext();
-        }
-    }
-    private void nextTest(){
-        testing = true;
-        System.out.println("NODE COUNT" + nodeCount);
-        System.out.println("*********printing queue************");
-        Word temp1 = head.getNext();
-        while (temp1!=null){
-            System.out.println(temp1.getGerman() + " " + temp1.getType() + "  score: " + temp1.getScore());
-            temp1 = temp1.getNext();
-        }
-        try{
-            setUpNextWord();
-            if (head.getNext().getType()==0){
-                setUpType0();
-            }else if (head.getNext().getType()==1){
-                setUpType1();
-            }else if (head.getNext().getType()==2){
-                setUpType2();
-            }
-        }catch(Exception e){
-            backToMainActivity();
-        }
-    }
-    private void nextWord(){
-        updateWord(10);
-        removeNode();
-        if (!finishedWithAll){nextTest();}
-    }
-    private void testAnswer1(){
-        test = false;
-        String enteredAnswer = entryText.getText().toString();
-
-        //test entered answer against all possible answers in database
-        for (String s : head.getNext().getEnglishStringsArray()){
-            if (s.equalsIgnoreCase(enteredAnswer)){
-                test = true;
-            }
-        }
-
-        if (test && !enteredAnswer.equals("")) {
-            setUpCorrectAnswerViews();
-        } else if (!test && !enteredAnswer.equals("")) {
-            setUpIncorrectType1AnswerViews();
-        }else{
-            //Do nothing because the edit text is empty. Prevents misclicks.
-        }
-    }
-    private void testAnswer2(){
-        test = false;
-        String enteredAnswer = entryText.getText().toString();
-        if (enteredAnswer.equalsIgnoreCase(head.getNext().getGerman())) {
-            test = true;
-        }
-
-        if (test && !enteredAnswer.equals("")) {
-            setUpCorrectAnswerViews();
-        } else if (!test && !enteredAnswer.equals("")) {
-            setUpIncorrectType1AnswerViews();
-        }else{
-            //Do nothing because the edit text is empty. Prevents misclicks.
-        }
-    }
-    private void setStudying(){
-        if (head.getNext().getStudying() != 1) {
-            nowStudying();
-        }
-    }
-    private void test(){
-        if (finishedWithAll){backToMainActivity();}
-        else{
-            //test the correctness on first button press
-            if (testing) {
-                if (head.getNext().getType() == 0) {
-                    head.getNext().setType(1);
-                    moveNode(false);
-                    nextTest();
-
-                } else if (head.getNext().getType() == 1) {
-                    setStudying();
-                    testAnswer1();
-
-                } else if (head.getNext().getType() == 2) {
-                    testAnswer2();
-                }
-            }
-            //After showing whether the answer was correct or not, move to next word
-            else{
-                //If answer was correct
-                if (test){
-                    nextWord();
-                }
-                //If answer was wrong
-                else{
-                    moveNode(true);
-                    nextTest();
-                }
-            }
-
-        }
-
-    }
-    public void updateWord(int s){
-        head.getNext().setScore(head.getNext().getScore()+s);
-        dbManager.updateWord(head.getNext(),tableName);
-    }
-    private void nowStudying(){
-        dbManager.setStudying(head.getNext(),tableName);
-    }
-    private void removeNode(){
-        try {
-            head.setNext(head.getNext().getNext());
-            nodeCount--;
-            if (nodeCount == 0){
-                System.out.println("finished");
-                topTestWord.setText("Finished!");
-                topTestWord.setAlpha(0f);
-                fadeIn(topTestWord,0);
-
-                if (!learnedAll){
-                    int numWordsLearned = dbManager.getWordsLearned(tableName);
-                    int totalWords = dbManager.getWordsMax(tableName);
-                    double percent = ((double)numWordsLearned/totalWords)*100;
-                    DecimalFormat df = new DecimalFormat("#.##");
-                    answerWord.setText(df.format(percent)+ "% of " + tableName + " words learned.");
-                }else{
-                    int numWordsMastered = dbManager.getWordsMastered(tableName);
-                    int totalWords = dbManager.getWordsMax(tableName);
-                    double percent = ((double)numWordsMastered/totalWords)*100;
-                    DecimalFormat df = new DecimalFormat("#.##");
-                    answerWord.setText(df.format(percent)+ "% of " + tableName + " words mastered.");
-                }
-
-                answerWord.setVisibility(View.VISIBLE);
-                answerWord.setAlpha(0f);
-                fadeIn(answerWord,0);
-                finishedWithAll = true;
-                buttonHint.setVisibility(View.INVISIBLE);
-                englishSentence.setVisibility(View.INVISIBLE);
-                germanSentence.setVisibility(View.INVISIBLE);
-                buttoniwasright.setVisibility(View.GONE);
-                correctLayout.setVisibility(View.GONE);
-                xmark.setVisibility(View.INVISIBLE);
-                checkmark.setVisibility(View.INVISIBLE);
-                entryText.setVisibility(View.INVISIBLE);
-                buttonCheck.setText("Done");
-            }
-        }catch(Exception e){
-            System.out.println("removeNode failed.");
-            //backToMainActivity();
-        }
-
-    }
-    private void moveNode(boolean b){
-        //Moves the current first node in the queue either 5 down or to the end.
-        if (b) {updateWord(-7);}
-        entryText.setText("");
-        Word temp = head.getNext();
-        if (nodeCount > 5){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(head.getNext().getNext().getNext().getNext().getNext());
-            head.getNext().getNext().getNext().getNext().setNext(temp);
-        }
-        else if (nodeCount == 5){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext().getNext().getNext());
-            head.getNext().getNext().getNext().getNext().setNext(temp);
-        }
-        else if (nodeCount == 4){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext().getNext());
-            head.getNext().getNext().getNext().setNext(temp);
-        }
-        else if (nodeCount == 3){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(null);//temp.setNext(head.getNext().getNext().getNext());
-            head.getNext().getNext().setNext(temp);
-        }else if (nodeCount == 2){
-            head.setNext(head.getNext().getNext());
-            temp.setNext(null);
-            head.getNext().setNext(temp);
-        }
-        else{
-            //Do nothing because its the last node.
-        }
-
-        System.out.println("*******************");
-        Word temp1 = head.getNext();
-        while (temp1!=null){
-            System.out.println(temp1.getGerman());
-            temp1 = temp1.getNext();
-        }
-    }
 
     //These need to be in the viewmodel?   can i use databinding to replace these?
     private void setUpNextWord(){
@@ -527,5 +326,5 @@ public class FlashcardActivity extends AppCompatActivity {
         }
         return true;
     }
-*/
+
 }

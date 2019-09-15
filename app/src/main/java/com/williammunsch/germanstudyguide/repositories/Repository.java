@@ -35,6 +35,8 @@ import retrofit2.Response;
  *  Manages query threads and allows you to use multiple backends. In the most common example,
  *  the Repository implements the logic for deciding whether to fetch data from a network or use results cached in a local database.
  *
+ *  Base repository that handles api calls and ROOM updates.
+ *
  */
 
 @Singleton

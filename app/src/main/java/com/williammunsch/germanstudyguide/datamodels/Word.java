@@ -13,14 +13,14 @@ public class Word {
     private Word next;
     private String[] englishStringsArray;
 
-    public Word(int id, int score, int freq, int studying, String german, String english, String gsentence, String esentence){
+    public Word(int id, String german, String english, String gsent, String esent, int score, int freq, int studying){
         this.id = id;
         this.score = score;
         this.freq = freq;
         this.german = german;
         this.english = english;
-        this.gsentence = gsentence;
-        this.esentence = esentence;
+        this.gsentence = gsent;
+        this.esentence = esent;
         type = 0;
         this.studying = studying;
         if (english!=null){
