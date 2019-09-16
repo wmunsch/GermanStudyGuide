@@ -1,10 +1,13 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.datamodels.Word;
@@ -30,30 +33,38 @@ import javax.inject.Singleton;
 public class FlashcardRepository {
 
     GermanDatabase db;
-   // private VocabModel head, tail;
-    private ArrayList<Word> wordList;
-    private LiveData<List<VocabModel>> modelList, modelOldList;
-    private LiveData<List<VocabModel>> mAllVocab;
-    private VocabDao mVocabDao;
-    private Word head, tail;
-    private Queue<VocabModel> wordQueue;
-    private int nodeCount;
-    private final int newWords = 5;
-    private MutableLiveData<Queue<VocabModel>> liveDataQueue;
 
+    private List<VocabModel> modelList; //The list holding data that can be manipulated
+    private MutableLiveData<List<VocabModel>> mAllVocab = new MutableLiveData<>();    //The live data that the activity observes
+
+    private LiveData<List<VocabModel>> vocabList;
+
+   // private MutableLiveData<List<VocabModel>> vocabQueue = new MutableLiveData<>();
+
+    private VocabDao mVocabDao;
+
+
+    private final int newWords = 5;
+
+
+    /**
+     * Need to inject context to get access to the live data to create the queue.
+     * Queue needs to be stored here so it will save throughout changes in the lifecycle.
+     */
     @Inject
     public FlashcardRepository(GermanDatabase db){
         this.db = db;
         mVocabDao = db.vocabDao();
 
-        wordQueue = new LinkedList<>();
-        modelList = mVocabDao.getFiveNewVocab();
-        //modelOldList = db.vocabDao().getFiveOldVocab();
-        mAllVocab = mVocabDao.getAllVocabs();
-       // Collections.shuffle(modelOldList);
+        vocabList = mVocabDao.getVocabQueue();
+      //  mAllVocab = mVocabDao.getFiveNewVocab();
 
-        System.out.println("TTTEESSTTTT");
-        System.out.println(mAllVocab.getValue().get(0));
+      //  vocabQueue.setValue(mAllVocab.getValue());
+
+
+        getVocabList();
+
+
 
         for(int i = 0 ; i < newWords ; i++){
             //wordQueue.add(modelList.getValue().get(i));
@@ -62,36 +73,75 @@ public class FlashcardRepository {
            // wordQueue.add(modelOldList.getValue().get(i));
         }
 
-        //liveDataQueue = new MutableLiveData<>();
-        //liveDataQueue.setValue(wordQueue);
-
-
-
-
-
-       // wordList = new ArrayList<>();
-        //wordList.add(new Word(modelList.get(0).getId(),modelList.get(0).getGerman(), modelList.get(0).getEnglish(), modelList.get(0).getGsent(),modelList.get(0).getEsent(),modelList.get(0).getScore(), modelList.get(0).getFreq(), modelList.get(0).getStudying()));
-        //wordList.add(new Word(modelList.get(1).getId(),modelList.get(1).getGerman(), modelList.get(1).getEnglish(), modelList.get(1).getGsent(),modelList.get(1).getEsent(),modelList.get(1).getScore(), modelList.get(1).getFreq(), modelList.get(1).getStudying()));
-        //wordList.add(new Word(modelList.get(2).getId(),modelList.get(2).getGerman(), modelList.get(2).getEnglish(), modelList.get(2).getGsent(),modelList.get(2).getEsent(),modelList.get(2).getScore(), modelList.get(2).getFreq(), modelList.get(2).getStudying()));
-
-
-        //onvert modelList to words?
-
-
-
-        //head = new VocabModel(0, null,null,null,null,0,0,0);
-        //tail = new VocabModel(0,null,null,null,null,0,0,0);
-       // head = new Word(0,0,0,0,null,null,null,null);
-        //tail = new Word(0,0,0,0,null,null,null,null);
-        //createQueue();
     }
+
+    public LiveData<List<VocabModel>> getVocabData(){
+        return vocabList;
+    }
+
+
+
+    private class GetVocabListAsyncTask extends AsyncTask<List<VocabModel>, Void, Void>{
+        private VocabDao vocabDao;
+        //private List<VocabModel> modelList;
+        //FlashcardRepository repo;
+
+        GetVocabListAsyncTask(VocabDao dao){
+            vocabDao = dao;
+           // this.repo = repo;
+        }
+
+        @Override
+        protected Void doInBackground(List<VocabModel>... vocabModels) {
+            modelList = vocabDao.getFiveNewVocab();
+            mAllVocab.postValue(modelList);
+            //create queue here
+            System.out.println("PRINTING MODELLIST");
+            System.out.println(modelList.get(0));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //mAllVocab.postValue(modelList);
+           // repo.updateList(modelList);
+           // super.onPostExecute(aVoid);
+        }
+
+
+    }
+
+    public void updateList(List<VocabModel> list){
+        modelList = list;
+    }
+
+    public void getVocabList(){
+        new GetVocabListAsyncTask(mVocabDao).execute();
+
+    }
+
+    public MutableLiveData<List<VocabModel>> getModelList(){
+        //MutableLiveData data = new MutableLiveData();
+        //data.postValue(modelList);
+        return mAllVocab;
+    }
+
+    public void removeFlashcard(int i){
+        modelList.remove(i);
+        mAllVocab.setValue(modelList);
+    }
+
+/*
+public LiveData<LinkedList<VocabModel>> getModelQueue(){
+    return modelQueue;
+}
 
     public LiveData<Queue<VocabModel>> getA1Queue(){
         return liveDataQueue;
     }
 
 
-
+*/
 
 
 /*

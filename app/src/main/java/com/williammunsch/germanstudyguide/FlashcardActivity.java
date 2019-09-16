@@ -29,6 +29,8 @@ import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import javax.inject.Inject;
@@ -81,7 +83,70 @@ public class FlashcardActivity extends AppCompatActivity {
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         //bindViews();
+        topTestWord = findViewById(R.id.textView_germanWord);
+
+        buttonHint = findViewById(R.id.button_seeSentence);
+        buttonHint.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                System.out.println("PRESSED BUTTON");
+                flashcardViewModel.removeFlashcard(0);
+            }
+        });
+
+
         shortAnimationDuration = 500;
+
+
+
+/*
+        flashcardViewModel.getWordQueue().observe(this, new Observer<LinkedList<VocabModel>>() {
+            @Override
+            public void onChanged(LinkedList<VocabModel> vocabModels) {
+                System.out.println("PRINTING MODELLIST");
+                if (vocabModels != null) {
+                    for (int i = 0 ; i < vocabModels.size();i++){
+                        System.out.println(vocabModels.get(i));
+                    }
+                }
+
+            }
+        });
+
+
+        */
+        flashcardViewModel.getVocabData().observe(this, new Observer<List<VocabModel>>() {
+            @Override
+            public void onChanged(List<VocabModel> vocabModels) {
+                System.out.println("PRINTING MODELLIST IN ACTIVITY");
+                if (vocabModels != null) {
+                    for (int i = 0 ; i < vocabModels.size();i++){
+                        System.out.println(vocabModels.get(i));
+                    }
+                    topTestWord.setText(vocabModels.get(0).toString());
+                }
+            }
+        });
+
+        /*
+        flashcardViewModel.getModelList().observe(this, new Observer<List<VocabModel>>() {
+            @Override
+            public void onChanged(List<VocabModel> vocabModels) {
+                System.out.println("PRINTING MODELLIST IN ACTIVITY");
+                if (vocabModels != null) {
+                    for (int i = 0 ; i < vocabModels.size();i++){
+                        System.out.println(vocabModels.get(i));
+                    }
+                    topTestWord.setText(vocabModels.get(0).toString());
+                }
+
+
+            }
+        });
+
+
+
+
 
 
 

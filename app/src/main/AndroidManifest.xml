@@ -35,7 +35,7 @@
         <activity
             android:name=".FlashcardActivity"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"
+
 
             >
             <meta-data
