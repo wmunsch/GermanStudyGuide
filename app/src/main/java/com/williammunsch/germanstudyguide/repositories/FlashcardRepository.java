@@ -62,7 +62,7 @@ public class FlashcardRepository {
       //  vocabQueue.setValue(mAllVocab.getValue());
 
 
-        getVocabList();
+        //getVocabList();
 
 
 
@@ -80,7 +80,7 @@ public class FlashcardRepository {
     }
 
 
-
+/*
     private class GetVocabListAsyncTask extends AsyncTask<List<VocabModel>, Void, Void>{
         private VocabDao vocabDao;
         //private List<VocabModel> modelList;

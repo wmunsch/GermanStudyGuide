@@ -32,6 +32,10 @@ public interface VocabDao {
     @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
     LiveData<List<VocabModel>> getVocabQueue();
 
+    //Gets # of new vocab and # of old vocab for review combined
+   // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
+    //List<VocabModel>getVocabQueue();
+
 
 
 
