@@ -91,7 +91,7 @@ public class FlashcardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 System.out.println("PRESSED BUTTON");
                // flashcardViewModel.removeFlashcard(0);
-                flashcardViewModel.removeNode(0);
+                flashcardViewModel.popNode();
 
 
             }
@@ -102,40 +102,51 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-/*
-        flashcardViewModel.getWordQueue().observe(this, new Observer<LinkedList<VocabModel>>() {
-            @Override
-            public void onChanged(LinkedList<VocabModel> vocabModels) {
-                System.out.println("PRINTING MODELLIST");
-                if (vocabModels != null) {
-                    for (int i = 0 ; i < vocabModels.size();i++){
-                        System.out.println(vocabModels.get(i));
-                    }
-                }
 
-            }
-        });
-
-
-        */
-
-
-
-        flashcardViewModel.getVocabData().observe(this, new Observer<List<VocabModel>>() {
+        flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
-                System.out.println("PRINTING MODELLIST IN ACTIVITY");
+                System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
                 if (vocabModels != null) {
-                    for (int i = 0 ; i < flashcardViewModel.getFlashcardOrderList().size();i++){
-                        //System.out.println(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(i)));
+                    for (int i = 0 ; i < vocabModels.size();i++){
                         System.out.println(vocabModels.get(i));
 
                     }
                     topTestWord.setText(vocabModels.get(0).toString());
+                }
+            }
+        });
+
+
+/*
+        flashcardViewModel.getVocabData().observe(this, new Observer<List<VocabModel>>() {
+            @Override
+            public void onChanged(List<VocabModel> vocabModels) {
+                System.out.println("PRINTING MODELLIST IN ACTIVITY     LIVE ");
+                if (vocabModels != null) {
+                    for (int i = 0 ; i < vocabModels.size();i++){
+                        //System.out.println(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(i)));
+                        System.out.println(vocabModels.get(i));
+
+                    }
+                    //topTestWord.setText(vocabModels.get(0).toString());
                    // topTestWord.setText(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(0)).toString());
                 }
             }
         });
+*/
+
+
+
+
+
+
+
+
+
+
+
+
 
         /*
         flashcardViewModel.getModelList().observe(this, new Observer<List<VocabModel>>() {

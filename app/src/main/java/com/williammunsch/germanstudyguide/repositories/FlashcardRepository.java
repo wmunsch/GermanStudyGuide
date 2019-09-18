@@ -37,6 +37,8 @@ public class FlashcardRepository {
     private List<VocabModel> modelList; //The list holding data that can be manipulated
     private MutableLiveData<List<VocabModel>> mAllVocab = new MutableLiveData<>();    //The live data that the activity observes
 
+    private List<VocabModel> vocabQueue;
+
     private LiveData<List<VocabModel>> vocabList;
 
    // private MutableLiveData<List<VocabModel>> vocabQueue = new MutableLiveData<>();
@@ -57,6 +59,7 @@ public class FlashcardRepository {
         mVocabDao = db.vocabDao();
 
         vocabList = mVocabDao.getVocabQueue();
+       // vocabQueue = mVocabDao.getVocabQueue();
       //  mAllVocab = mVocabDao.getFiveNewVocab();
 
       //  vocabQueue.setValue(mAllVocab.getValue());
@@ -73,6 +76,10 @@ public class FlashcardRepository {
            // wordQueue.add(modelOldList.getValue().get(i));
         }
 
+    }
+
+    public List<VocabModel> getVocabQueue(){
+        return vocabQueue;
     }
 
     public LiveData<List<VocabModel>> getVocabData(){

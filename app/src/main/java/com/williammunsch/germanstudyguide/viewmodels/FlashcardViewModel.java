@@ -3,6 +3,7 @@ package com.williammunsch.germanstudyguide.viewmodels;
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -26,49 +27,65 @@ import javax.inject.Inject;
 public class FlashcardViewModel extends ViewModel {
     private FlashcardRepository mFlashcardRepository;
     private LiveData<List<VocabModel>> vocabList;
-    private final MutableLiveData<String> mutableVocabList = new MutableLiveData<>();
-
-    //List used to keep the position of each flashcard in the queue,
-    //so the LiveData doesn't have to be changed,
-    // just which index is being shown in the live data.
-    private ArrayList<Integer> flashcardOrderList = new ArrayList<>();
-
-
-    private LiveData<LinkedList<VocabModel>> wordQueue;
-    private LiveData<List<VocabModel>> vocabQueue;
-
+    private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
 
     /**
-     * Keep track of the order of flashcards in the live data here, move the index
-     * positions around and remove them here.
+     * NEED TO TURN MEDIATORLIVEDATA INTO LIVEDATA TO EXPOSE TO THE VIEW
+     */
+
+    /**
+     * Keeps track of the order of flashcards in the live data here,
+     * moves the index positions around and removes them when necessary.
      */
     @Inject
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
 
-
        vocabList = mFlashcardRepository.getVocabData();
 
-        for (int i = 0; i < 5;i++){
-            flashcardOrderList.add(i);
+       //Livedata does not get updated when removing a node from mediatorlivedata, until the activity is recreated ?
+       mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+        /* Using lambda for simplicity instead of the code below
+        mediatorVocabList.addSource(vocabList, new Observer<List<VocabModel>>() {
+            @Override
+            public void onChanged(List<VocabModel> vocabModels) {
+                mediatorVocabList.setValue(vocabModels);
+            }
+        });
+*/
+
+
+       // mutableVocabList = Transformations.switchMap(
+       //         vocabList,
+        //        value -> mFlashcardRepository.getVocabData()
+       // );
+    }
+
+    public MediatorLiveData<List<VocabModel>> getMediatorVocabList(){
+        return mediatorVocabList;
+    }
+
+    /**
+     * Removes the top item from the mediatorLiveData list
+     */
+    public void popNode(){
+        List<VocabModel> list = mediatorVocabList.getValue();
+        try {
+            list.remove(0);
+        }catch(NullPointerException e){
+            System.out.println("List is null");
         }
-
-        vocabList = Transformations.switchMap(
-                mutableVocabList,
-                value -> mFlashcardRepository.getVocabData()
-        );
+        mediatorVocabList.setValue(list);
     }
 
-    public ArrayList<Integer> getFlashcardOrderList(){
-        return flashcardOrderList;
-    }
+    /**
+     * Moves the item in the mediatorLiveData list down a few indexes
+     */
+    public void moveNode(){
+        List<VocabModel> list = mediatorVocabList.getValue();
 
 
-
-    public void removeNode(int i){
-      //  flashcardOrderList.remove(i);
-      // mutableVocabList.getValue(
-
+        mediatorVocabList.setValue(list);
     }
 
 
@@ -76,9 +93,5 @@ public class FlashcardViewModel extends ViewModel {
         return vocabList;
     }
 
-    /*
-    public void removeFlashcard(int i){
-       mFlashcardRepository.removeFlashcard(i);
-   }
-*/
+
 }
