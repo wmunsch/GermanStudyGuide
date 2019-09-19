@@ -91,6 +91,8 @@ public class FlashcardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 System.out.println("PRESSED BUTTON");
                // flashcardViewModel.removeFlashcard(0);
+
+                //can put observe in onclicks!
                 flashcardViewModel.popNode();
 
 
@@ -113,13 +115,14 @@ public class FlashcardActivity extends AppCompatActivity {
 
                     }
                     topTestWord.setText(vocabModels.get(0).toString());
+                   // topTestWord.setText(vocabModels.get(0).toString());
                 }
             }
         });
 
 
 /*
-        flashcardViewModel.getVocabData().observe(this, new Observer<List<VocabModel>>() {
+        flashcardViewModel.getVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
                 System.out.println("PRINTING MODELLIST IN ACTIVITY     LIVE ");
@@ -129,6 +132,7 @@ public class FlashcardActivity extends AppCompatActivity {
                         System.out.println(vocabModels.get(i));
 
                     }
+                   // topTestWord.setText(vocabModels.get(0).toString());
                     //topTestWord.setText(vocabModels.get(0).toString());
                    // topTestWord.setText(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(0)).toString());
                 }

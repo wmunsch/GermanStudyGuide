@@ -29,9 +29,8 @@ public class FlashcardViewModel extends ViewModel {
     private LiveData<List<VocabModel>> vocabList;
     private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
 
-    /**
-     * NEED TO TURN MEDIATORLIVEDATA INTO LIVEDATA TO EXPOSE TO THE VIEW
-     */
+    //private MutableLiveData<List<VocabModel>> mutableVocabList;
+
 
     /**
      * Keeps track of the order of flashcards in the live data here,
@@ -55,15 +54,37 @@ public class FlashcardViewModel extends ViewModel {
 */
 
 
-       // mutableVocabList = Transformations.switchMap(
-       //         vocabList,
-        //        value -> mFlashcardRepository.getVocabData()
-       // );
-    }
 
+        /* use this to update the scores?
+        vocabList = Transformations.switchMap(
+                mediatorVocabList,
+                value -> mFlashcardRepository.getVocabData()
+        );
+        */
+
+    }
+/*
     public MediatorLiveData<List<VocabModel>> getMediatorVocabList(){
+        //return vocabList2;
         return mediatorVocabList;
     }
+*/
+
+    /**
+     *
+     * @return The MediatorLiveData as LiveData so it cant be changed from the activity
+     */
+    public LiveData<List<VocabModel>> getMediatorVocabList(){
+        //return vocabList2;
+        return mediatorVocabList;
+    }
+
+    public LiveData<List<VocabModel>> getVocabList(){
+        return vocabList;
+    }
+
+
+
 
     /**
      * Removes the top item from the mediatorLiveData list
@@ -89,9 +110,7 @@ public class FlashcardViewModel extends ViewModel {
     }
 
 
-    public LiveData<List<VocabModel>> getVocabData(){
-        return vocabList;
-    }
+
 
 
 }
