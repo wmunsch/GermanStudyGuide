@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.datamodels.Word;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
@@ -68,9 +70,13 @@ public class FlashcardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_learn);
-        Toolbar myToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
+       // setContentView(R.layout.activity_learn);
+        ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
+        binding.setLifecycleOwner(this);
+
+       // Toolbar myToolbar = findViewById(R.id.toolbar);
+        //setSupportActionBar(myToolbar);
+        setSupportActionBar(binding.toolbar);
 
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
 
@@ -78,6 +84,7 @@ public class FlashcardActivity extends AppCompatActivity {
         else{ System.out.println("NONNULL FACTORY IN FLASHCARDACTIVITY"); }
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
 
+        binding.setFlashcardviewmodel(flashcardViewModel);
 
         //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
@@ -104,24 +111,31 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-
+/*
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
                 System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
                 if (vocabModels != null) {
+                    //flashcardViewModel.setCurrentNode();
+                    //binding.invalidateAll();
+                    // flashcardViewModel.setCurrentNode(vocabModels.get(0).toString());
+                     //System.out.println("Setting currentNode to " + vocabModels.get(0).toString());
+                     //System.out.println("currentNode is : " + flashcardViewModel.getCurrentNode());
+
                     for (int i = 0 ; i < vocabModels.size();i++){
                         System.out.println(vocabModels.get(i));
+                       // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
+                       // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
 
                     }
-                    topTestWord.setText(vocabModels.get(0).toString());
                    // topTestWord.setText(vocabModels.get(0).toString());
                 }
             }
         });
 
-
 /*
+
         flashcardViewModel.getVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
@@ -138,8 +152,8 @@ public class FlashcardActivity extends AppCompatActivity {
                 }
             }
         });
-*/
 
+*/
 
 
 

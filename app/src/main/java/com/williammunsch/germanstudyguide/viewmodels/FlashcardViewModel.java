@@ -1,6 +1,8 @@
 package com.williammunsch.germanstudyguide.viewmodels;
 
 import android.app.Application;
+import android.net.TrafficStats;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -28,8 +30,11 @@ public class FlashcardViewModel extends ViewModel {
     private FlashcardRepository mFlashcardRepository;
     private LiveData<List<VocabModel>> vocabList;
     private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
+   // private String currentNode = "heehehehe";
+    private String currentNodeAnswer = "lalala";
 
-    //private MutableLiveData<List<VocabModel>> mutableVocabList;
+    private LiveData<VocabModel> currentNode;// = new MutableLiveData<>();
+
 
 
     /**
@@ -40,7 +45,8 @@ public class FlashcardViewModel extends ViewModel {
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
 
-       vocabList = mFlashcardRepository.getVocabData();
+        vocabList = mFlashcardRepository.getVocabData();
+
 
        //Livedata does not get updated when removing a node from mediatorlivedata, until the activity is recreated ?
        mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
@@ -53,6 +59,20 @@ public class FlashcardViewModel extends ViewModel {
         });
 */
 
+        /**
+         * Allows the textview to use databinding without having to call observe in the activity.
+         * First argument is the livedata where the value is coming from.
+         * Second argument (return value) is the object that the currentNode livedata needs to hold (a VocabModel in this case).
+         */
+        currentNode = Transformations.map(mediatorVocabList, value -> {
+            if (mediatorVocabList.getValue() != null){
+                return mediatorVocabList.getValue().get(0);
+            }else{
+                return null;//new VocabModel(0,null,null,null,null,0,0,0);
+            }
+        });
+      // currentNode = Transformations.map(mediatorVocabList, value -> mediatorVocabList.getValue().get(0));
+
 
 
         /* use this to update the scores?
@@ -63,12 +83,22 @@ public class FlashcardViewModel extends ViewModel {
         */
 
     }
-/*
-    public MediatorLiveData<List<VocabModel>> getMediatorVocabList(){
-        //return vocabList2;
-        return mediatorVocabList;
+
+
+
+    public String getCurrentNodeAnswer(){
+        return currentNodeAnswer;
     }
-*/
+
+
+
+    public void setCurrentNode(){
+      //  this.currentNode.setValue(mediatorVocabList.getValue().get(0));
+    }
+
+    public LiveData<VocabModel> getCurrentNode(){
+        return currentNode;
+    }
 
     /**
      *
@@ -86,6 +116,7 @@ public class FlashcardViewModel extends ViewModel {
 
 
 
+
     /**
      * Removes the top item from the mediatorLiveData list
      */
@@ -97,6 +128,7 @@ public class FlashcardViewModel extends ViewModel {
             System.out.println("List is null");
         }
         mediatorVocabList.setValue(list);
+
     }
 
     /**
