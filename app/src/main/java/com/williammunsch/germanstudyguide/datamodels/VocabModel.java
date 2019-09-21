@@ -15,14 +15,14 @@ public class VocabModel {
     private int studying;
     private String german;
     private String english;
-    private String gsent;
+    private String gesent;
     private String esent;
 
-    public VocabModel(int id, String german, String english, String gsent, String esent, int score, int freq, int studying){
+    public VocabModel(int id, String german, String english, String gesent, String esent, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
-        this.gsent = gsent;
+        this.gesent = gesent;
         this.esent = esent;
         this.score = score;
         this.freq = freq;
@@ -30,8 +30,22 @@ public class VocabModel {
     }
 
     public String toString(){
-        return _id+ " " + german+ " " +english;
+        if (score > 50){
+            return english;
+        }else{
+            return german;
+        }
+       // return _id+ " " + german+ " " +english;
     }
+
+    public String toSentence(){
+        if (score > 50){
+            return esent;
+        }else{
+            return gesent;
+        }
+    }
+
 
     public int getId() {
         return _id;
@@ -81,12 +95,12 @@ public class VocabModel {
         this.english = english;
     }
 
-    public String getGsent() {
-        return gsent;
+    public String getGesent() {
+        return gesent;
     }
 
-    public void setGsent(String gsent) {
-        this.gsent = gsent;
+    public void setGesent(String gesent) {
+        this.gesent = gesent;
     }
 
     public String getEsent() {

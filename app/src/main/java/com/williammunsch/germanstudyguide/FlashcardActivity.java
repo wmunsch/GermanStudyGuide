@@ -97,11 +97,9 @@ public class FlashcardActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 System.out.println("PRESSED BUTTON");
-               // flashcardViewModel.removeFlashcard(0);
-
                 //can put observe in onclicks!
-                flashcardViewModel.popNode();
-
+               // flashcardViewModel.popNode();
+                flashcardViewModel.showSentence();
 
             }
         });
@@ -111,12 +109,13 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-/*
+
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
                 System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
                 if (vocabModels != null) {
+                    System.out.println("SENTENCE :  " +flashcardViewModel.getMediatorVocabList().getValue().get(0).toSentence());
                     //flashcardViewModel.setCurrentNode();
                     //binding.invalidateAll();
                     // flashcardViewModel.setCurrentNode(vocabModels.get(0).toString());
@@ -134,8 +133,8 @@ public class FlashcardActivity extends AppCompatActivity {
             }
         });
 
-/*
 
+/*
         flashcardViewModel.getVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
