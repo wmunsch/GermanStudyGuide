@@ -27,28 +27,32 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <Button
-        android:id="@+id/button_next"
-        android:layout_width="200dp"
-        android:layout_height="35sp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/button_selector"
-        android:text="Check"
-        android:textAllCaps="false"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_iwasright" />
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="200dp"
+            android:layout_height="35sp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_selector"
+            android:onClick="@{() -> flashcardviewmodel.checkAnswer()}"
+            android:text="@{flashcardviewmodel.checkButtonText, default = Check}"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toEndOf="@+id/button_iwasright"
+            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
+            app:layout_constraintVertical_bias="1.0" />
 
-    <TextView
+        <TextView
         android:id="@+id/textView_germanWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="8dp"
+        android:textColor="#000000"
         android:text="@{flashcardviewmodel.currentNode.toString()}"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,6 +76,7 @@
         android:textColor="#000000"
         android:textCursorDrawable="@null"
         android:imeOptions="actionDone"
+        android:text="@={flashcardviewmodel.answer}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -138,49 +143,53 @@
         android:textAllCaps="false"
         android:textColor="#ffffff"
         android:textSize="16sp"
+        android:onClick="@{() -> flashcardviewmodel.showSentence()}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
 
-    <ImageView
-        android:id="@+id/imageView_checkmark"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:visibility="invisible"
-        android:src="@drawable/checkmark"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        <ImageView
+            android:id="@+id/imageView_checkmark"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/checkmark"
+            android:visibility="@{flashcardviewmodel.checkmarkVisibility, default=invisible}"
+            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <ImageView
-        android:id="@+id/imageView_xmark"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:src="@drawable/xmark"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        <ImageView
+            android:id="@+id/imageView_xmark"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/xmark"
+            android:visibility="@{flashcardviewmodel.xmarkVisibility, default=invisible}"
+            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <Button
-        android:id="@+id/button_iwasright"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/button_selector"
-        android:text="I was right"
-        android:visibility="gone"
-        android:textAllCaps="false"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/button_iwasright"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_selector"
+            android:text="I was right"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:visibility="@{flashcardviewmodel.iwasrightVisibility, default=gone}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
+            app:layout_constraintVertical_bias="1.0" />
 
-    <LinearLayout
+        <LinearLayout
         android:id="@+id/linearLayout_correct"
         android:layout_width="match_parent"
         android:layout_height="80dp"

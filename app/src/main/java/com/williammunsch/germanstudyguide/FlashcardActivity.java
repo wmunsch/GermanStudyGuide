@@ -80,8 +80,8 @@ public class FlashcardActivity extends AppCompatActivity {
 
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
 
-        if (viewModelFactory == null){System.out.println("NULL FACTORY IN FLASHCARDACTIVITY");}
-        else{ System.out.println("NONNULL FACTORY IN FLASHCARDACTIVITY"); }
+      //  if (viewModelFactory == null){System.out.println("NULL FACTORY IN FLASHCARDACTIVITY");}
+       // else{ System.out.println("NONNULL FACTORY IN FLASHCARDACTIVITY"); }
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
 
         binding.setFlashcardviewmodel(flashcardViewModel);
@@ -90,8 +90,9 @@ public class FlashcardActivity extends AppCompatActivity {
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
         //bindViews();
-        topTestWord = findViewById(R.id.textView_germanWord);
+        //topTestWord = findViewById(R.id.textView_germanWord);
 
+        /*
         buttonHint = findViewById(R.id.button_seeSentence);
         buttonHint.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -103,13 +104,13 @@ public class FlashcardActivity extends AppCompatActivity {
 
             }
         });
-
+*/
 
         shortAnimationDuration = 500;
 
 
 
-
+/*
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
@@ -263,6 +264,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
     //These need to be in the viewmodel?   can i use databinding to replace these?
+    /*
     private void setUpNextWord(){
         englishSentence.setVisibility(View.INVISIBLE);
         germanSentence.setVisibility(View.INVISIBLE);
@@ -323,7 +325,7 @@ public class FlashcardActivity extends AppCompatActivity {
         fadeIn(buttonHint,50);
         fadeIn(buttonCheck,50);
     }
-
+*/
     private void delayButtonCheck(){
         buttonCheck.setEnabled(false);
         new CountDownTimer(2100, 10) { //Set Timer for 5 seconds
@@ -338,7 +340,7 @@ public class FlashcardActivity extends AppCompatActivity {
     }
 
 
-
+/*
     private void setUpCorrectAnswerViews(){
         germanSentence.setText(head.getNext().getGSentence());
         englishSentence.setText(head.getNext().getEsentence());
@@ -380,7 +382,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-
+*/
 
     public void backToMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);

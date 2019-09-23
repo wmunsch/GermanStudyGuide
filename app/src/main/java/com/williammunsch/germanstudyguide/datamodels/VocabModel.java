@@ -17,6 +17,7 @@ public class VocabModel {
     private String english;
     private String gesent;
     private String esent;
+    //private String[] englishStringsArray;
 
     public VocabModel(int id, String german, String english, String gesent, String esent, int score, int freq, int studying){
         this._id = id;
@@ -27,6 +28,7 @@ public class VocabModel {
         this.score = score;
         this.freq = freq;
         this.studying = studying;
+
     }
 
     public String toString(){
@@ -45,6 +47,17 @@ public class VocabModel {
             return gesent;
         }
     }
+
+    public String[] getEnglishStringsArray()
+    {
+        if (english!=null){
+            String[] englishStringsArray = english.split(",");
+            return englishStringsArray;
+        }
+        return null;
+
+    }
+
 
 
     public int getId() {
@@ -87,9 +100,12 @@ public class VocabModel {
         this.german = german;
     }
 
+
     public String getEnglish() {
         return english;
     }
+
+
 
     public void setEnglish(String english) {
         this.english = english;

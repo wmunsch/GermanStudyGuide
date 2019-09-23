@@ -4,6 +4,9 @@ import android.app.Application;
 import android.net.TrafficStats;
 
 import androidx.databinding.Bindable;
+import androidx.databinding.Observable;
+import androidx.databinding.PropertyChangeRegistry;
+import androidx.databinding.library.baseAdapters.BR;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -28,10 +31,11 @@ import java.util.Queue;
 
 import javax.inject.Inject;
 
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class FlashcardViewModel extends ViewModel {
+public class FlashcardViewModel extends ViewModel implements Observable {
     private FlashcardRepository mFlashcardRepository;
     private LiveData<List<VocabModel>> vocabList;
     private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
@@ -52,8 +56,15 @@ public class FlashcardViewModel extends ViewModel {
 
     //Keep track of hint sentence visibility in a LiveData for data binding.
     private MutableLiveData<Integer> mHintVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> checkmarkVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> xmarkVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> iwasrightVisibility = new MutableLiveData<>();
+    private MutableLiveData<String> checkButtonText = new MutableLiveData<>();
 
 
+    private PropertyChangeRegistry propertyChangeRegistry = new PropertyChangeRegistry();
+    private String answer = "";
+    private boolean finished = false;
 
 
     /**
@@ -84,25 +95,37 @@ public class FlashcardViewModel extends ViewModel {
         });
 
         mHintVisibility.setValue(INVISIBLE);
-
-
-
-
-        /* use this to update the scores?
-        vocabList = Transformations.switchMap(
-                mediatorVocabList,
-                value -> mFlashcardRepository.getVocabData()
-        );
-        */
-
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        checkButtonText.setValue("Check");
+        iwasrightVisibility.setValue(GONE);
     }
 
 
+    public LiveData<String> getCheckButtonText(){
+        return checkButtonText;
+    }
 
+    public LiveData<Integer> getIwasrightVisibility(){
+        return iwasrightVisibility;
+    }
+
+
+    public LiveData<Integer> getXmarkVisibility(){
+        return xmarkVisibility;
+    }
+    public LiveData<Integer> getCheckmarkVisibility(){
+        return checkmarkVisibility;
+    }
+
+    public void setCheckmarkVisibility(){
+        //checkmarkVisibility;
+    }
 
     public LiveData<Integer> getHintVisibility(){
         return mHintVisibility;
     }
+
 
     public void showSentence(){
         if (mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
@@ -126,8 +149,62 @@ public class FlashcardViewModel extends ViewModel {
 
 
 
+    public void checkAnswer(){
+        System.out.println("Checking answer");
+        System.out.println("ANSWERtext IS : " + answer + "   currect answer: " + currentNode.getValue().getEnglish());
+        if (!finished){
+            boolean test = false;
+
+            //test entered answer against all possible answers in the VocabModel
+            for (String s : currentNode.getValue().getEnglishStringsArray()){
+                if (s.equalsIgnoreCase(answer)){
+                    test = true;
+                }
+            }
+
+            if (test && !answer.equals("")) {
+                System.out.println("CORRECT");
+                setUpCorrectAnswerViews();
+            } else if (!test && !answer.equals("")) {
+                System.out.println("INCORRECT");
+                setUpIncorrectAnswerViews();
+            }else{
+                //Do nothing because the edit text is empty. Prevents misclicks.
+            }
+        }else{
+            moveToNextNode();
+        }
 
 
+    }
+
+    private void setUpIncorrectAnswerViews(){
+        xmarkVisibility.setValue(VISIBLE);
+        iwasrightVisibility.setValue(VISIBLE);
+        //TODO : set linearLayout_correct to visible
+
+
+        checkButtonText.setValue("Next");
+        finished = true;
+    }
+
+    private void setUpCorrectAnswerViews(){
+        checkmarkVisibility.setValue(VISIBLE);
+        //TODO : set linearLayout_correct to visible to show other answers?
+
+        checkButtonText.setValue("Next");
+        finished = true;
+
+    }
+
+    private void moveToNextNode(){
+        popNode();
+        checkButtonText.setValue("Check");
+        finished = false;
+        setAnswer("");
+        checkmarkVisibility.setValue(INVISIBLE);
+        mHintVisibility.setValue(INVISIBLE);
+    }
 
 
     /**
@@ -154,10 +231,27 @@ public class FlashcardViewModel extends ViewModel {
         mediatorVocabList.setValue(list);
     }
 
+    //Two-way binding to allow reading of the edit text
+    @Bindable
+    public String getAnswer(){
+        return answer;
+    }
+
+    public void setAnswer(String a){
+        this.answer = a;
+        propertyChangeRegistry.notifyChange(this, BR.answer);
+    }
 
 
+    @Override
+    public void addOnPropertyChangedCallback(OnPropertyChangedCallback callback) {
+        propertyChangeRegistry.add(callback);
+    }
 
-
+    @Override
+    public void removeOnPropertyChangedCallback(OnPropertyChangedCallback callback) {
+        propertyChangeRegistry.remove(callback);
+    }
 }
 
 
