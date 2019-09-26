@@ -110,13 +110,13 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
 
-/*
+
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
-                System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
+               // System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
                 if (vocabModels != null) {
-                    System.out.println("SENTENCE :  " +flashcardViewModel.getMediatorVocabList().getValue().get(0).toSentence());
+                   // System.out.println("SENTENCE :  " +flashcardViewModel.getMediatorVocabList().getValue().get(0).toSentence());
                     //flashcardViewModel.setCurrentNode();
                     //binding.invalidateAll();
                     // flashcardViewModel.setCurrentNode(vocabModels.get(0).toString());
@@ -124,7 +124,7 @@ public class FlashcardActivity extends AppCompatActivity {
                      //System.out.println("currentNode is : " + flashcardViewModel.getCurrentNode());
 
                     for (int i = 0 ; i < vocabModels.size();i++){
-                        System.out.println(vocabModels.get(i));
+                        System.out.println(vocabModels.get(i).getId() + " " + vocabModels.get(i) + " " + vocabModels.get(i).getStudying());
                        // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
                        // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
 

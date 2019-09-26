@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 
@@ -29,7 +30,8 @@ public interface VocabDao {
 
 
     //Gets # of new vocab and # of old vocab for review combined
-    @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
+   // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
+    @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) ORDER BY studying ASC")
     LiveData<List<VocabModel>> getVocabQueue();
 
     //Gets # of new vocab and # of old vocab for review combined
@@ -37,7 +39,13 @@ public interface VocabDao {
     //List<VocabModel>getVocabQueue();
 
 
-
+    /**
+     * Update the vocabModel word with the new score.
+     */
+    @Update
+    void updateNode(VocabModel... vocabModels);
+   // @Query("UPDATE vocab_table SET score = score")
+   // void updateNode(VocabModel vocabModel);
 
     @Insert
     void insert(VocabModel vocabModel);

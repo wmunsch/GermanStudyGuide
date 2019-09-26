@@ -86,6 +86,27 @@ public class FlashcardRepository {
         return vocabList;
     }
 
+    public void updateNode(VocabModel vocabModel){
+        new updateNodeAsyncTask(mVocabDao).execute(vocabModel);
+    }
+
+
+    private static class updateNodeAsyncTask extends AsyncTask<VocabModel, Void, Void> {
+
+        private VocabDao mAsyncTaskDao;
+
+        updateNodeAsyncTask(VocabDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabModel... params) {
+            mAsyncTaskDao.updateNode(params[0]);
+            System.out.println("Updating node to " + params[0].getScore());
+            return null;
+        }
+    }
+
 
 /*
     private class GetVocabListAsyncTask extends AsyncTask<List<VocabModel>, Void, Void>{

@@ -76,6 +76,7 @@
         android:textColor="#000000"
         android:textCursorDrawable="@null"
         android:imeOptions="actionDone"
+        android:visibility="@{flashcardviewmodel.editTextVisibility, default=visible}"
         android:text="@={flashcardviewmodel.answer}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -89,14 +90,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="8dp"
-        android:text="TextView"
+        android:text="@{flashcardviewmodel.currentNode.english}"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:visibility="gone"
+        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"/>
 
     <TextView
         android:id="@+id/textView_germanSentence"
@@ -106,13 +107,15 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:padding="10dp"
-        android:text="TextView"
+        android:text="@{flashcardviewmodel.currentNode.toSentence()}"
+        android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+
         android:textAlignment="center"
-        android:textSize="16dp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
+        app:layout_constraintTop_toBottomOf="@+id/button_seeSentence" />
 
     <TextView
         android:id="@+id/textView_englishSentence"
@@ -122,10 +125,10 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:padding="10dp"
-        android:text="@{flashcardviewmodel.currentNode.toSentence()}"
+        android:text="@{flashcardviewmodel.currentNode.esent}"
         android:textAlignment="center"
         android:textSize="16sp"
-        android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -143,6 +146,7 @@
         android:textAllCaps="false"
         android:textColor="#ffffff"
         android:textSize="16sp"
+        android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=visible}"
         android:onClick="@{() -> flashcardviewmodel.showSentence()}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -196,7 +200,7 @@
         android:layout_marginTop="20dp"
         android:background=" #ff9999 "
         android:orientation="vertical"
-        android:visibility="invisible"
+        android:visibility="@{flashcardviewmodel.correctLayoutVisibility, default=gone}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText_entry">
@@ -217,7 +221,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
-            android:text="@{flashcardviewmodel.currentNodeAnswer}"
+            android:text="@{flashcardviewmodel.currentNode.answer}"
             android:textColor=" #8e0000"
             android:textSize="18sp" />
 

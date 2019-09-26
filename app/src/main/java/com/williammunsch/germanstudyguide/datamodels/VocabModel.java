@@ -40,6 +40,14 @@ public class VocabModel {
        // return _id+ " " + german+ " " +english;
     }
 
+    public String getAnswer(){
+        if (score < 50){
+            return english;
+        }else{
+            return german;
+        }
+    }
+
     public String toSentence(){
         if (score > 50){
             return esent;
@@ -58,7 +66,22 @@ public class VocabModel {
 
     }
 
+    public void increaseScore(){
+        if (score < 95){
+            score += 5;
+        }else{
+            score = 100;
+        }
 
+    }
+
+    public void decreaseScore(){
+        if (score >5){
+            score -=5;
+        }else{
+            score = 0;
+        }
+    }
 
     public int getId() {
         return _id;

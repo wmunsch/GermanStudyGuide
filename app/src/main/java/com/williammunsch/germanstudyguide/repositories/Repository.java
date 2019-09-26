@@ -85,7 +85,7 @@ public class Repository {
                 deleteAll();
 
                 for (int i = 0; i < vocabList.size();i++){
-                    System.out.println(vocabList.get(i).toString() + " " + vocabList.get(i).toSentence());
+                    System.out.println(vocabList.get(i).toString() + " " + vocabList.get(i).toSentence() + " " + vocabList.get(i).getStudying());
                    insert(vocabList.get(i));
                 }
 
