@@ -124,7 +124,7 @@ public class FlashcardActivity extends AppCompatActivity {
                      //System.out.println("currentNode is : " + flashcardViewModel.getCurrentNode());
 
                     for (int i = 0 ; i < vocabModels.size();i++){
-                        System.out.println(vocabModels.get(i).getId() + " " + vocabModels.get(i) + " " + vocabModels.get(i).getStudying());
+                        System.out.println(vocabModels.get(i).getId() + " " + vocabModels.get(i) + " " + vocabModels.get(i).getScore()+" " + vocabModels.get(i).getStudying());
                        // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
                        // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
 

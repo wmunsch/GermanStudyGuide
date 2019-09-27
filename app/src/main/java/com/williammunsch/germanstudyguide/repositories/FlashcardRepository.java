@@ -6,8 +6,10 @@ import android.os.AsyncTask;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.datamodels.Word;
@@ -20,9 +22,14 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 
 /**
@@ -49,6 +56,37 @@ public class FlashcardRepository {
     private final int newWords = 5;
 
 
+
+    private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
+    private LiveData<VocabModel> currentNode;// = new MutableLiveData<>();
+    private MutableLiveData<Integer> mHintVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> checkmarkVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> xmarkVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> iwasrightVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> correctLayoutVisibility = new MutableLiveData<>();
+    private MutableLiveData<String> checkButtonText = new MutableLiveData<>();
+    private MutableLiveData<Integer> editTextVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> hintButtonVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
+    private String answer = "";
+
+
+    private boolean finished = false;
+
+
+
+    private boolean finishedWithActivity = false;
+
+
+
+    private boolean correct = false;
+    private Random random = new Random();
+
+
+
+    private ArrayList<VocabModel> finishedList = new ArrayList<>();
+
+
     /**
      * Need to inject context to get access to the live data to create the queue.
      * Queue needs to be stored here so it will save throughout changes in the lifecycle.
@@ -59,6 +97,25 @@ public class FlashcardRepository {
         mVocabDao = db.vocabDao();
 
         vocabList = mVocabDao.getVocabQueue();
+        mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+
+
+        currentNode = Transformations.map(mediatorVocabList, value -> {
+            if (mediatorVocabList.getValue() != null){
+                System.out.println("calling transformations.map currentNode = " + currentNode.getValue());
+                if (mediatorVocabList.getValue().size()>0){
+                    if (mediatorVocabList.getValue().get(0).getStudying()==0){
+                        setUpViewsForNewCard();
+                    }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
+                        setUpViewsForOldCard();
+                    }
+                    return mediatorVocabList.getValue().get(0);
+                }
+                return null;
+            }else{
+                return null;//new VocabModel(0,null,null,null,null,0,0,0);
+            }
+        });
        // vocabQueue = mVocabDao.getVocabQueue();
       //  mAllVocab = mVocabDao.getFiveNewVocab();
 
@@ -78,12 +135,233 @@ public class FlashcardRepository {
 
     }
 
+    /**
+     * Removes the top item from the mediatorLiveData list
+     */
+    private void popNode(){
+        List<VocabModel> list = mediatorVocabList.getValue();
+        try {
+            // finishedList.add(list.get(0));
+            finishedList.add(currentNode.getValue());
+            list.remove(0);
+        }catch(NullPointerException e){
+            System.out.println("List is null");
+        }
+        mediatorVocabList.setValue(list);
+    }
+
+    /**
+     * Moves the item in the mediatorLiveData list down a random number of indexes
+     */
+    public void moveNode(){
+        List<VocabModel> list =mediatorVocabList.getValue();
+        System.out.println("Size is " + list.size());
+
+        VocabModel temp = list.get(0);
+        int ranNum = 0;
+
+        if (list.size() > 5){
+            ranNum = random.nextInt(3)+3;  //index 0-5+  between 3 and 5
+        }
+        else if (list.size() == 5){
+            ranNum = random.nextInt(2)+3;   //index 0-4 between 3 and 4
+        }
+        else if (list.size() == 4){
+            ranNum = random.nextInt(2)+2; //index 0-3   between 2 and 3
+        }
+        else if (list.size() == 3){
+            ranNum = random.nextInt(2)+1;  //index 0-2  between 1 and 2
+        }
+        else if (list.size() == 2){
+            ranNum = 1;
+        }
+
+        //Move every index between 0 and where the currentNode will go down one position
+        for (int i = 0; i < ranNum; i++){
+            list.set(i, list.get(i+1));
+        }
+
+        list.set(ranNum,temp); //move the currentNode to the random position chosen earlier
+
+        mediatorVocabList.setValue(list);
+    }
+
+    public void updateAllNodes(){
+        System.out.println("UPDATING ALL NODES");
+        for (int i = 0 ; i < finishedList.size();i++){
+            updateNode(finishedList.get(i));
+        }
+    }
+
+    private void setUpViewsForNewCard(){
+        System.out.println("CALLING setupviewsforNEWcard");
+        englishTextVisibility.setValue(VISIBLE);
+        mHintVisibility.setValue(VISIBLE);
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        checkButtonText.setValue("Next");
+        iwasrightVisibility.setValue(GONE);
+        correctLayoutVisibility.setValue(GONE);
+        editTextVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(INVISIBLE);
+    }
+
+    private void setUpViewsForOldCard(){
+        System.out.println("CALLING setupviewsforOLDcard");
+        checkButtonText.setValue("Check");
+        finished = false;
+        //setAnswer("");
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        mHintVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(VISIBLE);
+        editTextVisibility.setValue(VISIBLE);
+        englishTextVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        iwasrightVisibility.setValue(GONE);
+    }
+
+    private void setUpIncorrectAnswerViews(){
+        System.out.println("calling setupincorrectanswerviews");
+        xmarkVisibility.setValue(VISIBLE);
+        iwasrightVisibility.setValue(VISIBLE);
+        correctLayoutVisibility.setValue(VISIBLE);
+
+        checkButtonText.setValue("Next");
+        //finished = true;
+    }
+
+    private void setUpCorrectAnswerViews(){
+        System.out.println("calling setupcorrectanswerviews");
+        checkmarkVisibility.setValue(VISIBLE);
+        //TODO : set linearLayout_correct to visible to show other answers?
+
+        checkButtonText.setValue("Next");
+       // finished = true;
+
+    }
+
+    public boolean isFinishedWithActivity() {
+        return finishedWithActivity;
+    }
+
+    public void setFinishedWithActivity(boolean finishedWithActivity) {
+        this.finishedWithActivity = finishedWithActivity;
+    }
+
+    public void removeMediatorSource(){
+        mediatorVocabList.removeSource(vocabList);
+    }
+
+    public boolean isCorrect() {
+        return correct;
+    }
+
+    public void setCorrect(boolean correct) {
+        this.correct = correct;
+    }
+
+    public void setMediatorVocabListValue(List<VocabModel> list) {
+        this.mediatorVocabList.setValue(list);
+    }
+
+
+    public ArrayList<VocabModel> getFinishedList() {
+        return finishedList;
+    }
+
+    public void setFinishedList(ArrayList<VocabModel> finishedList) {
+        this.finishedList = finishedList;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+    public void setEnglishTextVisibility(int i){
+        englishTextVisibility.setValue(i);
+    }
+    public void setHintButtonVisibility(int i){
+        hintButtonVisibility.setValue(i);
+    }
+    public void setEditTextVisibility(int i){
+        editTextVisibility.setValue(i);
+    }
+    public void setCheckButtonText(String s){
+        checkButtonText.setValue(s);
+    }
+    public void setCorrectLayoutVisibility(int i){
+        correctLayoutVisibility.setValue(i);
+    }
+    public void setIwasrightVisibility(int i){
+        iwasrightVisibility.setValue(i);
+    }
+    public void setCheckmarkVisibility(int i){
+        checkmarkVisibility.setValue(i);
+    }
+    public void setmHintVisibility(int i){
+        mHintVisibility.setValue(i);
+    }
+
+    public void setXmarkVisibility(int i){
+        xmarkVisibility.setValue(i);
+    }
+
     public List<VocabModel> getVocabQueue(){
         return vocabQueue;
     }
 
     public LiveData<List<VocabModel>> getVocabData(){
         return vocabList;
+    }
+    public LiveData<Integer> getEnglishTextVisibility(){
+        return englishTextVisibility;
+    }
+    public LiveData<Integer> getHintButtonVisibility(){
+        return hintButtonVisibility;
+    }
+    public LiveData<Integer> getEditTextVisibility(){
+        return editTextVisibility;
+    }
+
+    public LiveData<String> getCheckButtonText(){
+        return checkButtonText;
+    }
+
+    public LiveData<Integer> getIwasrightVisibility(){
+        return iwasrightVisibility;
+    }
+    public LiveData<Integer> getCorrectLayoutVisibility(){
+        return correctLayoutVisibility;
+    }
+
+    public LiveData<Integer> getXmarkVisibility(){
+        return xmarkVisibility;
+    }
+    public LiveData<Integer> getCheckmarkVisibility(){
+        return checkmarkVisibility;
+    }
+
+    public LiveData<Integer> getHintVisibility(){
+        return mHintVisibility;
+    }
+
+
+    public void showSentence(){
+        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
+        else{mHintVisibility.setValue(VISIBLE);}
+    }
+
+    public LiveData<List<VocabModel>> getMediatorVocabList(){
+        return mediatorVocabList;
+    }
+
+    public LiveData<VocabModel> getCurrentNode(){
+        return currentNode;
     }
 
     public void updateNode(VocabModel vocabModel){

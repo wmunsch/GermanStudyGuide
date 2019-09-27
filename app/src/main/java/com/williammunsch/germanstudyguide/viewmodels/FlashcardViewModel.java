@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
@@ -39,7 +40,7 @@ import static android.view.View.VISIBLE;
 public class FlashcardViewModel extends ViewModel implements Observable {
     private FlashcardRepository mFlashcardRepository;
     private LiveData<List<VocabModel>> vocabList;
-    private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
+
    // private String currentNode = "heehehehe";
     private String currentNodeAnswer = "lalala";
    // private String hintVisibility = "invisible";
@@ -48,14 +49,18 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
    // private MutableLiveData<Integer> hintVisibility = new MutableLiveData<>();
 
-    private LiveData<VocabModel> currentNode;// = new MutableLiveData<>();
+
 
 
   //  private Integer hintVisibility = VISIBLE;
     //private String hintVisibility = "VISIBLE";
    // private LiveData<Integer> hintVisibility;
 
+    //TODO : Move all of these databinding values into the repository so it saves as a singleton
     //Keep track of hint sentence visibility in a LiveData for data binding.
+    /*
+    private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
+    private LiveData<VocabModel> currentNode;// = new MutableLiveData<>();
     private MutableLiveData<Integer> mHintVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> checkmarkVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> xmarkVisibility = new MutableLiveData<>();
@@ -65,23 +70,25 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     private MutableLiveData<Integer> editTextVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> hintButtonVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
+    private ArrayList<VocabModel> finishedList = new ArrayList<>();
 
-
+*/
     //private MutableLiveData<VocabModel> currentNode = new MutableLiveData<>();
 
 
     private PropertyChangeRegistry propertyChangeRegistry = new PropertyChangeRegistry();
 
-    private ArrayList<VocabModel> finishedList = new ArrayList<>();
+
 
     private String answer = "";
     private boolean finished = false;
+    private boolean finishedWithActivity = false;
 
     private Random random = new Random();
     private boolean correct;
-    private String textToShow;
 
-    //TODO : make incorrect stuff invisible when moving to next node
+    //TODO : reset edittext to ""
+
 
     /**
      * Keeps track of the order of flashcards in the live data here,
@@ -91,11 +98,11 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
 
-        vocabList = mFlashcardRepository.getVocabData();
+        //vocabList = mFlashcardRepository.getVocabData();
 
        //Livedata does not get updated when removing a node from mediatorlivedata, until the activity is recreated ?
         //Needs to be observed or it does not get updated.
-       mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+      // mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
         //currentNode.setValue(mediatorVocabList.getValue().get(0));
 
         /*
@@ -103,12 +110,18 @@ public class FlashcardViewModel extends ViewModel implements Observable {
          * First argument is the livedata where the value is coming from.
          * Second argument (return value) is the object that the currentNode livedata needs to hold (a VocabModel in this case).
          */
-
-
+        //setUpViewsForNewCard();
+       // checkButtonText.setValue("TUNAKTUNAKTAUNK");
+        /*
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
-               //System.out.println("calling transformations.map currentNode = " + currentNode.getValue());
+               System.out.println("calling transformations.map currentNode = " + currentNode.getValue());
                 if (mediatorVocabList.getValue().size()>0){
+                    if (mediatorVocabList.getValue().get(0).getStudying()==0){
+                        setUpViewsForNewCard();
+                    }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
+                        setUpViewsForOldCard();
+                    }
                     return mediatorVocabList.getValue().get(0);
                 }
                     return null;
@@ -117,9 +130,21 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             }
         });
 
+         */
 
 
+/*
+        if (currentNode.getValue()!= null && currentNode.getValue().getStudying()==0){
+            setUpViewsForNewCard();
+        }else if (currentNode.getValue()!= null && currentNode.getValue().getStudying()==1){
+            setUpViewsForOldCard();
+        }else{
+            setUpViewsForNewCard();
+        }
 
+        //setUpViewsForNewCard();
+
+        /*
         englishTextVisibility.setValue(VISIBLE);
         mHintVisibility.setValue(VISIBLE);
         checkmarkVisibility.setValue(INVISIBLE);
@@ -130,75 +155,85 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         editTextVisibility.setValue(INVISIBLE);
         hintButtonVisibility.setValue(INVISIBLE);
 
+         */
+
 
     }
+    /*
+    private void setUpViewsForNewCard(){
+        System.out.println("CALLING setupviewsforNEWcard");
+        englishTextVisibility.setValue(VISIBLE);
+        mHintVisibility.setValue(VISIBLE);
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        checkButtonText.setValue("Next");
+        iwasrightVisibility.setValue(GONE);
+        correctLayoutVisibility.setValue(GONE);
+        editTextVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(INVISIBLE);
+    }
+
+    private void setUpViewsForOldCard(){
+        System.out.println("CALLING setupviewsforOLDcard");
+        checkButtonText.setValue("Check");
+        finished = false;
+        setAnswer("");
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        mHintVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(VISIBLE);
+        editTextVisibility.setValue(VISIBLE);
+        englishTextVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        iwasrightVisibility.setValue(GONE);
+    }
+
+     */
+
+
     public LiveData<Integer> getEnglishTextVisibility(){
-        return englishTextVisibility;
+        return mFlashcardRepository.getEnglishTextVisibility();
     }
     public LiveData<Integer> getHintButtonVisibility(){
-        return hintButtonVisibility;
+        return mFlashcardRepository.getHintButtonVisibility();
     }
     public LiveData<Integer> getEditTextVisibility(){
-        return editTextVisibility;
+        return mFlashcardRepository.getEditTextVisibility();
     }
 
     public LiveData<String> getCheckButtonText(){
-        return checkButtonText;
+        return mFlashcardRepository.getCheckButtonText();
     }
-
     public LiveData<Integer> getIwasrightVisibility(){
-        return iwasrightVisibility;
+        return mFlashcardRepository.getIwasrightVisibility();
     }
     public LiveData<Integer> getCorrectLayoutVisibility(){
-        return correctLayoutVisibility;
+        return mFlashcardRepository.getCorrectLayoutVisibility();
     }
-
     public LiveData<Integer> getXmarkVisibility(){
-        return xmarkVisibility;
+        return mFlashcardRepository.getXmarkVisibility();
     }
     public LiveData<Integer> getCheckmarkVisibility(){
-        return checkmarkVisibility;
+        return mFlashcardRepository.getCheckmarkVisibility();
     }
-
-    public void setCheckmarkVisibility(){
-        //checkmarkVisibility;
-    }
-
     public LiveData<Integer> getHintVisibility(){
-        return mHintVisibility;
+        return mFlashcardRepository.getHintVisibility();
     }
 
 
     public void showSentence(){
-        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
-        else{mHintVisibility.setValue(VISIBLE);}
+        mFlashcardRepository.showSentence();
     }
 
     public LiveData<List<VocabModel>> getMediatorVocabList(){
-        return mediatorVocabList;
+        return mFlashcardRepository.getMediatorVocabList();
     }
 
-
-
-    public String getCurrentNodeAnswer(){
-        return currentNodeAnswer;
-    }
-
-    public String getTextToShow(){
-        return textToShow;
-    }
 
 
     public LiveData<VocabModel> getCurrentNode(){
-        return currentNode;
-        /*
-        MutableLiveData<VocabModel> node = new MediatorLiveData<>();
-        if (mediatorVocabList.getValue() != null){
-            node.setValue(mediatorVocabList.getValue().get(0));
-        }
-        return node;
-
-         */
+        return mFlashcardRepository.getCurrentNode();
     }
 
 
@@ -206,16 +241,14 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public void checkAnswer(){
        // moveToNextNode();
        // System.out.println("currentNode = " + currentNode.getValue());
-
-
-            if (!finished && currentNode.getValue()!=null && currentNode.getValue().getStudying() != 0){
+            if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
                 System.out.println("Checking answer");
-                System.out.println("ANSWERtext IS : " + answer + "   currect answer: " + currentNode.getValue().getEnglish());
+                System.out.println("ANSWERtext IS : " + answer + "   currect answer: " + mFlashcardRepository.getCurrentNode().getValue().getEnglish());
                 //System.out.println("ANSWERtext IS : " + answer + "   currect answer: " + mediatorVocabList.getValue().get(0).getEnglish());
                 boolean test = false;
 
                 //test entered answer against all possible answers in the VocabModel
-                for (String s : currentNode.getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
+                for (String s : mFlashcardRepository.getCurrentNode().getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
                     if (s.equalsIgnoreCase(answer)){
                         test = true;
                     }
@@ -225,18 +258,18 @@ public class FlashcardViewModel extends ViewModel implements Observable {
                     System.out.println("CORRECT");
                     // mediatorVocabList.getValue().get(0).setScore(mediatorVocabList.getValue().get(0).getScore()+5);
                    // currentNode.getValue().setScore(currentNode.getValue().getScore()+5);
-                    currentNode.getValue().increaseScore();
+                    mFlashcardRepository.getCurrentNode().getValue().increaseScore();
                     //mFlashcardRepository.updateNode(mediatorVocabList.getValue().get(0));
-                    correct = true;
+                    mFlashcardRepository.setCorrect(true);
                     setUpCorrectAnswerViews();
 
                 } else if (!test && !answer.equals("")) {
                     System.out.println("INCORRECT");
                     //currentNode.getValue().setScore(currentNode.getValue().getScore()-5);
-                    currentNode.getValue().decreaseScore();
+                    mFlashcardRepository.getCurrentNode().getValue().decreaseScore();
                     //mediatorVocabList.getValue().get(0).setScore(mediatorVocabList.getValue().get(0).getScore()-5);
                     // mFlashcardRepository.updateNode(mediatorVocabList.getValue().get(0));
-                    correct = false;
+                    mFlashcardRepository.setCorrect(false);//correct = false;
                     setUpIncorrectAnswerViews();
 
                 }else{
@@ -255,63 +288,53 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     }
 
     private void setUpIncorrectAnswerViews(){
-        xmarkVisibility.setValue(VISIBLE);
-        iwasrightVisibility.setValue(VISIBLE);
-        correctLayoutVisibility.setValue(VISIBLE);
-
-        checkButtonText.setValue("Next");
-        finished = true;
+        System.out.println("calling setupincorrectanswerviews");
+        mFlashcardRepository.setXmarkVisibility(VISIBLE);
+        mFlashcardRepository.setIwasrightVisibility(VISIBLE);
+        mFlashcardRepository.setCorrectLayoutVisibility(VISIBLE);
+        mFlashcardRepository.setCheckButtonText("Next");
+        mFlashcardRepository.setFinished(true);
     }
 
     private void setUpCorrectAnswerViews(){
-        checkmarkVisibility.setValue(VISIBLE);
+        System.out.println("calling setupcorrectanswerviews");
+        mFlashcardRepository.setCheckmarkVisibility(VISIBLE);
         //TODO : set linearLayout_correct to visible to show other answers?
 
-        checkButtonText.setValue("Next");
-        finished = true;
+        mFlashcardRepository.setCheckButtonText("Next");
+        mFlashcardRepository.setFinished(true);//finished = true;
 
     }
 
     private void moveToNextNode(){
+        if (finishedWithActivity){
+           // finish();
+        }
         System.out.println("is it correct?" + correct);
         //popNode();
-        if (currentNode.getValue() != null && currentNode.getValue().getStudying()==0){
-            currentNode.getValue().setStudying(1);
+        if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
+            mFlashcardRepository.getCurrentNode().getValue().setStudying(1);
         }
 
-        if (correct){
+        if (mFlashcardRepository.isCorrect()){
             popNode();
         }else{
             moveNode();
         }
 
 
-        if (currentNode.getValue()!=null && currentNode.getValue().getStudying()==0){
 
-        }else{
-            checkButtonText.setValue("Check");
-            finished = false;
-            setAnswer("");
-            checkmarkVisibility.setValue(INVISIBLE);
-            xmarkVisibility.setValue(INVISIBLE);
-            correctLayoutVisibility.setValue(INVISIBLE);
-            mHintVisibility.setValue(INVISIBLE);
-            hintButtonVisibility.setValue(VISIBLE);
-            editTextVisibility.setValue(VISIBLE);
-            englishTextVisibility.setValue(INVISIBLE);
-            correctLayoutVisibility.setValue(INVISIBLE);
-            iwasrightVisibility.setValue(GONE);
-        }
-
-
-        if (mediatorVocabList.getValue()!= null && mediatorVocabList.getValue().size()<=0){
-            System.out.println("FINISHED WITH ACTIVITY");
+        if (mFlashcardRepository.getMediatorVocabList().getValue()!= null &&mFlashcardRepository.getMediatorVocabList().getValue().size()<=0){
+            /*System.out.println("FINISHED WITH ACTIVITY");
             for (int i = 0 ; i < finishedList.size();i++){
                 System.out.println(finishedList.get(i).toString() + " " + finishedList.get(i).getScore());
-            }
-            editTextVisibility.setValue(GONE);
-            hintButtonVisibility.setValue(GONE);
-            //TODO : Set edit text to gone, hint button to gone, check button to gone.
+            }*/
+            mFlashcardRepository.setEditTextVisibility(GONE);//editTextVisibility.setValue(GONE);
+            mFlashcardRepository.setHintButtonVisibility(GONE);//hintButtonVisibility.setValue(GONE);
+            mFlashcardRepository.setCheckButtonText("Finish");//checkButtonText.setValue("Finish");
+            mFlashcardRepository.setFinishedWithActivity(true);//finishedWithActivity = true;
+            mFlashcardRepository.removeMediatorSource();//mediatorVocabList.removeSource(vocabList);
+            mFlashcardRepository.updateAllNodes();
             //TODO : Display stats from the activity.
         }
     }
@@ -320,43 +343,25 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     /**
      * Removes the top item from the mediatorLiveData list
      */
+
+    //TODO : fix this giving indexoutofbounds exception when lists are size 0
     private void popNode(){
-        /*
-        System.out.println("Before popping");
-       // System.out.println("currentNode = " + currentNode.getValue());
-        for (int i = 0 ; i < mediatorVocabList.getValue().size(); i++){
-            System.out.println(mediatorVocabList.getValue().get(i));
-        }
-
-         */
-
-        List<VocabModel> list = mediatorVocabList.getValue();
+        List<VocabModel> list = mFlashcardRepository.getMediatorVocabList().getValue();//mediatorVocabList.getValue();
         try {
-           // finishedList.add(list.get(0));
-            finishedList.add(currentNode.getValue());
+            mFlashcardRepository.getFinishedList().add(mFlashcardRepository.getCurrentNode().getValue());//finishedList.add(currentNode.getValue());
             list.remove(0);
         }catch(NullPointerException e){
             System.out.println("List is null");
         }
-        mediatorVocabList.setValue(list);
-       // currentNode
-
-        /*
-        System.out.println("After popping");
-       // System.out.println("currentNode = " + currentNode.getValue());
-        for (int i = 0 ; i < mediatorVocabList.getValue().size(); i++){
-            System.out.println(mediatorVocabList.getValue().get(i));
-        }
-
-         */
-
+        mFlashcardRepository.setMediatorVocabListValue(list);
     }
 
     /**
      * Moves the item in the mediatorLiveData list down a random number of indexes
      */
+
     public void moveNode(){
-        List<VocabModel> list = mediatorVocabList.getValue();
+        List<VocabModel> list =mFlashcardRepository.getMediatorVocabList().getValue();// mediatorVocabList.getValue();
         System.out.println("Size is " + list.size());
 
         VocabModel temp = list.get(0);
@@ -385,8 +390,17 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
         list.set(ranNum,temp); //move the currentNode to the random position chosen earlier
 
-        mediatorVocabList.setValue(list);
+        mFlashcardRepository.setMediatorVocabListValue(list);//mediatorVocabList.setValue(list);
     }
+/*
+    private void updateAllNodes(){
+        System.out.println("UPDATING ALL NODES");
+        for (int i = 0 ; i < finishedList.size();i++){
+            mFlashcardRepository.updateNode(finishedList.get(i));
+        }
+    }
+
+ */
 
     //Two-way binding to allow reading of the edit text
     @Bindable
@@ -398,6 +412,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         this.answer = a;
         propertyChangeRegistry.notifyChange(this, BR.answer);
     }
+
 
 
     @Override
