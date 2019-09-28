@@ -70,7 +70,6 @@ public class FlashcardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.activity_learn);
         ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
         binding.setLifecycleOwner(this);
 
@@ -80,252 +79,37 @@ public class FlashcardActivity extends AppCompatActivity {
 
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
 
-      //  if (viewModelFactory == null){System.out.println("NULL FACTORY IN FLASHCARDACTIVITY");}
-       // else{ System.out.println("NONNULL FACTORY IN FLASHCARDACTIVITY"); }
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
 
         binding.setFlashcardviewmodel(flashcardViewModel);
 
-        //dbManager = new DBManager(this);
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
-        //bindViews();
-        //topTestWord = findViewById(R.id.textView_germanWord);
 
-        /*
-        buttonHint = findViewById(R.id.button_seeSentence);
-        buttonHint.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                System.out.println("PRESSED BUTTON");
-                //can put observe in onclicks!
-               // flashcardViewModel.popNode();
-                flashcardViewModel.showSentence();
-
-            }
-        });
-*/
 
         shortAnimationDuration = 500;
 
 
-
+        flashcardViewModel.getNavigateToMainActivity().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                finish();
+            }
+        });
 
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
             @Override
             public void onChanged(List<VocabModel> vocabModels) {
-               // System.out.println("PRINTING MODELLIST IN ACTIVITY   MEDIATOR ");
                 if (vocabModels != null) {
-                   // System.out.println("SENTENCE :  " +flashcardViewModel.getMediatorVocabList().getValue().get(0).toSentence());
-                    //flashcardViewModel.setCurrentNode();
-                    //binding.invalidateAll();
-                    // flashcardViewModel.setCurrentNode(vocabModels.get(0).toString());
-                     //System.out.println("Setting currentNode to " + vocabModels.get(0).toString());
-                     //System.out.println("currentNode is : " + flashcardViewModel.getCurrentNode());
-
                     for (int i = 0 ; i < vocabModels.size();i++){
                         System.out.println(vocabModels.get(i).getId() + " " + vocabModels.get(i) + " " + vocabModels.get(i).getScore()+" " + vocabModels.get(i).getStudying());
-                       // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
-                       // flashcardViewModel.setCurrentNode(vocabModels.get(i).toString());
 
                     }
-                   // topTestWord.setText(vocabModels.get(0).toString());
                 }
             }
         });
-
-
-/*
-        flashcardViewModel.getVocabList().observe(this, new Observer<List<VocabModel>>() {
-            @Override
-            public void onChanged(List<VocabModel> vocabModels) {
-                System.out.println("PRINTING MODELLIST IN ACTIVITY     LIVE ");
-                if (vocabModels != null) {
-                    for (int i = 0 ; i < vocabModels.size();i++){
-                        //System.out.println(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(i)));
-                        System.out.println(vocabModels.get(i));
-
-                    }
-                   // topTestWord.setText(vocabModels.get(0).toString());
-                    //topTestWord.setText(vocabModels.get(0).toString());
-                   // topTestWord.setText(vocabModels.get(flashcardViewModel.getFlashcardOrderList().get(0)).toString());
-                }
-            }
-        });
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-        /*
-        flashcardViewModel.getModelList().observe(this, new Observer<List<VocabModel>>() {
-            @Override
-            public void onChanged(List<VocabModel> vocabModels) {
-                System.out.println("PRINTING MODELLIST IN ACTIVITY");
-                if (vocabModels != null) {
-                    for (int i = 0 ; i < vocabModels.size();i++){
-                        System.out.println(vocabModels.get(i));
-                    }
-                    topTestWord.setText(vocabModels.get(0).toString());
-                }
-
-
-            }
-        });
-
-
-
-
-
-
-
-        /*
-        flashcardViewModel.getWordQueue().observe(this, new Observer<Queue<VocabModel>>() {
-            @Override
-            public void onChanged(Queue<VocabModel> vocabModels) {
-                System.out.println(vocabModels.peek());
-            }
-        });
-*/
-
-
     }
 
-
-
-
-
-
-
-    //REPLACE ALL OF THIS WITH DATABINDING
-    /*
-    private void bindViews(){
-        topTestWord = findViewById(R.id.textView_germanWord);
-        answerWord = findViewById(R.id.textView_englishWord);
-        englishSentence = findViewById(R.id.textView_englishSentence);
-        germanSentence = findViewById(R.id.textView_germanSentence);
-        entryText = findViewById(R.id.editText_entry);
-        entryText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                boolean handled =false;
-                if (i == EditorInfo.IME_ACTION_DONE){
-                    test();
-                    handled = true;
-                }
-                return handled;
-            }
-        });
-
-        checkmark=findViewById(R.id.imageView_checkmark);
-        xmark=findViewById(R.id.imageView_xmark);
-        correctLayout=findViewById(R.id.linearLayout_correct);
-        correctAnswer=findViewById(R.id.textView_correctWord);
-        buttonCheck = findViewById(R.id.button_next);
-        buttonCheck.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                test();
-
-            }
-        });
-
-
-        buttonHint = findViewById(R.id.button_seeSentence);
-        buttonHint.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                germanSentence.setVisibility(View.VISIBLE);
-                buttonHint.setVisibility(View.INVISIBLE);
-                fadeIn(germanSentence,0);
-            }
-        });
-        buttoniwasright = findViewById(R.id.button_iwasright);
-        buttoniwasright.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                test=true;
-                test();
-            }
-        });
-    }
-*/
-
-
-
-
-    //These need to be in the viewmodel?   can i use databinding to replace these?
-    /*
-    private void setUpNextWord(){
-        englishSentence.setVisibility(View.INVISIBLE);
-        germanSentence.setVisibility(View.INVISIBLE);
-        buttonHint.setVisibility(View.VISIBLE);
-        germanSentence.setText(head.getNext().getGSentence());
-        englishSentence.setText(head.getNext().getEsentence());
-        buttoniwasright.setVisibility(View.GONE);
-        xmark.setVisibility(View.INVISIBLE);
-        checkmark.setVisibility(View.INVISIBLE);
-        correctLayout.setVisibility(View.GONE);
-        buttonCheck.setText("Check");
-        topTestWord.setAlpha(0f);
-        answerWord.setAlpha(0f);
-        germanSentence.setAlpha(0f);
-        englishSentence.setAlpha(0f);
-        entryText.setAlpha(0f);
-        buttonHint.setAlpha(0f);
-        buttonCheck.setAlpha(0f);
-    }
-    private void setUpType0(){
-        topTestWord.setText(head.getNext().getGerman());
-        answerWord.setText(head.getNext().getEnglish());
-        answerWord.setVisibility(View.VISIBLE);
-        entryText.setVisibility(View.INVISIBLE);
-        buttonHint.setVisibility(View.INVISIBLE);
-        germanSentence.setVisibility(View.VISIBLE);
-        englishSentence.setVisibility(View.VISIBLE);
-        delayButtonCheck();
-        fadeIn(buttonCheck,2100);
-        fadeIn(topTestWord,100);
-        fadeIn(answerWord,1100);
-        fadeIn(germanSentence,2100);
-        fadeIn(englishSentence,2100);
-        buttonCheck.setText("Next");
-        entryText.setText("");
-    }
-    private void setUpType1(){
-        topTestWord.setText(head.getNext().getGerman());
-        answerWord.setVisibility(View.INVISIBLE);
-        entryText.setVisibility(View.VISIBLE);
-        buttonCheck.setText("Check");
-        entryText.setText("");
-        fadeIn(topTestWord,50);
-        fadeIn(entryText,50);
-        fadeIn(buttonHint,50);
-        fadeIn(buttonCheck,50);
-    }
-    private void setUpType2(){
-        topTestWord.setText(head.getNext().getEnglish());
-        englishSentence.setText(head.getNext().getGSentence());
-        germanSentence.setText(head.getNext().getEsentence());
-        answerWord.setVisibility(View.INVISIBLE);
-        entryText.setVisibility(View.VISIBLE);
-        buttonCheck.setText("Check");
-        entryText.setText("");
-        fadeIn(topTestWord,50);
-        fadeIn(entryText,50);
-        fadeIn(buttonHint,50);
-        fadeIn(buttonCheck,50);
-    }
-*/
     private void delayButtonCheck(){
         buttonCheck.setEnabled(false);
         new CountDownTimer(2100, 10) { //Set Timer for 5 seconds
@@ -339,50 +123,6 @@ public class FlashcardActivity extends AppCompatActivity {
         }.start();
     }
 
-
-/*
-    private void setUpCorrectAnswerViews(){
-        germanSentence.setText(head.getNext().getGSentence());
-        englishSentence.setText(head.getNext().getEsentence());
-        checkmark.setVisibility(View.VISIBLE);
-        checkmark.setAlpha(0f);
-        fadeIn(checkmark,0);
-        buttonCheck.setText("Next");
-        buttonHint.setVisibility(View.INVISIBLE);
-        germanSentence.setVisibility(View.VISIBLE);
-        englishSentence.setVisibility(View.VISIBLE);
-        fadeIn(germanSentence,0);
-        fadeIn(englishSentence,0);
-        testing=false;
-    }
-
-    private void setUpIncorrectType1AnswerViews(){
-        xmark.setVisibility(View.VISIBLE);
-        xmark.setAlpha(0f);
-        correctLayout.setAlpha(0f);
-        fadeIn(xmark,0);
-        fadeIn(correctLayout,0);
-        correctLayout.setVisibility(View.VISIBLE);
-        if (head.getNext().getType()==1){
-            correctAnswer.setText(head.getNext().getEnglish());
-        }else{
-            correctAnswer.setText(head.getNext().getGerman());
-        }
-        buttonCheck.setText("Next");
-        buttonHint.setVisibility(View.INVISIBLE);
-        germanSentence.setVisibility(View.VISIBLE);
-        fadeIn(germanSentence,0);
-        fadeIn(englishSentence,0);
-        englishSentence.setVisibility(View.VISIBLE);
-        buttoniwasright.setVisibility(View.VISIBLE);
-        testing=false;
-    }
-
-
-
-
-
-*/
 
     public void backToMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);

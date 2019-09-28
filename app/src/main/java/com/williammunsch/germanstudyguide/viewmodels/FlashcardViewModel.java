@@ -17,6 +17,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.transition.Visibility;
 
+import com.williammunsch.germanstudyguide.SingleLiveEvent;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.datamodels.Word;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
@@ -37,6 +38,9 @@ import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
+/**
+ * Contains the core business logic for the flashcard activity.
+ */
 public class FlashcardViewModel extends ViewModel implements Observable {
     private FlashcardRepository mFlashcardRepository;
     private LiveData<List<VocabModel>> vocabList;
@@ -56,7 +60,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     //private String hintVisibility = "VISIBLE";
    // private LiveData<Integer> hintVisibility;
 
-    //TODO : Move all of these databinding values into the repository so it saves as a singleton
+
     //Keep track of hint sentence visibility in a LiveData for data binding.
     /*
     private MediatorLiveData<List<VocabModel>> mediatorVocabList = new MediatorLiveData<>();
@@ -87,8 +91,10 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     private Random random = new Random();
     private boolean correct;
 
-    //TODO : reset edittext to ""
+    private SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
 
+
+    //TODO : figure out how to get back to main activity
 
     /**
      * Keeps track of the order of flashcards in the live data here,
@@ -97,6 +103,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     @Inject
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
+
+
 
         //vocabList = mFlashcardRepository.getVocabData();
 
@@ -191,7 +199,21 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
      */
 
+    public void finishActivity(){
+        navigateToMainActivity.call();
+        mFlashcardRepository.addSource();
+    }
 
+    public LiveData<Integer> getCheckButtonVisibility() {
+        return mFlashcardRepository.getCheckButtonVisibility();
+    }
+
+    public LiveData<Boolean> getNavigateToMainActivity(){
+        return navigateToMainActivity;
+    }
+    public LiveData<Integer> getFinishButtonVisibility(){
+        return mFlashcardRepository.getFinishButtonVisibility();
+    }
     public LiveData<Integer> getEnglishTextVisibility(){
         return mFlashcardRepository.getEnglishTextVisibility();
     }
@@ -307,9 +329,15 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     }
 
     private void moveToNextNode(){
-        if (finishedWithActivity){
+        /*
+        System.out.println("isFinished= " + mFlashcardRepository.isFinished());
+        if (mFlashcardRepository.isFinished()){
+            System.out.println("calling finishActivity()");
+            finishActivity();
            // finish();
         }
+
+         */
         System.out.println("is it correct?" + correct);
         //popNode();
         if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
@@ -322,6 +350,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             moveNode();
         }
 
+        setAnswer("");
 
 
         if (mFlashcardRepository.getMediatorVocabList().getValue()!= null &&mFlashcardRepository.getMediatorVocabList().getValue().size()<=0){
@@ -331,9 +360,13 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             }*/
             mFlashcardRepository.setEditTextVisibility(GONE);//editTextVisibility.setValue(GONE);
             mFlashcardRepository.setHintButtonVisibility(GONE);//hintButtonVisibility.setValue(GONE);
-            mFlashcardRepository.setCheckButtonText("Finish");//checkButtonText.setValue("Finish");
-            mFlashcardRepository.setFinishedWithActivity(true);//finishedWithActivity = true;
+            mFlashcardRepository.setCheckButtonVisibility(GONE);
+            //mFlashcardRepository.setCheckButtonText("Finish");//checkButtonText.setValue("Finish");
+            System.out.println("Setting finishedwithactivity to true");
+           // mFlashcardRepository.setFinishedWithActivity(true);//finishedWithActivity = true;
+            mFlashcardRepository.setCheckmarkVisibility(GONE);
             mFlashcardRepository.removeMediatorSource();//mediatorVocabList.removeSource(vocabList);
+            mFlashcardRepository.setFinishButtonVisibility(VISIBLE);
             mFlashcardRepository.updateAllNodes();
             //TODO : Display stats from the activity.
         }
@@ -401,6 +434,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     }
 
  */
+
+
 
     //Two-way binding to allow reading of the edit text
     @Bindable

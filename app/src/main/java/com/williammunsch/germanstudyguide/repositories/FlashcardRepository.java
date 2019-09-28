@@ -68,6 +68,8 @@ public class FlashcardRepository {
     private MutableLiveData<Integer> editTextVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> hintButtonVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> finishButtonVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> checkButtonVisibility = new MutableLiveData<>();
     private String answer = "";
 
 
@@ -133,6 +135,10 @@ public class FlashcardRepository {
            // wordQueue.add(modelOldList.getValue().get(i));
         }
 
+    }
+
+    public void addSource(){
+        mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
     }
 
     /**
@@ -204,6 +210,8 @@ public class FlashcardRepository {
         correctLayoutVisibility.setValue(GONE);
         editTextVisibility.setValue(INVISIBLE);
         hintButtonVisibility.setValue(INVISIBLE);
+        finishButtonVisibility.setValue(INVISIBLE);
+
     }
 
     private void setUpViewsForOldCard(){
@@ -220,7 +228,9 @@ public class FlashcardRepository {
         englishTextVisibility.setValue(INVISIBLE);
         correctLayoutVisibility.setValue(INVISIBLE);
         iwasrightVisibility.setValue(GONE);
+        finishButtonVisibility.setValue(INVISIBLE);
     }
+
 
     private void setUpIncorrectAnswerViews(){
         System.out.println("calling setupincorrectanswerviews");
@@ -279,6 +289,15 @@ public class FlashcardRepository {
         return finished;
     }
 
+    public LiveData<Integer> getCheckButtonVisibility() {
+        return checkButtonVisibility;
+    }
+
+    public void setCheckButtonVisibility(int i) {
+        this.checkButtonVisibility.setValue(i);
+    }
+
+    public void setFinishButtonVisibility(int i){this.finishButtonVisibility.setValue(i);}
     public void setFinished(boolean finished) {
         this.finished = finished;
     }
@@ -318,6 +337,9 @@ public class FlashcardRepository {
     public LiveData<List<VocabModel>> getVocabData(){
         return vocabList;
     }
+
+
+    public LiveData<Integer> getFinishButtonVisibility(){return finishButtonVisibility;}
     public LiveData<Integer> getEnglishTextVisibility(){
         return englishTextVisibility;
     }
