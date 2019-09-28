@@ -20,6 +20,7 @@ import com.williammunsch.germanstudyguide.FlashcardActivity;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.ViewActivity;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
+import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +29,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private List<VocabListItem> mVocabList;
     private Integer a1Max;
     private Context mContext;
+    private VocabListViewModel vocabListViewModel;
    // private int a1Max;
 
-    public RecyclerViewAdapter(Context mContext){
+    public RecyclerViewAdapter(Context mContext, VocabListViewModel viewModel){
    // public RecyclerViewAdapter(Context mContext, List<VocabListItem> mVocabList){
        // this.mVocabList = mVocabList;
         this.mContext = mContext;
+        this.vocabListViewModel = viewModel;
        // this.a1Max = a1Max;
         //System.out.println("In recyclerviewadapter constructor : " + this.a1Max + " " + a1Max);
        // mVocabList = new ArrayList<>();
@@ -87,6 +90,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     intent.putExtra("table", "A1");
                     mContext.startActivity(intent);
                 }else if (viewHolder.getAdapterPosition()==1){
+                    vocabListViewModel.addSource();
                     Intent intent = new Intent(mContext, ViewActivity.class);
                     intent.putExtra("table", "A2");
                     mContext.startActivity(intent);
@@ -104,6 +108,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
                 if (viewHolder.getAdapterPosition()==0){
+                    System.out.println("Adding source from recyclerviewadaper88888888888");
+                    vocabListViewModel.addSource();
                     Intent intent = new Intent(mContext, FlashcardActivity.class);
                     intent.putExtra("table", "A1");
                     mContext.startActivity(intent);

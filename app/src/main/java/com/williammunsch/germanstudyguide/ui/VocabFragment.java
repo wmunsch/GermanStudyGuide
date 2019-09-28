@@ -123,7 +123,7 @@ public class VocabFragment extends Fragment {
 
       //  mAdapter = new RecyclerViewAdapter(getContext(), mVocabListViewModel.getVocabListItems().getValue());
        // mAdapter = new RecyclerViewAdapter(getContext(), mVocabListViewModel.getVocabListItems().getValue()); //should this be observed instead?
-        mAdapter = new RecyclerViewAdapter(getContext());
+        mAdapter = new RecyclerViewAdapter(getContext(), mVocabListViewModel);
         recyclerView.setAdapter(mAdapter);
 
         try {

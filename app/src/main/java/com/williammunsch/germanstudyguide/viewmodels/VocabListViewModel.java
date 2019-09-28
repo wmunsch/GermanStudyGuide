@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.inject.Inject;
  */
 public class VocabListViewModel extends ViewModel {
     private Repository mRepository;//injected
+    private FlashcardRepository flashcardRepository;
 
     private LiveData<List<VocabModel>> mAllVocab;
     private LiveData<List<VocabListItem>> mVocabListItems;
@@ -24,8 +26,9 @@ public class VocabListViewModel extends ViewModel {
    // private LiveData<Integer> wordCount;
 
     @Inject
-    public VocabListViewModel(Repository repository){
+    public VocabListViewModel(Repository repository, FlashcardRepository flashcardRepository){
         this.mRepository = repository;
+        this.flashcardRepository = flashcardRepository;
 
         mVocabListItems = mRepository.getVocabListItems();
         a1Max = mRepository.getA1Max();
@@ -37,6 +40,10 @@ public class VocabListViewModel extends ViewModel {
 
    // public LiveData<Integer> getA1Max() {return a1Max;}
 
+
+    public void addSource(){
+        flashcardRepository.addSource();
+    }
 
     /**
      * Add a "getter" method for all the words. This completely hides the implementation from the UI.

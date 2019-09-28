@@ -90,6 +90,7 @@ public class FlashcardActivity extends AppCompatActivity {
         shortAnimationDuration = 500;
 
 
+
         flashcardViewModel.getNavigateToMainActivity().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {

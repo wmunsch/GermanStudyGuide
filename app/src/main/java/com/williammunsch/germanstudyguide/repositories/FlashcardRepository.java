@@ -99,7 +99,9 @@ public class FlashcardRepository {
         mVocabDao = db.vocabDao();
 
         vocabList = mVocabDao.getVocabQueue();
-        mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+       // mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+        System.out.println("CREATING FLASHCARDREPO");
+        //addSource();
 
 
         currentNode = Transformations.map(mediatorVocabList, value -> {
@@ -138,7 +140,13 @@ public class FlashcardRepository {
     }
 
     public void addSource(){
-        mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+
+        if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
+            System.out.println("*\n*\nADDING SOURCE\n*\n*");
+            mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+        }
+
+
     }
 
     /**
@@ -197,6 +205,7 @@ public class FlashcardRepository {
         for (int i = 0 ; i < finishedList.size();i++){
             updateNode(finishedList.get(i));
         }
+        finishedList.clear();
     }
 
     private void setUpViewsForNewCard(){
@@ -211,6 +220,8 @@ public class FlashcardRepository {
         editTextVisibility.setValue(INVISIBLE);
         hintButtonVisibility.setValue(INVISIBLE);
         finishButtonVisibility.setValue(INVISIBLE);
+        checkButtonVisibility.setValue(VISIBLE);
+        correct = false;
 
     }
 
@@ -229,6 +240,8 @@ public class FlashcardRepository {
         correctLayoutVisibility.setValue(INVISIBLE);
         iwasrightVisibility.setValue(GONE);
         finishButtonVisibility.setValue(INVISIBLE);
+        checkButtonVisibility.setValue(VISIBLE);
+        correct = false;
     }
 
 

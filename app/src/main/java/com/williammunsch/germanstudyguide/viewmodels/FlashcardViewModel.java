@@ -94,6 +94,9 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     private SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
 
 
+    private SingleLiveEvent<Boolean> addSourceEvent = new SingleLiveEvent<>();
+
+
     //TODO : figure out how to get back to main activity
 
     /**
@@ -104,108 +107,23 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
 
-
-
-        //vocabList = mFlashcardRepository.getVocabData();
-
-       //Livedata does not get updated when removing a node from mediatorlivedata, until the activity is recreated ?
-        //Needs to be observed or it does not get updated.
-      // mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
-        //currentNode.setValue(mediatorVocabList.getValue().get(0));
-
-        /*
-         * Allows the textview to use databinding without having to call observe in the activity.
-         * First argument is the livedata where the value is coming from.
-         * Second argument (return value) is the object that the currentNode livedata needs to hold (a VocabModel in this case).
-         */
-        //setUpViewsForNewCard();
-       // checkButtonText.setValue("TUNAKTUNAKTAUNK");
-        /*
-        currentNode = Transformations.map(mediatorVocabList, value -> {
-            if (mediatorVocabList.getValue() != null){
-               System.out.println("calling transformations.map currentNode = " + currentNode.getValue());
-                if (mediatorVocabList.getValue().size()>0){
-                    if (mediatorVocabList.getValue().get(0).getStudying()==0){
-                        setUpViewsForNewCard();
-                    }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
-                        setUpViewsForOldCard();
-                    }
-                    return mediatorVocabList.getValue().get(0);
-                }
-                    return null;
-            }else{
-                return null;//new VocabModel(0,null,null,null,null,0,0,0);
-            }
-        });
-
-         */
-
-
-/*
-        if (currentNode.getValue()!= null && currentNode.getValue().getStudying()==0){
-            setUpViewsForNewCard();
-        }else if (currentNode.getValue()!= null && currentNode.getValue().getStudying()==1){
-            setUpViewsForOldCard();
-        }else{
-            setUpViewsForNewCard();
-        }
-
-        //setUpViewsForNewCard();
-
-        /*
-        englishTextVisibility.setValue(VISIBLE);
-        mHintVisibility.setValue(VISIBLE);
-        checkmarkVisibility.setValue(INVISIBLE);
-        xmarkVisibility.setValue(INVISIBLE);
-        checkButtonText.setValue("Next");
-        iwasrightVisibility.setValue(GONE);
-        correctLayoutVisibility.setValue(GONE);
-        editTextVisibility.setValue(INVISIBLE);
-        hintButtonVisibility.setValue(INVISIBLE);
-
-         */
-
-
     }
-    /*
-    private void setUpViewsForNewCard(){
-        System.out.println("CALLING setupviewsforNEWcard");
-        englishTextVisibility.setValue(VISIBLE);
-        mHintVisibility.setValue(VISIBLE);
-        checkmarkVisibility.setValue(INVISIBLE);
-        xmarkVisibility.setValue(INVISIBLE);
-        checkButtonText.setValue("Next");
-        iwasrightVisibility.setValue(GONE);
-        correctLayoutVisibility.setValue(GONE);
-        editTextVisibility.setValue(INVISIBLE);
-        hintButtonVisibility.setValue(INVISIBLE);
-    }
-
-    private void setUpViewsForOldCard(){
-        System.out.println("CALLING setupviewsforOLDcard");
-        checkButtonText.setValue("Check");
-        finished = false;
-        setAnswer("");
-        checkmarkVisibility.setValue(INVISIBLE);
-        xmarkVisibility.setValue(INVISIBLE);
-        correctLayoutVisibility.setValue(INVISIBLE);
-        mHintVisibility.setValue(INVISIBLE);
-        hintButtonVisibility.setValue(VISIBLE);
-        editTextVisibility.setValue(VISIBLE);
-        englishTextVisibility.setValue(INVISIBLE);
-        correctLayoutVisibility.setValue(INVISIBLE);
-        iwasrightVisibility.setValue(GONE);
-    }
-
-     */
 
     public void finishActivity(){
         navigateToMainActivity.call();
-        mFlashcardRepository.addSource();
+        //mFlashcardRepository.addSource();
     }
 
     public LiveData<Integer> getCheckButtonVisibility() {
         return mFlashcardRepository.getCheckButtonVisibility();
+    }
+
+    public LiveData<Boolean> getAddSourceEvent() {
+        return addSourceEvent;
+    }
+
+    public void removeMediatorSource(){
+        mFlashcardRepository.removeMediatorSource();
     }
 
     public LiveData<Boolean> getNavigateToMainActivity(){
@@ -261,6 +179,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
 
     public void checkAnswer(){
+
        // moveToNextNode();
        // System.out.println("currentNode = " + currentNode.getValue());
             if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
@@ -338,7 +257,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         }
 
          */
-        System.out.println("is it correct?" + correct);
+        System.out.println("is it correct?" + mFlashcardRepository.isCorrect());
         //popNode();
         if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
             mFlashcardRepository.getCurrentNode().getValue().setStudying(1);
@@ -365,7 +284,9 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             System.out.println("Setting finishedwithactivity to true");
            // mFlashcardRepository.setFinishedWithActivity(true);//finishedWithActivity = true;
             mFlashcardRepository.setCheckmarkVisibility(GONE);
-            mFlashcardRepository.removeMediatorSource();//mediatorVocabList.removeSource(vocabList);
+
+            mFlashcardRepository.removeMediatorSource();
+
             mFlashcardRepository.setFinishButtonVisibility(VISIBLE);
             mFlashcardRepository.updateAllNodes();
             //TODO : Display stats from the activity.
