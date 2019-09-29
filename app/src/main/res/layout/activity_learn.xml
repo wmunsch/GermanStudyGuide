@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="flashcardviewmodel"
+            type="com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -20,30 +27,35 @@
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <Button
-        android:id="@+id/button_next"
-        android:layout_width="200dp"
-        android:layout_height="35sp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/button_selector"
-        android:text="Check"
-        android:textAllCaps="false"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button_iwasright" />
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="200dp"
+            android:layout_height="35sp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_selector"
+            android:onClick="@{() -> flashcardviewmodel.checkAnswer()}"
+            android:text="@{flashcardviewmodel.checkButtonText, default = Next}"
+            android:visibility="@{flashcardviewmodel.checkButtonVisibility, default=invisible}"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toEndOf="@+id/button_iwasright"
+            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
+            app:layout_constraintVertical_bias="1.0" />
 
-    <TextView
+        <TextView
         android:id="@+id/textView_germanWord"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="44dp"
         android:layout_marginEnd="8dp"
-        android:text="TextView"
-        android:textSize="20dp"
+        android:textColor="#000000"
+        android:text="@{flashcardviewmodel.currentNode.toString()}"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,6 +77,8 @@
         android:textColor="#000000"
         android:textCursorDrawable="@null"
         android:imeOptions="actionDone"
+        android:visibility="@{flashcardviewmodel.editTextVisibility, default=invisible}"
+        android:text="@={flashcardviewmodel.answer}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,13 +91,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="8dp"
-        android:text="TextView"
+        android:text="@{flashcardviewmodel.currentNode.english}"
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="20sp"
+        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"/>
 
     <TextView
         android:id="@+id/textView_germanSentence"
@@ -93,13 +108,15 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:padding="10dp"
-        android:text="TextView"
+        android:text="@{flashcardviewmodel.currentNode.toSentence()}"
+        android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+
         android:textAlignment="center"
-        android:textSize="16dp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
+        app:layout_constraintTop_toBottomOf="@+id/button_seeSentence" />
 
     <TextView
         android:id="@+id/textView_englishSentence"
@@ -109,9 +126,10 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:padding="10dp"
-        android:text="TextView"
+        android:text="@{flashcardviewmodel.currentNode.esent}"
         android:textAlignment="center"
-        android:textSize="16dp"
+        android:textSize="16sp"
+        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -129,52 +147,62 @@
         android:textAllCaps="false"
         android:textColor="#ffffff"
         android:textSize="16sp"
+        android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=invisible}"
+        android:onClick="@{() -> flashcardviewmodel.showSentence()}"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
 
-    <ImageView
-        android:id="@+id/imageView_checkmark"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:src="@drawable/checkmark"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        <ImageView
+            android:id="@+id/imageView_checkmark"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/checkmark"
+            android:visibility="@{flashcardviewmodel.checkmarkVisibility, default=invisible}"
+            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <ImageView
-        android:id="@+id/imageView_xmark"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="40dp"
-        android:src="@drawable/xmark"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        <ImageView
+            android:id="@+id/imageView_xmark"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/xmark"
+            android:visibility="@{flashcardviewmodel.xmarkVisibility, default=invisible}"
+            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <Button
-        android:id="@+id/button_iwasright"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="32dp"
-        android:background="@drawable/button_selector"
-        android:text="I was right"
-        android:textAllCaps="false"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/button_iwasright"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_selector"
+            android:text="I was right"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:onClick="@{() -> flashcardviewmodel.iWasright()}"
+            android:visibility="@{flashcardviewmodel.iwasrightVisibility, default=gone}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
+            app:layout_constraintVertical_bias="1.0" />
 
-    <LinearLayout
+        <LinearLayout
         android:id="@+id/linearLayout_correct"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_marginTop="20dp"
         android:background=" #ff9999 "
         android:orientation="vertical"
+        android:visibility="@{flashcardviewmodel.correctLayoutVisibility, default=gone}"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText_entry">
@@ -195,11 +223,29 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
-            android:text="test"
+            android:text="@{flashcardviewmodel.currentNode.answer}"
             android:textColor=" #8e0000"
             android:textSize="18sp" />
 
     </LinearLayout>
 
+        <Button
+            android:id="@+id/button_finish"
+            android:text="Finish"
+            android:layout_width="200dp"
+            android:layout_height="35sp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/button_selector"
+            android:onClick="@{() -> flashcardviewmodel.finishActivity()}"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:visibility="@{flashcardviewmodel.finishButtonVisibility, default=invisible}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

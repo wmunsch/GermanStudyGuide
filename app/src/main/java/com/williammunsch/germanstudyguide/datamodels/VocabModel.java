@@ -15,22 +15,72 @@ public class VocabModel {
     private int studying;
     private String german;
     private String english;
-    private String gsent;
+    private String gesent;
     private String esent;
+    //private String[] englishStringsArray;
 
-    public VocabModel(int id, String german, String english, String gsent, String esent, int score, int freq, int studying){
+    public VocabModel(int id, String german, String english, String gesent, String esent, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
-        this.gsent = gsent;
+        this.gesent = gesent;
         this.esent = esent;
         this.score = score;
         this.freq = freq;
         this.studying = studying;
+
     }
 
     public String toString(){
-        return _id+ " " + german+ " " +english;
+        if (score > 50){
+            return english;
+        }else{
+            return german;
+        }
+       // return _id+ " " + german+ " " +english;
+    }
+
+    public String getAnswer(){
+        if (score < 50){
+            return english;
+        }else{
+            return german;
+        }
+    }
+
+    public String toSentence(){
+        if (score > 50){
+            return esent;
+        }else{
+            return gesent;
+        }
+    }
+
+    public String[] getEnglishStringsArray()
+    {
+        if (english!=null){
+            String[] englishStringsArray = english.split(",");
+            return englishStringsArray;
+        }
+        return null;
+
+    }
+
+    public void increaseScore(){
+        if (score < 95){
+            score += 5;
+        }else{
+            score = 100;
+        }
+
+    }
+
+    public void decreaseScore(){
+        if (score >5){
+            score -=5;
+        }else{
+            score = 0;
+        }
     }
 
     public int getId() {
@@ -73,20 +123,23 @@ public class VocabModel {
         this.german = german;
     }
 
+
     public String getEnglish() {
         return english;
     }
+
+
 
     public void setEnglish(String english) {
         this.english = english;
     }
 
-    public String getGsent() {
-        return gsent;
+    public String getGesent() {
+        return gesent;
     }
 
-    public void setGsent(String gsent) {
-        this.gsent = gsent;
+    public void setGesent(String gesent) {
+        this.gesent = gesent;
     }
 
     public String getEsent() {

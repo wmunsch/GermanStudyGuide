@@ -1,12 +1,14 @@
 package com.williammunsch.germanstudyguide.di;
 
 import android.app.Application;
+import android.view.View;
 
 import androidx.room.Room;
 
 
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
+import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelModule;
 
 import javax.inject.Singleton;
@@ -40,6 +42,7 @@ public class AppModule {
         return mApplication;
     }
 */
+
 
     @Singleton
     @Provides

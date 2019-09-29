@@ -35,6 +35,8 @@ import retrofit2.Response;
  *  Manages query threads and allows you to use multiple backends. In the most common example,
  *  the Repository implements the logic for deciding whether to fetch data from a network or use results cached in a local database.
  *
+ *  Base repository that handles api calls and ROOM updates.
+ *
  */
 
 @Singleton
@@ -83,7 +85,7 @@ public class Repository {
                 deleteAll();
 
                 for (int i = 0; i < vocabList.size();i++){
-                    System.out.println(vocabList.get(i).toString());
+                    System.out.println(vocabList.get(i).toString() + " " + vocabList.get(i).toSentence() + " " + vocabList.get(i).getStudying());
                    insert(vocabList.get(i));
                 }
 

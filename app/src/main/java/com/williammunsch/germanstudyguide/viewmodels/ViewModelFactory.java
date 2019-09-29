@@ -29,6 +29,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory{
      * Creates a new ViewModel based on a generic class (T) that must extend the ViewModel class
      * This allows for multiple types of ViewModels to be created with one factory.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
         Provider<? extends ViewModel> creator = creators.get(modelClass);

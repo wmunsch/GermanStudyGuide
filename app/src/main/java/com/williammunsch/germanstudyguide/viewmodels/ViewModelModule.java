@@ -19,6 +19,11 @@ public abstract class ViewModelModule {
     @ViewModelKey(VocabListViewModel.class)
     abstract ViewModel bindVocabViewModel(VocabListViewModel vocabListViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(FlashcardViewModel.class)
+    abstract ViewModel bindFlashcardViewModel(FlashcardViewModel flashcardViewModel);
+
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);

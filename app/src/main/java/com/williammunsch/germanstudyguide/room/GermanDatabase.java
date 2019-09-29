@@ -14,7 +14,7 @@ import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 
-@Database(entities = {VocabModel.class, Story.class, VocabListItem.class}, version = 1)
+@Database(entities = {VocabModel.class, Story.class, VocabListItem.class}, version = 2)
 public abstract class GermanDatabase extends RoomDatabase {
     //private static GermanDatabase instance;
 
