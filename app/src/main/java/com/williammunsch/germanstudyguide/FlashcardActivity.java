@@ -5,35 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.view.KeyEvent;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
-import com.williammunsch.germanstudyguide.datamodels.Word;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
-import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import javax.inject.Inject;
 
@@ -48,17 +34,6 @@ import javax.inject.Inject;
  */
 public class FlashcardActivity extends AppCompatActivity {
 
-    private TextView answerWord, topTestWord, englishSentence, germanSentence, correctAnswer;
-    private EditText entryText;
-    private Button buttonCheck, buttonHint,buttoniwasright;
-    private ImageView checkmark, xmark;
-    private LinearLayout correctLayout;
-    private Word head, tail;
-    private ArrayList<Word> wordList;
-    private static final int newWords = 5; //use preferences to set this in options
-    private String tableName;
-    private int nodeCount;
-    private boolean testing = true, test=false, finishedWithAll = false, learnedAll = false;
     private int shortAnimationDuration;
 
 
@@ -66,6 +41,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
 
     FlashcardViewModel flashcardViewModel;
+    private String tableName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +87,7 @@ public class FlashcardActivity extends AppCompatActivity {
         });
     }
 
+    /*
     private void delayButtonCheck(){
         buttonCheck.setEnabled(false);
         new CountDownTimer(2100, 10) { //Set Timer for 5 seconds
@@ -124,13 +101,6 @@ public class FlashcardActivity extends AppCompatActivity {
         }.start();
     }
 
-
-    public void backToMainActivity(){
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //intent.putExtra("flashcard",maxId);
-        startActivity(intent);
-    }
 
     private void fadeIn(View view, int time){
         view.animate()
@@ -156,6 +126,8 @@ public class FlashcardActivity extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(entryText.getWindowToken(), 0);
     }
+
+     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
