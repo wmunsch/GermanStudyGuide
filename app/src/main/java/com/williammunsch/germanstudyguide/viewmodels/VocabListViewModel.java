@@ -25,6 +25,8 @@ public class VocabListViewModel extends ViewModel {
     private LiveData<Integer> a1Max;
    // private LiveData<Integer> wordCount;
 
+    //TODO : in case where studying all words, or less than 5 are not studying, replace with studying words for full 20
+
     @Inject
     public VocabListViewModel(Repository repository, FlashcardRepository flashcardRepository){
         this.mRepository = repository;

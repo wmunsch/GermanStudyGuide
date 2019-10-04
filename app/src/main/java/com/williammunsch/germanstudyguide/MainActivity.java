@@ -22,14 +22,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //TODO : Bind the views and toolbar
+
         setContentView(R.layout.activity_main);
 
 
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
+
         try {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+           // getSupportActionBar().setIcon(R.mipmap.ic_launcher);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }catch(NullPointerException e){
             throw new Error("Null icon");
@@ -83,19 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-       // Log.d(TAG, "onCreate: started.");
-
-
-
-
-
-
-
-
-       // initRecyclerViewData();
     }
 
     @Override
@@ -106,10 +96,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        /*
         if (item.getItemId() == R.id.action_settings){
            // startSettings();
             return true;
         }
+
+         */
         return true;
     }
 

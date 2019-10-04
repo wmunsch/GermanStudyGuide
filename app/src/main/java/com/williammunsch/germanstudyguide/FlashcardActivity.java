@@ -34,6 +34,7 @@ import javax.inject.Inject;
  */
 public class FlashcardActivity extends AppCompatActivity {
 
+    //TODO : Set up the finished list with the progress bar on toolbar
     private int shortAnimationDuration;
 
 
@@ -137,10 +138,13 @@ public class FlashcardActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        /*
         if (item.getItemId() == R.id.action_settings){
             // startSettings();
             return true;
         }
+
+         */
         return true;
     }
 
