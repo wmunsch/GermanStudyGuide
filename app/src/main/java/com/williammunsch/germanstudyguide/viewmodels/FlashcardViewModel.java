@@ -59,6 +59,12 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public LiveData<Integer> getFinishButtonVisibility(){
         return mFlashcardRepository.getFinishButtonVisibility();
     }
+    public LiveData<Integer> getTv_wordsLearnedVisibility(){
+        return mFlashcardRepository.getTv_wordsLearnedVisibility();
+    }
+    public LiveData<Integer> getGoodJobVisibility(){
+        return mFlashcardRepository.getGoodJobVisibility();
+    }
     public LiveData<Integer> getEnglishTextVisibility(){
         return mFlashcardRepository.getEnglishTextVisibility();
     }
@@ -68,7 +74,19 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public LiveData<Integer> getEditTextVisibility(){
         return mFlashcardRepository.getEditTextVisibility();
     }
+    public LiveData<Integer> getTextView_wordsMasteredVisibility(){
+        return mFlashcardRepository.getTextView_wordsMasteredVisibility();
+    }
+    public LiveData<Integer> getProgressBar_wordsMasteredVisibility(){
+        return mFlashcardRepository.getProgressBar_wordsMasteredVisibility();
+    }
+    public LiveData<Integer> getTextView_wordsMasteredOutOfVisibility(){
+        return mFlashcardRepository.getTextView_wordsMasteredOutOfVisibility();
+    }
 
+    public LiveData<Integer> getTextView_wordsLearnedOutOfVisibility(){
+        return mFlashcardRepository.getTextView_wordsLearnedOutOfVisibility();
+    }
     public LiveData<String> getCheckButtonText(){
         return mFlashcardRepository.getCheckButtonText();
     }
@@ -88,6 +106,9 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         return mFlashcardRepository.getHintVisibility();
     }
 
+    public LiveData<Integer> getProgressBar_wordsLearnedVisibility(){
+        return mFlashcardRepository.getProgressBar_wordsLearnedVisibility();
+    }
 
     public void showSentence(){
         mFlashcardRepository.showSentence();
@@ -183,6 +204,14 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             mFlashcardRepository.setFinishButtonVisibility(VISIBLE);
             mFlashcardRepository.updateAllNodes();
             //TODO : Display stats from the activity.
+            mFlashcardRepository.setGoodJobVisibility(VISIBLE);
+            mFlashcardRepository.setTv_wordsLearnedVisibility(VISIBLE);
+            mFlashcardRepository.setProgressBar_wordsLearnedVisibility(VISIBLE);
+            mFlashcardRepository.setTextView_wordsLearnedOutOfVisibility(VISIBLE);
+
+            mFlashcardRepository.setTextView_wordsMasteredVisibility(VISIBLE);
+            mFlashcardRepository.setProgressBar_wordsMasteredVisibility(VISIBLE);
+            mFlashcardRepository.setTextView_wordsMasteredOutOfVisibility(VISIBLE);
         }
     }
 

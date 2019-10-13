@@ -64,7 +64,7 @@ public class FlashcardActivity extends AppCompatActivity {
         tableName =bIntent.getStringExtra("table");
 
 
-        shortAnimationDuration = 500;
+        //shortAnimationDuration = 500;
 
 
 

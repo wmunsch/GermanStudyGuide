@@ -13,79 +13,80 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:background="?attr/colorPrimary"
-        android:elevation="2dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:background="?attr/colorPrimary"
+            android:elevation="2dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <ImageView
-                android:id="@+id/userIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_usericon2"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/usernameTextView"
-                app:layout_constraintTop_toTopOf="parent" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cards Finished : 5/20"
-                android:textSize="18sp"
-                android:textColor="#000000"
-                app:layout_constraintBottom_toTopOf="@+id/flashcardProgressBar"
-                app:layout_constraintEnd_toStartOf="@+id/streakIcon"
-                app:layout_constraintStart_toEndOf="@+id/userIcon"
-                app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/userIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_usericon2"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/usernameTextView"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ProgressBar
-                android:id="@+id/flashcardProgressBar"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="200dp"
-                android:layout_height="8dp"
-                android:layout_marginBottom="10dp"
-                android:progressBackgroundTint="#333333"
-                android:progressTint="#ffe869"
-                android:progress="20"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/streakIcon"
-                app:layout_constraintStart_toEndOf="@+id/userIcon">
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cards Finished : 5/20"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/flashcardProgressBar"
+                    app:layout_constraintEnd_toStartOf="@+id/streakIcon"
+                    app:layout_constraintStart_toEndOf="@+id/userIcon"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </ProgressBar>
+                <ProgressBar
+                    android:id="@+id/flashcardProgressBar"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="200dp"
+                    android:layout_height="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:progress="20"
+                    android:progressBackgroundTint="#333333"
+                    android:progressTint="#ffe869"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/streakIcon"
+                    app:layout_constraintStart_toEndOf="@+id/userIcon">
 
-            <ImageView
-                android:id="@+id/streakIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_streak6"
-                android:layout_marginEnd="15dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="12"
-                android:textColor="#000"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/streakIcon"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                </ProgressBar>
 
-    </androidx.appcompat.widget.Toolbar>
+                <ImageView
+                    android:id="@+id/streakIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:src="@drawable/ic_streak6"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    android:textColor="#000"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/streakIcon" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <Button
             android:id="@+id/button_next"
@@ -95,10 +96,10 @@
             android:background="@drawable/button_selector"
             android:onClick="@{() -> flashcardviewmodel.checkAnswer()}"
             android:text="@{flashcardviewmodel.checkButtonText, default = Next}"
-            android:visibility="@{flashcardviewmodel.checkButtonVisibility, default=invisible}"
             android:textAllCaps="false"
             android:textColor="#ffffff"
             android:textSize="20sp"
+            android:visibility="@{flashcardviewmodel.checkButtonVisibility, default=invisible}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
@@ -107,111 +108,111 @@
             app:layout_constraintVertical_bias="1.0" />
 
         <TextView
-        android:id="@+id/textView_germanWord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="8dp"
-        android:textColor="#000000"
-        android:text="@{flashcardviewmodel.currentNode.toString()}"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            android:id="@+id/textView_germanWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="44dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{flashcardviewmodel.currentNode.toString()}"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <EditText
-        android:id="@+id/editText_entry"
-        android:layout_width="200dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/edittext_background"
-        android:ems="10"
-        android:gravity="center"
-        android:hint="Translate"
-        android:inputType="text"
-        android:padding="10dp"
-        android:textColor="#000000"
-        android:textCursorDrawable="@null"
-        android:imeOptions="actionDone"
-        android:visibility="@{flashcardviewmodel.editTextVisibility, default=invisible}"
-        android:text="@={flashcardviewmodel.answer}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+        <EditText
+            android:id="@+id/editText_entry"
+            android:layout_width="200dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/edittext_background"
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Translate"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:padding="10dp"
+            android:text="@={flashcardviewmodel.answer}"
+            android:textColor="#000000"
+            android:textCursorDrawable="@null"
+            android:visibility="@{flashcardviewmodel.editTextVisibility, default=invisible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <TextView
-        android:id="@+id/textView_englishWord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="8dp"
-        android:text="@{flashcardviewmodel.currentNode.english}"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"/>
+        <TextView
+            android:id="@+id/textView_englishWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{flashcardviewmodel.currentNode.english}"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-    <TextView
-        android:id="@+id/textView_germanSentence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="8dp"
-        android:padding="10dp"
-        android:text="@{flashcardviewmodel.currentNode.toSentence()}"
-        android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+        <TextView
+            android:id="@+id/textView_germanSentence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:padding="10dp"
+            android:text="@{flashcardviewmodel.currentNode.toSentence()}"
+            android:textAlignment="center"
 
-        android:textAlignment="center"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_seeSentence" />
+            android:textSize="16sp"
+            android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_seeSentence" />
 
-    <TextView
-        android:id="@+id/textView_englishSentence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
-        android:padding="10dp"
-        android:text="@{flashcardviewmodel.currentNode.esent}"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_germanSentence" />
+        <TextView
+            android:id="@+id/textView_englishSentence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:padding="10dp"
+            android:text="@{flashcardviewmodel.currentNode.esent}"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanSentence" />
 
-    <Button
-        android:id="@+id/button_seeSentence"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/button_selector"
-        android:text="Hint"
-        android:textAllCaps="false"
-        android:textColor="#ffffff"
-        android:textSize="16sp"
-        android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=invisible}"
-        android:onClick="@{() -> flashcardviewmodel.showSentence()}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
+        <Button
+            android:id="@+id/button_seeSentence"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/button_selector"
+            android:onClick="@{() -> flashcardviewmodel.showSentence()}"
+            android:text="Hint"
+            android:textAllCaps="false"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=invisible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
 
         <ImageView
             android:id="@+id/imageView_checkmark"
@@ -244,11 +245,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginBottom="32dp"
             android:background="@drawable/button_selector"
+            android:onClick="@{() -> flashcardviewmodel.iWasright()}"
             android:text="I was right"
             android:textAllCaps="false"
             android:textColor="#ffffff"
             android:textSize="20sp"
-            android:onClick="@{() -> flashcardviewmodel.iWasright()}"
             android:visibility="@{flashcardviewmodel.iwasrightVisibility, default=gone}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -256,52 +257,144 @@
             app:layout_constraintVertical_bias="1.0" />
 
         <LinearLayout
-        android:id="@+id/linearLayout_correct"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginTop="20dp"
-        android:background=" #ff9999 "
-        android:orientation="vertical"
-        android:visibility="@{flashcardviewmodel.correctLayoutVisibility, default=gone}"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_entry">
+            android:id="@+id/linearLayout_correct"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:background=" #ff9999 "
+            android:orientation="vertical"
+            android:visibility="@{flashcardviewmodel.correctLayoutVisibility, default=gone}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editText_entry">
 
-        <TextView
-            android:id="@+id/textView_correctanswer"
-            android:layout_width="wrap_content"
-            android:layout_height="23dp"
-            android:layout_marginStart="20dp"
-            android:text="Correct Answer:"
-            android:textColor=" #8e0000"
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/textView_correctanswer"
+                android:layout_width="wrap_content"
+                android:layout_height="23dp"
+                android:layout_marginStart="20dp"
+                android:text="Correct Answer:"
+                android:textColor=" #8e0000"
+                android:textSize="20sp" />
 
 
-        <TextView
-            android:id="@+id/textView_correctWord"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:text="@{flashcardviewmodel.currentNode.answer}"
-            android:textColor=" #8e0000"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/textView_correctWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:text="@{flashcardviewmodel.currentNode.answer}"
+                android:textColor=" #8e0000"
+                android:textSize="18sp" />
 
-    </LinearLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/button_finish"
-            android:text="Finish"
             android:layout_width="200dp"
             android:layout_height="35sp"
-            android:layout_marginBottom="32dp"
             android:background="@drawable/button_selector"
             android:onClick="@{() -> flashcardviewmodel.finishActivity()}"
+            android:text="Finish"
             android:textAllCaps="false"
             android:textColor="#ffffff"
             android:textSize="20sp"
             android:visibility="@{flashcardviewmodel.finishButtonVisibility, default=invisible}"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_wordsMasteredOutOf" />
+
+        <ProgressBar
+            android:id="@+id/progressBar_wordsLearned"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="200dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="20dp"
+            android:progress="20"
+            android:progressBackgroundTint="#333333"
+            android:progressTint="#ffe869"
+            android:visibility="@{flashcardviewmodel.progressBar_wordsLearnedVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_wordsLearned" />
+
+        <ProgressBar
+            android:id="@+id/progressBar_wordsMastered"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="200dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="20dp"
+            android:progress="20"
+            android:progressBackgroundTint="#333333"
+            android:progressTint="#ffe869"
+            android:visibility="@{flashcardviewmodel.progressBar_wordsMasteredVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_wordsMastered" />
+
+        <TextView
+            android:id="@+id/textView_wordsLearned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:text="Words Learned"
+            android:visibility="@{flashcardviewmodel.tv_wordsLearnedVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_goodJob" />
+
+        <TextView
+            android:id="@+id/textView_wordsLearnedOutOf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:text="200/700"
+            android:visibility="@{flashcardviewmodel.textView_wordsLearnedOutOfVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsLearned" />
+
+        <TextView
+            android:id="@+id/textView_wordsMastered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="52dp"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:text="Words Mastered"
+            android:visibility="@{flashcardviewmodel.textView_wordsMasteredVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_wordsLearnedOutOf" />
+
+        <TextView
+            android:id="@+id/textView_wordsMasteredOutOf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:text="10/700"
+            android:visibility="@{flashcardviewmodel.textView_wordsMasteredOutOfVisibility, default=visible}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsMastered" />
+
+        <TextView
+            android:id="@+id/textView_goodJob"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:textColor="#333333"
+            android:visibility="@{flashcardviewmodel.goodJobVisibility, default=visible}"
+            android:text="Good Job!"
+            android:textSize="45sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />

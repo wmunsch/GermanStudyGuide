@@ -53,6 +53,16 @@ public class FlashcardRepository {
     private MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> finishButtonVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> checkButtonVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> goodJobVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> tv_wordsLearnedVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> progressBar_wordsLearnedVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> textView_wordsLearnedOutOfVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> textView_wordsMasteredVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> progressBar_wordsMasteredVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> textView_wordsMasteredOutOfVisibility = new MutableLiveData<>();
+
+
+
 
     private boolean finished = false;
 
@@ -118,6 +128,13 @@ public class FlashcardRepository {
         hintButtonVisibility.setValue(INVISIBLE);
         finishButtonVisibility.setValue(INVISIBLE);
         checkButtonVisibility.setValue(VISIBLE);
+        goodJobVisibility.setValue(GONE);
+        tv_wordsLearnedVisibility.setValue(GONE);
+        progressBar_wordsLearnedVisibility.setValue(GONE);
+        textView_wordsLearnedOutOfVisibility.setValue(GONE);
+        textView_wordsMasteredVisibility.setValue(GONE);
+        progressBar_wordsMasteredVisibility.setValue(GONE);
+        textView_wordsMasteredOutOfVisibility.setValue(GONE);
         correct = false;
 
     }
@@ -202,11 +219,39 @@ public class FlashcardRepository {
     public void setmHintVisibility(int i){
         mHintVisibility.setValue(i);
     }
+    public void setGoodJobVisibility(int i){
+        goodJobVisibility.setValue(i);
+    }
+    public void setTv_wordsLearnedVisibility(int i){
+        tv_wordsLearnedVisibility.setValue(i);
+    }
+    public void setProgressBar_wordsLearnedVisibility(int i){
+        progressBar_wordsLearnedVisibility.setValue(i);
+    }
 
     public void setXmarkVisibility(int i){
         xmarkVisibility.setValue(i);
     }
+    public void setTextView_wordsLearnedOutOfVisibility(int i){
+        textView_wordsLearnedOutOfVisibility.setValue(i);
+    }
+    public void setTextView_wordsMasteredVisibility(int i){
+        textView_wordsMasteredVisibility.setValue(i);
+    }
+    public void setProgressBar_wordsMasteredVisibility(int i){
+        progressBar_wordsMasteredVisibility.setValue(i);
+    }
+    public void setTextView_wordsMasteredOutOfVisibility(int i){
+        textView_wordsMasteredOutOfVisibility.setValue(i);
+    }
 
+    public LiveData<Integer> getTextView_wordsMasteredOutOfVisibility(){return  textView_wordsMasteredOutOfVisibility;}
+    public LiveData<Integer> getProgressBar_wordsMasteredVisibility(){return  progressBar_wordsMasteredVisibility;}
+    public LiveData<Integer> getTextView_wordsMasteredVisibility(){return  textView_wordsMasteredVisibility;}
+    public LiveData<Integer> getProgressBar_wordsLearnedVisibility(){return progressBar_wordsLearnedVisibility;}
+    public LiveData<Integer> getTextView_wordsLearnedOutOfVisibility(){return  textView_wordsLearnedOutOfVisibility;}
+    public LiveData<Integer> getTv_wordsLearnedVisibility(){return tv_wordsLearnedVisibility;}
+    public LiveData<Integer> getGoodJobVisibility(){return goodJobVisibility;}
     public LiveData<Integer> getFinishButtonVisibility(){return finishButtonVisibility;}
     public LiveData<Integer> getEnglishTextVisibility(){
         return englishTextVisibility;
