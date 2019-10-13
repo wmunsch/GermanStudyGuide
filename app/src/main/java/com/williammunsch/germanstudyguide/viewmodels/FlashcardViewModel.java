@@ -49,10 +49,26 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         //mFlashcardRepository.addSource();
     }
 
+    public LiveData<Integer> getWordsMax() {
+        return mFlashcardRepository.getWordsMax();
+    }
+    public LiveData<Integer> getWordsLearnedPercent() {
+        return mFlashcardRepository.getWordsLearnedPercent();
+    }
+    public LiveData<Integer> getWordsMastered() {
+        return mFlashcardRepository.getWordsMastered();
+    }
+
     public LiveData<Integer> getCheckButtonVisibility() {
         return mFlashcardRepository.getCheckButtonVisibility();
     }
+    public LiveData<Integer> getCardsFinished() {
+        return mFlashcardRepository.getCardsFinished();
+    }
 
+    public LiveData<String> getCardsFinishedText() {
+        return mFlashcardRepository.getCardsFinishedText();
+    }
     public LiveData<Boolean> getNavigateToMainActivity(){
         return navigateToMainActivity;
     }
@@ -126,6 +142,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
 
     public void iWasright(){
+        mFlashcardRepository.getCurrentNode().getValue().fixScore();
         mFlashcardRepository.setCorrect(true);
         moveToNextNode();
     }

@@ -60,8 +60,13 @@ public class FlashcardRepository {
     private MutableLiveData<Integer> textView_wordsMasteredVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> progressBar_wordsMasteredVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> textView_wordsMasteredOutOfVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> cardsFinished = new MutableLiveData<>();
+    private MutableLiveData<String> cardsFinishedText = new MutableLiveData<>();
 
-
+    private LiveData<Integer> wordsMax;
+    private LiveData<Integer> wordsLearned;
+    private LiveData<Integer> wordsMastered;
+    private MutableLiveData<Integer> wordsLearnedPercent = new MutableLiveData<>();
 
 
     private boolean finished = false;
@@ -69,10 +74,10 @@ public class FlashcardRepository {
     private boolean correct = false;
 
     private ArrayList<VocabModel> finishedList = new ArrayList<>();
+    //private VocabModel[] finishedList = new VocabModel[5];
 
 
     /**
-     * Need to inject context to get access to the live data to create the queue.
      * Queue needs to be stored here so it will save throughout changes in the lifecycle.
      */
     @Inject
@@ -81,10 +86,22 @@ public class FlashcardRepository {
         mVocabDao = db.vocabDao();
 
         vocabList = mVocabDao.getVocabQueue();
+        wordsMax =mVocabDao.count();
+        wordsLearned = mVocabDao.countLearned();
+        wordsMax = mVocabDao.countMastered();
+        //TODO : Add functionality to the progress bars
 
+        //wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
+
+        /*
+        Every time the mediatorVocabList changes, the currentNode is set to the first entry,
+        and the values for the top progress bar and text are set,
+        and the visibility for the different card types are set up.
+         */
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
-                System.out.println("calling transformations.map currentNode = " + currentNode.getValue());
+                cardsFinished.setValue(100 - (mediatorVocabList.getValue().size()*100/5));
+                cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size());
                 if (mediatorVocabList.getValue().size()>0){
                     if (mediatorVocabList.getValue().get(0).getStudying()==0){
                         setUpViewsForNewCard();
@@ -107,12 +124,27 @@ public class FlashcardRepository {
         }
     }
 
+    /**
+     * Updates the scores for every vocabulary word that was in the activity
+     * based on a finished List that all words are sent to after being popped from
+     * the mediatorVocabList.
+     */
     public void updateAllNodes(){
         System.out.println("UPDATING ALL NODES");
-        for (int i = 0 ; i < finishedList.size();i++){
-            updateNode(finishedList.get(i));
-        }
+        //for (int i = 0 ; i < finishedList.size();i++){
+        //    updateNode(finishedList.get(i));
+        //}
+       // finishedList.clear();
+
+
+        updateNode(finishedList);
         finishedList.clear();
+        System.out.println(" wordsleared : "+ wordsLearned.getValue() );
+        System.out.println(" wordsmax : "+ wordsMax.getValue() );
+        if (wordsLearned.getValue() != null && wordsMax.getValue()!=null){
+            System.out.println("PERCENTS : " + wordsLearned.getValue() + " " + wordsMax.getValue() + " " +wordsLearned.getValue()*100/wordsMax.getValue() );
+            wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
+        }
     }
 
     private void setUpViewsForNewCard(){
@@ -175,10 +207,51 @@ public class FlashcardRepository {
     }
 
 
+
+
+    /**
+     * Creates an updateNodeAsyncTask and executes it.
+     * @param vocabModels
+     */
+    private void updateNode(List<VocabModel> vocabModels){
+        //new updateNodeAsyncTask(mVocabDao).execute(vocabModel);
+        new updateNodeAsyncTask(mVocabDao).execute(vocabModels.get(0), vocabModels.get(1), vocabModels.get(2), vocabModels.get(3), vocabModels.get(4));
+    }
+
+    /**
+     * AsyncTask to update each vocabulary word in the ROOM database on a separate thread
+     * at the end of the activity, once every flashcard has been finished.
+     */
+    private static class updateNodeAsyncTask extends AsyncTask<VocabModel, Void, Void> {
+
+        private VocabDao mAsyncTaskDao;
+
+        updateNodeAsyncTask(VocabDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabModel... params) {
+            for (VocabModel model : params){
+                mAsyncTaskDao.updateNode(model);
+                System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+            }
+            //mAsyncTaskDao.updateNode(params[0]);
+            //System.out.println("Updating node to " + params[0].getScore());
+            return null;
+        }
+    }
+
+
+
+
+
+   /*
+   Getters and setters
+    */
     public ArrayList<VocabModel> getFinishedList() {
         return finishedList;
     }
-
     public boolean isFinished() {
         return finished;
     }
@@ -244,7 +317,16 @@ public class FlashcardRepository {
     public void setTextView_wordsMasteredOutOfVisibility(int i){
         textView_wordsMasteredOutOfVisibility.setValue(i);
     }
+    public LiveData<Integer> getCardsFinished(){
+        return cardsFinished;
+    }
 
+    public LiveData<Integer> getWordsLearnedPercent(){return wordsLearnedPercent;}
+    public LiveData<Integer> getWordsMax(){return wordsMax;}
+    public LiveData<Integer> getWordsLearned(){return wordsLearned;}
+    public LiveData<Integer> getWordsMastered(){return wordsMastered;}
+
+    public LiveData<String> getCardsFinishedText(){return cardsFinishedText;}
     public LiveData<Integer> getTextView_wordsMasteredOutOfVisibility(){return  textView_wordsMasteredOutOfVisibility;}
     public LiveData<Integer> getProgressBar_wordsMasteredVisibility(){return  progressBar_wordsMasteredVisibility;}
     public LiveData<Integer> getTextView_wordsMasteredVisibility(){return  textView_wordsMasteredVisibility;}
@@ -285,12 +367,6 @@ public class FlashcardRepository {
         return mHintVisibility;
     }
 
-
-    public void showSentence(){
-        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
-        else{mHintVisibility.setValue(VISIBLE);}
-    }
-
     public LiveData<List<VocabModel>> getMediatorVocabList(){
         return mediatorVocabList;
     }
@@ -299,24 +375,12 @@ public class FlashcardRepository {
         return currentNode;
     }
 
-    public void updateNode(VocabModel vocabModel){
-        new updateNodeAsyncTask(mVocabDao).execute(vocabModel);
+
+    public void showSentence(){
+        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
+        else{mHintVisibility.setValue(VISIBLE);}
     }
 
 
-    private static class updateNodeAsyncTask extends AsyncTask<VocabModel, Void, Void> {
 
-        private VocabDao mAsyncTaskDao;
-
-        updateNodeAsyncTask(VocabDao dao) {
-            mAsyncTaskDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(final VocabModel... params) {
-            mAsyncTaskDao.updateNode(params[0]);
-            System.out.println("Updating node to " + params[0].getScore());
-            return null;
-        }
-    }
 }
