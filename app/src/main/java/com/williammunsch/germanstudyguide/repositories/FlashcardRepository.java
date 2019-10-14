@@ -89,7 +89,7 @@ public class FlashcardRepository {
         wordsMax =mVocabDao.count();
         wordsLearned = mVocabDao.countLearned();
         wordsMax = mVocabDao.countMastered();
-        //TODO : Add functionality to the progress bars
+        //TODO : Add functionality to the progress bars and animation
 
         //wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
 
