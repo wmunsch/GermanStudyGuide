@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         viewPager = findViewById(R.id.view_pager);
+        //viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(sectionsPagerAdapter);
 
 
@@ -53,12 +54,15 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
+                        System.out.println("NAVIGATION_HOME 0");
                         viewPager.setCurrentItem(0);
                         return true;
                     case R.id.navigation_dashboard:
+                        System.out.println("NAVIGATION_dashboard 1");
                         viewPager.setCurrentItem(1);
                         return true;
                     case R.id.navigation_notifications:
+                        System.out.println("NAVIGATION_notifacions 2");
                         viewPager.setCurrentItem(2);
                         return true;
                 }
@@ -73,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
             }
 
             @Override

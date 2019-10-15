@@ -26,11 +26,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         // getItem is called to instantiate the fragment for the given page.
         // Return a VocabFragment (defined as a static inner class below).
         if (position==0){
-            return VocabFragment.newInstance(position + 1);
+            return VocabFragment.newInstance(0);
         }else if (position==1){
-            return StoriesFragment.newInstance(position + 1);
+            return StoriesFragment.newInstance(1);
         }else{
-            return OptionsFragment.newInstance(position + 1);
+            return OptionsFragment.newInstance(2);
         }
 
     }

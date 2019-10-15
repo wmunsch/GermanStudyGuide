@@ -1,14 +1,15 @@
 <resources>
     <string name="app_name">German Study Guide</string>
     <string name="title_home">Vocabulary</string>
-    <string name="title_dashboard">Stories</string>
-    <string name="title_notifications">Settings</string>
+    <string name="title_dashboard">Grammar</string>
+    <string name="title_notifications">Stories</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="words_mastered">Words mastered : %d / %d</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="log_in">Log in</string>
     <string name="not_registered">Not registered? Click here to sign up!</string>
     <string name="sign_up">Sign up</string>

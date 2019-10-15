@@ -8,21 +8,42 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:src="@drawable/ic_usericon2" />
 
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            tools:layout_editor_absoluteX="260dp"
-            tools:layout_editor_absoluteY="13dp" />
+            android:orientation="vertical"
+            android:layout_marginStart="10dp">
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Username"
+                tools:layout_editor_absoluteX="260dp"
+                tools:layout_editor_absoluteY="13dp" />
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Email"
+                tools:layout_editor_absoluteX="31dp"
+                tools:layout_editor_absoluteY="121dp" />
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 
@@ -31,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Fluency Level"
-        tools:layout_editor_absoluteX="23dp"
-        tools:layout_editor_absoluteY="93dp" />
+        tools:layout_editor_absoluteX="27dp"
+        tools:layout_editor_absoluteY="99dp" />
 
     <TextView
         android:id="@+id/imageView"
@@ -46,7 +67,30 @@
         android:textColor="#FFFFFF"
         android:textSize="30sp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="31dp"
-        tools:layout_editor_absoluteY="112dp" />
+        tools:layout_editor_absoluteX="43dp"
+        tools:layout_editor_absoluteY="118dp" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Words Learned"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="197dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign out"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="552dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="409dp"
+        android:layout_height="334dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="217dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

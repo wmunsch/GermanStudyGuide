@@ -71,23 +71,19 @@ public class VocabFragment extends Fragment {
 
         mVocabListViewModel = ViewModelProviders.of(this,viewModelFactory).get(VocabListViewModel.class);
 
-/*
-        mVocabListViewModel.getA1Max().observe(this, new Observer<Integer>(){
+    }
 
-            @Override
-            public void onChanged(Integer a1WordsMax) {
-                a1Max = a1WordsMax;
-                System.out.println("ONCHANGED " + a1Max + " " + a1WordsMax); //it works here
-                mAdapter.notifyDataSetChanged();
-            }
-        });
-*/
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_main, container, false);
 
         mVocabListViewModel.getVocabListItems().observe(this, new Observer<List<VocabListItem>>(){
 
             @Override
             public void onChanged(List<VocabListItem> vocabListItems) {
                 mAdapter.setVocabList(vocabListItems);
+                //Below not needed, just for testing
                 StringBuilder b = new StringBuilder();
                 String all = "";
                 for (int i = 0; i < vocabListItems.size(); i++){
@@ -108,15 +104,6 @@ public class VocabFragment extends Fragment {
                 mAdapter.setA1Max(num);
             }
         });
-
-    }
-
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_main, container, false);
-
-         //dbManager = new DBManager(getActivity());
 
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
