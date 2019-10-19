@@ -14,18 +14,20 @@ import java.util.List;
 import javax.inject.Inject;
 
 /**
- * Never pass context into a viewmodel. Application context is ok as is used here.
+ * The view model for the vocab list fragment in MainActivity.
+ * It displays a recycler view which contains different levels
+ * of vocabulary, which when clicked on open a new FlashcardActivity.
  */
 public class VocabListViewModel extends ViewModel {
     private Repository mRepository;//injected
-    private FlashcardRepository flashcardRepository;
+    private FlashcardRepository flashcardRepository;//injected
 
     private LiveData<List<VocabModel>> mAllVocab;
     private LiveData<List<VocabListItem>> mVocabListItems;
     private LiveData<Integer> a1Max;
    // private LiveData<Integer> wordCount;
 
-    //TODO : in case where studying all words, or less than 5 are not studying, replace with studying words for full 20
+    //TODO : in case where studying all words, or less than 5 are not studying, replace with studying=1 words for full 20
 
     @Inject
     public VocabListViewModel(Repository repository, FlashcardRepository flashcardRepository){

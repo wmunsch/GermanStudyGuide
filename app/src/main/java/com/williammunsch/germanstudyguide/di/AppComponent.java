@@ -10,6 +10,7 @@ import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 import com.williammunsch.germanstudyguide.ui.VocabFragment;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
+import com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import javax.inject.Singleton;
@@ -44,6 +45,8 @@ public interface AppComponent {
     void inject(VocabFragment vocabFragment);
 
     void inject(FlashcardActivity flashcardActivity);
+
+    void inject(MainActivityViewModel mainActivityViewModel);
 
 
    // void inject(VocabTestActivity vocabTestActivity);

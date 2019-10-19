@@ -24,6 +24,11 @@ public abstract class ViewModelModule {
     @ViewModelKey(FlashcardViewModel.class)
     abstract ViewModel bindFlashcardViewModel(FlashcardViewModel flashcardViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainActivityViewModel.class)
+    abstract ViewModel bindMainActivityViewModel(MainActivityViewModel mainActivityViewModel);
+
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);
