@@ -35,10 +35,27 @@ public class MainActivity extends AppCompatActivity {
 
         mainActivityViewModel = ViewModelProviders.of(this,viewModelFactory).get(MainActivityViewModel.class);
         binding.setMainactivityviewmodel(mainActivityViewModel);
-        binding.viewPager.setAdapter(new SectionsPagerAdapter(this,getSupportFragmentManager()));
+        binding.viewPager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
 
         binding.loginClickable.setOnClickListener((View view)->
                 binding.drawerLayout.openDrawer(GravityCompat.START));
+
+
+
+       // FragmentLoginBinding fragmentLoginBinding = DataBindingUtil.setContentView(this,R.layout.fragment_login);
+       // FragmentLoginBinding _bind = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_login, binding.navigationView, false);
+       // binding.navigationView.addHeaderView(_bind.getRoot());
+     //   _bind.setUser(Session.getUserProfile());
+
+        /*
+        binding.navigationView.getHeaderView(0).findViewById(R.id.button_login).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println("login button pressed");
+            }
+        });
+
+         */
 
         //Allows the bottom navigation bar to change viewPager items.
         binding.navView.setOnNavigationItemSelectedListener((@NonNull MenuItem item) ->{

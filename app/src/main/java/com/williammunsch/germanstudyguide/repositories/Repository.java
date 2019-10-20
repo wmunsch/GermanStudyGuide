@@ -12,12 +12,16 @@ import androidx.lifecycle.Observer;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
 import com.williammunsch.germanstudyguide.room.VocabDao;
 import com.williammunsch.germanstudyguide.room.VocabListDao;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +55,13 @@ public class Repository {
     private List<VocabListItem> dataSet;
     private MediatorLiveData<List<VocabListItem>> mObservableListItems;
 
+    private User user;
+
     DatabaseService apiService;
 
     GermanDatabase db;
+
+
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -90,60 +98,54 @@ public class Repository {
                 }
 
             }
-
             @Override
             public void onFailure(Call<List<VocabModel>> call, Throwable t) {
                 System.out.println("Error on call");
             }
         });
 
-/*
-        mObservableListItems = new MediatorLiveData<>();
+    }
 
-        mObservableListItems.addSource(mVocabListDao.getAllVocabLists(), productEntities -> {
-                    if (db.getDatabaseCreated().getValue() != null) {
-                        mObservableListItems.postValue(productEntities);
-                    }
-                });
 
-*/
-/*
-        if (mVocabListDao.getAllVocabLists().getValue() == null){
-            System.out.println(" VOCABLIST TABLE IS EMPTY");
-            //insertList(new VocabListItem("Beginner Level 1","A1",0,0,0));
-        }else{
-            System.out.println(" VOCABLIST TABLE IS NOT EMPTY");
-            for (int i = 0 ; i < mVocabListDao.getAllVocabLists().getValue().size(); i ++ ){
-                System.out.println( mVocabListDao.getAllVocabLists().getValue().get(i));
-            }
+    public void logIn(String email, String password){
+        /*
+        JSONObject request = new JSONObject();
+        try {
+            //Populate the request parameters
+            request.put("email", email);
+            request.put("password", password);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 */
 
+        Call<List<User>> call = apiService.logIn(email,password);
+        call.enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                System.out.println("Response to call: ");
+                //User user = response.body();
+                List<User> userList = response.body();
 
+                if (userList != null && userList.size() > 0)
+                System.out.println(userList.get(0).getUsername() + " " + userList.get(0).getEmail() +  " " + userList.get(0).getPassword());
+                if (user != null)
+                    System.out.println(user.getUsername() + " " + user.getEmail() + " " + user.getPassword());
+                else System.out.println("Null user");
+            }
 
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                System.out.println("Error on call");
+            }
+        });
     }
 
     private void setVocabListItems(){
         //retrieve data from database here
         //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
-       // System.out.println("Checking database for listitems");
-       // System.out.println("total words: " + mVocabDao.count().getValue());
-        //System.out.println("anything?: " + mVocabDao.getAllVocabs().getValue());
 
-        /*
-        List<VocabListItem> vl = mVocabListDao.getAllVocabLists().getValue();
-        if (vl == null || vl.isEmpty()){
-            insertList(new VocabListItem("Beginner Level 1","A1",mVocabDao.countLearned().getValue(),mVocabDao.count().getValue(),mVocabDao.countMastered().getValue()));
-        }
-        /*
-        try{
-            for (int i = 0 ; i < vl.size();i++){
-                if (vl.get(i) !=)
-            }
-        }catch(NullPointerException e){
-            System.out.println("null vocablistitem");
-        }
-       */
         dataSet = new ArrayList<>();
         dataSet.add(new VocabListItem("Beginner Level 1","A1",0,0,0));
         dataSet.add(new VocabListItem("Beginner Level 2","A2",0,0,0));
@@ -153,14 +155,8 @@ public class Repository {
        // dataSet.add(new VocabListItem("Advanced Level 2","C2",0,0,0));
     }
 
-/*
-    public MutableLiveData<List<VocabListItem>> getVocabListItems(){
-        setVocabListItems();
-        MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
-        data.setValue(dataSet);
-        return data;
-    }
-*/
+
+
     public LiveData<List<VocabListItem>> getVocabListItems(){
         MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
         data.setValue(dataSet);

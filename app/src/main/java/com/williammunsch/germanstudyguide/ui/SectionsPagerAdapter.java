@@ -31,12 +31,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             R.drawable.ic_vocab
     };
 
-    Context context;
 
-
-    public SectionsPagerAdapter(Context context, FragmentManager fm) {
+    public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.context = context;
     }
     // overriding getPageTitle()
     @Override

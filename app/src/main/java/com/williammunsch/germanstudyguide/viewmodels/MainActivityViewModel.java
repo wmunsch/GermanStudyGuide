@@ -1,32 +1,16 @@
 package com.williammunsch.germanstudyguide.viewmodels;
 
-import android.view.MenuItem;
-import android.view.View;
+import android.text.Editable;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.GravityCompat;
-import androidx.databinding.BindingAdapter;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModel;
-import androidx.viewpager.widget.ViewPager;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
-import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.repositories.Repository;
-import com.williammunsch.germanstudyguide.ui.SectionsPagerAdapter;
 
 import javax.inject.Inject;
 
 public class MainActivityViewModel extends ViewModel {
     private Repository mRepository;//injected
-    public SectionsPagerAdapter pageAdapter;
-    //public ViewPager viewPager;
-    public BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener;
-    public ViewPager.OnPageChangeListener onPageChangeListener;
 
-
-    //public BottomNavigationView navView;
 
     @Inject
     public MainActivityViewModel(Repository repository){
@@ -35,8 +19,19 @@ public class MainActivityViewModel extends ViewModel {
 
     }
 
-    public void openLoginScreen(DrawerLayout mDrawer){
-        mDrawer.openDrawer(GravityCompat.START);
-        System.out.println("Pressed user icon button");
+    public void logIn(Editable email, Editable password){
+        System.out.println("clicekd login");
+        System.out.println("Email = " + email + "      password = " + password);
+
+        if (email.toString() != null && !email.toString().isEmpty() && password.toString() != null && !password.toString().isEmpty()){
+            mRepository.logIn(email.toString().toLowerCase().trim(), password.toString().toLowerCase().trim());
+        }
+
+        //TODO : Handle failed login (reset password)
+
+        //TODO : Handle successful login (change fragment?)
+
     }
+
+
 }
