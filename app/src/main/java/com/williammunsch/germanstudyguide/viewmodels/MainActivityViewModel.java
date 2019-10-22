@@ -24,8 +24,17 @@ public class MainActivityViewModel extends ViewModel {
         System.out.println("Email = " + email + "      password = " + password);
 
         if (email.toString() != null && !email.toString().isEmpty() && password.toString() != null && !password.toString().isEmpty()){
-            mRepository.logIn(email.toString().toLowerCase().trim(), password.toString().toLowerCase().trim());
+            int errorType = mRepository.logIn(email.toString().toLowerCase().trim(), password.toString().toLowerCase().trim());
+            if(errorType == 1){
+                //show account not found
+            }else if (errorType==2){
+                //show incorrect password
+            }else{
+                //change account
+            }
         }
+
+
 
         //TODO : Handle failed login (reset password)
 

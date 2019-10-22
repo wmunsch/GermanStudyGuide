@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.williammunsch.germanstudyguide.LoginResponse;
 import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
@@ -55,12 +56,14 @@ public class Repository {
     private List<VocabListItem> dataSet;
     private MediatorLiveData<List<VocabListItem>> mObservableListItems;
 
+    int responseValue = 0;
     private User user;
 
     DatabaseService apiService;
 
     GermanDatabase db;
 
+    LoginResponse loginResponse;
 
 
     /**
@@ -77,6 +80,9 @@ public class Repository {
 
         setVocabListItems();
 
+
+        //Check for updates to the vocab lists and stories.
+        //checkForUpdates();
 
 /**
  * Calls the MySQL database A1 table and inserts all the rows into the ROOM database locally
@@ -107,32 +113,47 @@ public class Repository {
     }
 
 
+    /**
+     * Calls the API login interface, returning user information to LoginResponse if login information is correct,
+     * if not, the LoginResponse gathers the error of either non-existant email or incorrect password.
+     * @param email The email typed into the edit text.
+     * @param password The password typed into the edit text.
+     */
+    public int logIn(String email, String password){
+        Call<LoginResponse> call = apiService.logIn(email,password);
+        call.enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                System.out.println("Response to call: ");
+                System.out.println(response);
+                loginResponse = response.body();
+                System.out.println(loginResponse);
+
+                if(loginResponse != null)
+                responseValue = loginResponse.checkError();
+
+
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                System.out.println("Error on call" + t);
+            }
+        });
+        return responseValue;
+    }
+/*
     public void logIn(String email, String password){
-        /*
-        JSONObject request = new JSONObject();
-        try {
-            //Populate the request parameters
-            request.put("email", email);
-            request.put("password", password);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-*/
-
         Call<List<User>> call = apiService.logIn(email,password);
         call.enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 System.out.println("Response to call: ");
-                //User user = response.body();
                 List<User> userList = response.body();
 
-                if (userList != null && userList.size() > 0)
+                if (userList != null && userList.size() == 1)
                 System.out.println(userList.get(0).getUsername() + " " + userList.get(0).getEmail() +  " " + userList.get(0).getPassword());
-                if (user != null)
-                    System.out.println(user.getUsername() + " " + user.getEmail() + " " + user.getPassword());
-                else System.out.println("Null user");
+
             }
 
             @Override
@@ -141,6 +162,8 @@ public class Repository {
             }
         });
     }
+
+ */
 
     private void setVocabListItems(){
         //retrieve data from database here

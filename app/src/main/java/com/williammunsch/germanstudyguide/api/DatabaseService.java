@@ -1,4 +1,5 @@
 package com.williammunsch.germanstudyguide.api;
+import com.williammunsch.germanstudyguide.LoginResponse;
 import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 
@@ -22,7 +23,7 @@ public interface DatabaseService {
 
     @FormUrlEncoded
     @POST("api/login.php")
-    Call<List<User>> logIn(
+    Call<LoginResponse> logIn(
             @Field("email") String email,
             @Field("password") String password
     );

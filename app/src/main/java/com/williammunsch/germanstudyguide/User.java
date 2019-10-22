@@ -12,6 +12,8 @@ public class User {
         this.password = password;
     }
 
+    public String toString(){return username + " " + email + " " + password;}
+
     public String getUsername(){
         return username;
     }
