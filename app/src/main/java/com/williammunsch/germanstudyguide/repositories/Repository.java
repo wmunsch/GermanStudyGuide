@@ -1,6 +1,7 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
+import android.accounts.AccountManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
@@ -50,21 +52,9 @@ public class Repository {
     private VocabDao mVocabDao;
     private VocabListDao mVocabListDao;
     private LiveData<List<VocabModel>> mAllVocab;
-   // private List<VocabListItem> dataSet;
-    //private LiveData<Integer> a1Max;
-    //private LiveData<List<VocabListItem>> dataSet;
     private List<VocabListItem> dataSet;
-    private MediatorLiveData<List<VocabListItem>> mObservableListItems;
-
-    int responseValue = 0;
-    private User user;
-
-    DatabaseService apiService;
-
+    public DatabaseService apiService;
     GermanDatabase db;
-
-    LoginResponse loginResponse;
-
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -80,9 +70,6 @@ public class Repository {
 
         setVocabListItems();
 
-
-        //Check for updates to the vocab lists and stories.
-        //checkForUpdates();
 
 /**
  * Calls the MySQL database A1 table and inserts all the rows into the ROOM database locally
@@ -112,58 +99,6 @@ public class Repository {
 
     }
 
-
-    /**
-     * Calls the API login interface, returning user information to LoginResponse if login information is correct,
-     * if not, the LoginResponse gathers the error of either non-existant email or incorrect password.
-     * @param email The email typed into the edit text.
-     * @param password The password typed into the edit text.
-     */
-    public int logIn(String email, String password){
-        Call<LoginResponse> call = apiService.logIn(email,password);
-        call.enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                System.out.println("Response to call: ");
-                System.out.println(response);
-                loginResponse = response.body();
-                System.out.println(loginResponse);
-
-                if(loginResponse != null)
-                responseValue = loginResponse.checkError();
-
-
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                System.out.println("Error on call" + t);
-            }
-        });
-        return responseValue;
-    }
-/*
-    public void logIn(String email, String password){
-        Call<List<User>> call = apiService.logIn(email,password);
-        call.enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                System.out.println("Response to call: ");
-                List<User> userList = response.body();
-
-                if (userList != null && userList.size() == 1)
-                System.out.println(userList.get(0).getUsername() + " " + userList.get(0).getEmail() +  " " + userList.get(0).getPassword());
-
-            }
-
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                System.out.println("Error on call");
-            }
-        });
-    }
-
- */
 
     private void setVocabListItems(){
         //retrieve data from database here

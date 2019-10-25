@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#ffffff</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#000000</color>
-    <color name="colorCursor">#000011</color>
+    <color name="colorAccent">#0f86e1</color>
+    <color name="colorCursor">#0f86e1</color>
     <color name="navBarPrimary"> #0f86e1</color>
 </resources>
