@@ -7,9 +7,11 @@ import java.util.List;
 public class LoginResponse {
     //The name of these values must match the values given by JSON in the PHP API
     private String error;
+
     private String username, email, password;
     private boolean isError = false;
     private int errorType = 0;
+
 
     public LoginResponse(String username, String email, String password){
         this.username = username;
@@ -40,9 +42,11 @@ public class LoginResponse {
             }
         }else{
             isError = false;
-            return 0;
+            return 3;
         }
     }
+
+    public boolean getIsError(){return isError;}
 /*
     public boolean checkError(){
         if (error != null && !error.isEmpty()){
@@ -57,6 +61,30 @@ public class LoginResponse {
 
     public String getError() {
         return error;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }

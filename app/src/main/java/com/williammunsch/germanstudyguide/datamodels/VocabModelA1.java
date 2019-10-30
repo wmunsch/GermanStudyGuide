@@ -4,34 +4,37 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 
-
-@Entity(tableName = "vocab_table")
-public class VocabModel {
+/**
+ * Table for the generic 700 vocabulary words with sentences.
+ * Only gets updated if the database is changed, or downloaded on app installation.
+ */
+@Entity(tableName = "vocab_tableA1")
+public class VocabModelA1 {
     @PrimaryKey
     private int _id;
 
-    private int score;
-    private int freq;
-    private int studying;
+  //  private int score;
+   // private int freq;
+   // private int studying;
     private String german;
     private String english;
     private String gesent;
     private String esent;
     //private String[] englishStringsArray;
 
-    public VocabModel(int id, String german, String english, String gesent, String esent, int score, int freq, int studying){
+    public VocabModelA1(int id, String german, String english, String gesent, String esent){//}, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
         this.gesent = gesent;
         this.esent = esent;
-        this.score = score;
-        this.freq = freq;
-        this.studying = studying;
+       // this.score = score;
+       // this.freq = freq;
+       // this.studying = studying;
 
     }
 
-    public String toString(){
+    public String toString(int score){
         if (score > 50){
             return english;
         }else{
@@ -40,7 +43,7 @@ public class VocabModel {
        // return _id+ " " + german+ " " +english;
     }
 
-    public String getAnswer(){
+    public String getAnswer(int score){
         if (score < 50){
             return english;
         }else{
@@ -48,7 +51,7 @@ public class VocabModel {
         }
     }
 
-    public String toSentence(){
+    public String toSentence(int score){
         if (score > 50){
             return esent;
         }else{
@@ -65,7 +68,7 @@ public class VocabModel {
         return null;
 
     }
-
+/*
     public void increaseScore(){
         if (score < 95){
             score += 5;
@@ -91,6 +94,8 @@ public class VocabModel {
         }
     }
 
+ */
+
     public int getId() {
         return _id;
     }
@@ -98,7 +103,7 @@ public class VocabModel {
     public void setId(int id) {
         this._id = id;
     }
-
+/*
     public int getScore() {
         return score;
     }
@@ -122,6 +127,8 @@ public class VocabModel {
     public void setStudying(int studying) {
         this.studying = studying;
     }
+
+ */
 
     public String getGerman() {
         return german;

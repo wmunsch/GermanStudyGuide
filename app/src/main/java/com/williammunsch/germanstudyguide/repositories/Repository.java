@@ -1,30 +1,21 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
-import android.accounts.AccountManager;
 import android.os.AsyncTask;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
-import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.williammunsch.germanstudyguide.LoginResponse;
+import com.williammunsch.germanstudyguide.SaveDataResponse;
 import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
+import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
+import com.williammunsch.germanstudyguide.room.UserDao;
 import com.williammunsch.germanstudyguide.room.VocabDao;
 import com.williammunsch.germanstudyguide.room.VocabListDao;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +42,19 @@ public class Repository {
 
     private VocabDao mVocabDao;
     private VocabListDao mVocabListDao;
-    private LiveData<List<VocabModel>> mAllVocab;
+    private UserDao mUserDao;
     private List<VocabListItem> dataSet;
     public DatabaseService apiService;
+    private LiveData<User> currentUser;
+    private LiveData<String> userName;
+    private LiveData<List<VocabListItem>> vocabListItemList;
+
     GermanDatabase db;
+
+
+
+
+    private LiveData<Integer> a1Count;
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -66,59 +66,81 @@ public class Repository {
 
         mVocabDao = db.vocabDao();
         mVocabListDao = db.vocabListDao();
-        mAllVocab = mVocabDao.getAllVocabs();
+        mUserDao = db.userDao();
 
-        setVocabListItems();
+        getUserInfoFromRoom();
+
+        a1Count = db.vocabDao().count();
+
+        dataSet = new ArrayList<>();
+
+        //map username to currentuser.username to show username in top left of main screen
+        userName = Transformations.map(currentUser, name->{
+            if (currentUser.getValue() != null)
+               return currentUser.getValue().getUsername();
+            return "Log In";
+        } );
+
+        checkA1();
+
+        vocabListItemList = mVocabListDao.getAllVocabLists();
+    }
+
+    public void getUserInfoFromRoom(){
+        currentUser = mUserDao.getUser();
+    }
 
 
-/**
- * Calls the MySQL database A1 table and inserts all the rows into the ROOM database locally
- */
-        Call<List<VocabModel>> call = apiService.vocabList();
-        call.enqueue(new Callback<List<VocabModel>>() {
+
+    public void logOut(){
+        //deleteUser();
+        deleteAllScores();
+    }
+
+    /**
+     * Called when logging in.
+     */
+    public void downloadSaveData(){
+        Call<SaveDataResponse> call = apiService.getSaveData();
+        call.enqueue(new Callback<SaveDataResponse>() {
             @Override
-            public void onResponse(Call<List<VocabModel>> call, Response<List<VocabModel>> response) {
+            public void onResponse(Call<SaveDataResponse> call, Response<SaveDataResponse> response) {
                 System.out.println("Response to call: ");
                 int statusCode = response.code();
-                List<VocabModel> vocabList = response.body();
+                SaveDataResponse data = response.body();
 
-                //Delete all current entries in the A1 table so it doesn't give non unique errors while testing
-                deleteAll();
-
-                for (int i = 0; i < vocabList.size();i++){
-                    System.out.println(vocabList.get(i).toString() + " " + vocabList.get(i).toSentence() + " " + vocabList.get(i).getStudying());
-                   insert(vocabList.get(i));
+                if (data!=null){
+                    String dataSet = data.toString();
+                    String temp = "";
+                    for (int i = 0; i < 700; i ++){
+                        //insert each entry into ScoreModelA1 table
+                        temp=dataSet.substring(i,i+6);
+                        mVocabDao.insertIntoScoreModelA1(new ScoreModelA1(i,Integer.parseInt(temp.substring(0,1)),Integer.parseInt(temp.substring(2,4)),Integer.parseInt((temp.substring(5)))));
+                    }
                 }
+
 
             }
             @Override
-            public void onFailure(Call<List<VocabModel>> call, Throwable t) {
+            public void onFailure(Call<SaveDataResponse> call, Throwable t) {
                 System.out.println("Error on call");
             }
         });
-
     }
 
-
-    private void setVocabListItems(){
-        //retrieve data from database here
-        //MAKE SURE TO USE ASYNC TASK FOR DATABASE QUERIES IN FUTURE
-
-        dataSet = new ArrayList<>();
-        dataSet.add(new VocabListItem("Beginner Level 1","A1",0,0,0));
-        dataSet.add(new VocabListItem("Beginner Level 2","A2",0,0,0));
-        dataSet.add(new VocabListItem("Intermediate Level 1","B1",0,0,0));
-       // dataSet.add(new VocabListItem("Intermediate Level 2","B2",0,0,0));
-       // dataSet.add(new VocabListItem("Advanced Level 1","C1",0,0,0));
-       // dataSet.add(new VocabListItem("Advanced Level 2","C2",0,0,0));
+    public LiveData<String> getUserName() {
+        return userName;
     }
 
-
+    public LiveData<Integer> getA1Count() {
+        return a1Count;
+    }
 
     public LiveData<List<VocabListItem>> getVocabListItems(){
-        MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
-        data.setValue(dataSet);
-        return data;
+        return vocabListItemList;
+        //MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
+        //data.setValue(dataSet);
+        //return data;
     }
 
 
@@ -126,22 +148,23 @@ public class Repository {
         return mVocabDao.count();
     }
 
-   // public LiveData<Integer> getA1Max() {return a1Max;}
-    public LiveData<List<VocabModel>> getAll() { return mAllVocab; }
 
-    LiveData<VocabModel> getOne(){return mVocabDao.getOneVocab();}
-
-    public void insert (VocabModel vocabModel) {
-        new insertAsyncTask(mVocabDao).execute(vocabModel);
+    public void insert (VocabModelA1 vocabModelA1) {
+        new insertAsyncTask(mVocabDao).execute(vocabModelA1);
+    }
+    public void insertUser(User user){
+        new insertUserAsyncTask(mUserDao).execute(user);
     }
 
-    public void update (VocabModel vocabModel) {
-        new updateAsyncTask(mVocabDao).execute(vocabModel);
+    public void update (VocabModelA1 vocabModelA1) {
+        new updateAsyncTask(mVocabDao).execute(vocabModelA1);
     }
 
     public void deleteAll(){
         new deleteAsyncTask(mVocabDao).execute();
     }
+
+    public void deleteAllScores(){new deleteA1AsyncTask(mVocabDao).execute();}
 
     public LiveData<Integer> count() {
         return mVocabDao.count();
@@ -150,6 +173,95 @@ public class Repository {
     public void insertList (VocabListItem vocabListItem){
         new insertListAsyncTask(mVocabListDao).execute(vocabListItem);
     }
+
+
+    public void checkA1(){
+        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao).execute();
+    }
+    /**
+     * Checks to see if the A1 table has been downloaded to the local database, if not, downloads it.
+     * If it does exist, or after downloading, adds A1 to VocabListItems.
+     */
+    private static class checkA1AsyncTask extends AsyncTask<Void, Void, Integer> {
+        private VocabDao mAsyncTaskDao;
+        private VocabListDao mVocabListDao;
+        private DatabaseService apiService;
+
+
+        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao) {
+            mAsyncTaskDao = dao;
+            apiService = api;
+            mVocabListDao = vDao;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            System.out.println("COUNT : " + mAsyncTaskDao.countA1());
+            return mAsyncTaskDao.countA1();
+        }
+
+        @Override
+        protected void onPostExecute(Integer vocabCount){
+            if (vocabCount!=14){
+                System.out.println("Downloading A1 table");
+
+                Call<List<VocabModelA1>> call = apiService.vocabList();
+                call.enqueue(new Callback<List<VocabModelA1>>() {
+                    @Override
+                    public void onResponse(Call<List<VocabModelA1>> call, Response<List<VocabModelA1>> response) {
+                        List<VocabModelA1> vocabList = response.body();
+                        VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
+                        new insertAsyncTask(mAsyncTaskDao).execute(vocabListArray);
+                    }
+                    @Override
+                    public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
+                        System.out.println("Error on call");
+                    }
+                });
+
+                //Add the vocab list item
+                new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","A1",0,0,0));
+
+            }else{
+                System.out.println("Already downloaded");
+            }
+
+
+        }
+    }
+
+
+    private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
+        private VocabDao mAsyncTaskDao;
+
+        insertAsyncTask(VocabDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabModelA1... params) {
+            for (VocabModelA1 model : params){
+                mAsyncTaskDao.insert(model);
+            }
+            return null;
+        }
+    }
+
+
+    private static class insertVocabListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
+        private VocabListDao mAsyncTaskDao;
+
+        insertVocabListAsyncTask(VocabListDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final VocabListItem... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
 
 
     private static class insertListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
@@ -172,15 +284,17 @@ public class Repository {
 
 
 
-    private static class insertAsyncTask extends AsyncTask<VocabModel, Void, Void> {
-        private VocabDao mAsyncTaskDao;
 
-        insertAsyncTask(VocabDao dao) {
+
+    private static class insertUserAsyncTask extends AsyncTask<User, Void, Void> {
+        private UserDao mAsyncTaskDao;
+
+        insertUserAsyncTask(UserDao dao) {
             mAsyncTaskDao = dao;
         }
 
         @Override
-        protected Void doInBackground(final VocabModel... params) {
+        protected Void doInBackground(final User... params) {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
@@ -201,7 +315,7 @@ public class Repository {
 
     }
 
-    private static class updateAsyncTask extends AsyncTask<VocabModel, Void, Void> {
+    private static class updateAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
         private VocabDao mAsyncTaskDao;
 
         updateAsyncTask(VocabDao dao) {
@@ -209,10 +323,25 @@ public class Repository {
         }
 
         @Override
-        protected Void doInBackground(final VocabModel... params) {
+        protected Void doInBackground(final VocabModelA1... params) {
           //  mAsyncTaskDao.insert(params[0]);
             return null;
         }
+    }
+
+    private static class deleteA1AsyncTask extends AsyncTask<Void, Void, Void> {
+        private VocabDao mAsyncTaskDao;
+
+        deleteA1AsyncTask(VocabDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAllScores();
+            return null;
+        }
+
     }
 
 

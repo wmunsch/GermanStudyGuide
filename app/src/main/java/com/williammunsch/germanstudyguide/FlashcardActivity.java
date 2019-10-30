@@ -1,9 +1,8 @@
 package com.williammunsch.germanstudyguide;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -12,10 +11,9 @@ import androidx.lifecycle.ViewModelProviders;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+
+//import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
 
@@ -47,18 +45,18 @@ public class FlashcardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
-        binding.setLifecycleOwner(this);
+       //TODO ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
+        //TODO binding.setLifecycleOwner(this);
 
        // Toolbar myToolbar = findViewById(R.id.toolbar);
         //setSupportActionBar(myToolbar);
-        setSupportActionBar(binding.toolbar);
+       //TODO setSupportActionBar(binding.toolbar);
 
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
 
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
 
-        binding.setFlashcardviewmodel(flashcardViewModel);
+        //TODO binding.setFlashcardviewmodel(flashcardViewModel);
 
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
@@ -75,12 +73,12 @@ public class FlashcardActivity extends AppCompatActivity {
             }
         });
 
-        flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModel>>() {
+        flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModelA1>>() {
             @Override
-            public void onChanged(List<VocabModel> vocabModels) {
-                if (vocabModels != null) {
-                    for (int i = 0 ; i < vocabModels.size();i++){
-                        System.out.println(vocabModels.get(i).getId() + " " + vocabModels.get(i) + " " + vocabModels.get(i).getScore()+" " + vocabModels.get(i).getStudying());
+            public void onChanged(List<VocabModelA1> vocabModelA1s) {
+                if (vocabModelA1s != null) {
+                    for (int i = 0; i < vocabModelA1s.size(); i++){
+                        System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i));// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
 
                     }
                 }

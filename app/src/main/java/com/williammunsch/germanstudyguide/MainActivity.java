@@ -2,21 +2,19 @@ package com.williammunsch.germanstudyguide;
 
 import androidx.annotation.NonNull;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityMainBinding;
 import com.williammunsch.germanstudyguide.ui.LoginDialogFragment;
@@ -33,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     MainActivityViewModel mainActivityViewModel;
     FragmentManager fm;
 
+    //TODO  : slide down with animation when clicking on recyclerview list item
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,12 +56,20 @@ public class MainActivity extends AppCompatActivity {
             }else if (code==2){
                 LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Incorrect password","The password you entered was incorrect.\nPlease make sure you entered the\ncorrect password and try again.");
                 loginDialogFragment.show(fm,"loginDialogFrament");
-                //TODO : reset the edittext to empty
+                binding.etPassword.setText("");
+               // binding.etPassword.setBackground(getDrawable(R.drawable.edittext_background_wrong));
+                binding.etPassword.requestFocus();
             }else if (code==3){
                 //login
                 //TODO : Handle successful login (change fragment?)
+                System.out.println("LOGGING IN");
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                closeKeyboard();
             }
         });
+
+        mainActivityViewModel.getUserName().observe(this, name ->
+                binding.textViewUsername.setText(name));
 
 
         //Allows the bottom navigation bar to change viewPager items.
@@ -96,7 +103,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    public void closeKeyboard(){
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

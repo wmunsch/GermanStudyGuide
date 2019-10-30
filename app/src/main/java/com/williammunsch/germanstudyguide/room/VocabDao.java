@@ -1,86 +1,98 @@
 package com.williammunsch.germanstudyguide.room;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 @Dao
 public interface VocabDao {
-    @Query("SELECT * FROM vocab_table")
-    LiveData<List<VocabModel>> getAllVocabs();   //ROOM does not support MutableLiveData
+    @Query("SELECT * FROM vocab_tableA1")
+    LiveData<List<VocabModelA1>> getAllVocabs();   //ROOM does not support MutableLiveData
 
-    @Query("SELECT * FROM vocab_table LIMIT 1;")
-    LiveData<VocabModel> getOneVocab();
-
-
-
-    @Query("SELECT * FROM vocab_table WHERE studying = 0 ORDER BY _id LIMIT 5;")// + "SELECT * FROM vocab_table WHERE studying = 1 ODER BY _id LIMIT 5")
-    List<VocabModel> getFiveNewVocab();
+    @Query("SELECT * FROM vocab_tableA1 LIMIT 1;")
+    LiveData<VocabModelA1> getOneVocab();
 
 
+
+    //@Query("SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5;")// + "SELECT * FROM vocab_table WHERE studying = 1 ODER BY _id LIMIT 5")
+   // List<VocabModelA1> getFiveNewVocab();
+
+
+
+    //Gets # of new vocab and # of old vocab for review combined
+    //@Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 3) ORDER BY studying ASC")
+  //  LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets # of new vocab and # of old vocab for review combined
    // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
-    @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 1 ORDER BY score LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 0 ORDER BY _id LIMIT 3) ORDER BY studying ASC")
-    LiveData<List<VocabModel>> getVocabQueue();
-
-    //Gets # of new vocab and # of old vocab for review combined
-   // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
-    //List<VocabModel>getVocabQueue();
+    //List<VocabModelA1>getVocabQueue();
 
 
     /**
      * Update the vocabModel word with the new score.
      */
     @Update
-    void updateNode(VocabModel... vocabModels);
+    void updateNode(VocabModelA1... vocabModelA1s);
    // @Query("UPDATE vocab_table SET score = score")
-   // void updateNode(VocabModel vocabModel);
+   // void updateNode(VocabModelA1 vocabModel);
 
-    @Insert
-    void insert(VocabModel vocabModel);
+    //Inserts the A1 data, will replace unique constraints in case of a non-fully downloaded previous attempt
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(VocabModelA1 vocabModelA1);
 
-    @Query("DELETE FROM vocab_table")
+    @Query("DELETE FROM vocab_tableA1")
     void deleteAll();
 
-    @Query("SELECT * FROM vocab_Table WHERE studying = 1 ORDER BY score;")
-    List<VocabModel> getFiveOldVocab();
+   // @Query("SELECT * FROM vocab_TableA1 WHERE studying = 1 ORDER BY score;")
+    //List<VocabModelA1> getFiveOldVocab();
 
 
+    /**
+     * Called when logging in.
+     */
+    @Insert
+    void insertIntoScoreModelA1(ScoreModelA1... scoreModelA1s);
+
+    /**
+     * Called when logging out.
+     */
+    @Query("DELETE FROM score_tableA1")
+    void deleteAllScores();
 
 
     //@Query("SELECT * FROM vocab_table WHERE ")
+
+    @Query("SELECT COUNT(*) FROM  vocab_tableA1")
+    Integer countA1();
 
 
     /**
      * Counts the number of entries in the table.
      * @return The number of entries.
      */
-    @Query("SELECT COUNT(*) FROM  vocab_table")
+    @Query("SELECT COUNT(*) FROM  vocab_tableA1")
     LiveData<Integer> count();
 
     /**
      * Counts the number of learned words in the table.
      * @return The number of learned words.
      */
-    @Query("SELECT COUNT(*) FROM  vocab_table WHERE studying = 1")
-    LiveData<Integer> countLearned();
+    //@Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE studying = 1")
+   // LiveData<Integer> countLearned();
 
     /**
      * Counts the number of mastered words in the table.
      * @return The number of mastered words.
      */
-    @Query("SELECT COUNT(*) FROM  vocab_table WHERE score = 100")
-    LiveData<Integer> countMastered();
+    //@Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score = 100")
+   // LiveData<Integer> countMastered();
 
 }

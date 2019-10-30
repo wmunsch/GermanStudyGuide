@@ -2,13 +2,12 @@ package com.williammunsch.germanstudyguide.viewmodels;
 
 import android.text.Editable;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.LoginResponse;
+import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import javax.inject.Inject;
@@ -21,13 +20,16 @@ public class MainActivityViewModel extends ViewModel {
     private Repository mRepository;//injected
 
     private MutableLiveData<Integer> errorCode = new MutableLiveData<>();
+    private LiveData<String> userName;
+    //private MutableLiveData<String> userName = new MutableLiveData<>();
     private LoginResponse loginResponse;
 
 
     @Inject
     public MainActivityViewModel(Repository repository){
         this.mRepository = repository;
-
+        userName=mRepository.getUserName();
+       // userName.setValue("Log in");
 
     }
 
@@ -50,8 +52,17 @@ public class MainActivityViewModel extends ViewModel {
                 System.out.println(response);
                 loginResponse = response.body();
                 System.out.println(loginResponse);
-                if(loginResponse != null)
+                if(loginResponse != null) {
                     errorCode.setValue(loginResponse.checkError());
+                    if (!loginResponse.getIsError()){
+                        //add user to ROOM database
+                        mRepository.insertUser(new User(loginResponse.getUsername(), loginResponse.getEmail(),loginResponse.getPassword()));
+
+                        //TODO : reset the ROOM database scores and reload them with new values?
+                        //mRepository.getScoresFromServer();
+                    }
+
+                }
 
                 //End loading bar here?
             }
@@ -62,7 +73,13 @@ public class MainActivityViewModel extends ViewModel {
         });
     }
 
+    public LiveData<Integer> getA1Count() {
+        return mRepository.getA1Count();
+    }
 
+    public LiveData<String> getUserName(){
+        return userName;
+    }
 
 
     public LiveData<Integer> getErrorCode(){

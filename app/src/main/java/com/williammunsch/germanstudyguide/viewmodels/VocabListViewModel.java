@@ -1,11 +1,10 @@
 package com.williammunsch.germanstudyguide.viewmodels;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
@@ -22,7 +21,7 @@ public class VocabListViewModel extends ViewModel {
     private Repository mRepository;//injected
     private FlashcardRepository flashcardRepository;//injected
 
-    private LiveData<List<VocabModel>> mAllVocab;
+    private LiveData<List<VocabModelA1>> mAllVocab;
     private LiveData<List<VocabListItem>> mVocabListItems;
     private LiveData<Integer> a1Max;
    // private LiveData<Integer> wordCount;
@@ -52,7 +51,7 @@ public class VocabListViewModel extends ViewModel {
     /**
      * Add a "getter" method for all the words. This completely hides the implementation from the UI.
      */
-    public LiveData<List<VocabModel>> getAllVocab(){
+    public LiveData<List<VocabModelA1>> getAllVocab(){
         return mAllVocab;
     }
 
@@ -68,7 +67,7 @@ public class VocabListViewModel extends ViewModel {
     /**
      * wrapper insert() method that calls the Repository's insert() method. In this way, the implementation of insert() is completely hidden from the UI.
      */
-    public void insert(VocabModel vocabModel) {mRepository.insert(vocabModel);}
+    public void insert(VocabModelA1 vocabModelA1) {mRepository.insert(vocabModelA1);}
 
   //  public Integer count() {return mRepository.count();}
 

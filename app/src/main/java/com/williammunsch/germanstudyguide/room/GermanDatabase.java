@@ -1,20 +1,16 @@
 package com.williammunsch.germanstudyguide.room;
 
-import android.content.Context;
-import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Database;
-import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
-@Database(entities = {VocabModel.class, Story.class, VocabListItem.class}, version = 2)
+@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class}, version = 3)
 public abstract class GermanDatabase extends RoomDatabase {
     //private static GermanDatabase instance;
 
@@ -23,6 +19,8 @@ public abstract class GermanDatabase extends RoomDatabase {
     public abstract VocabListDao vocabListDao();
 
     public abstract StoryDao storyDao();
+
+    public abstract UserDao userDao();
 
     private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
 

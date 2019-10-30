@@ -18,7 +18,6 @@ import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.adapters.RecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
 import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 

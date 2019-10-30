@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.SingleLiveEvent;
-import com.williammunsch.germanstudyguide.datamodels.VocabModel;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 
 import java.util.List;
@@ -130,27 +130,29 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         mFlashcardRepository.showSentence();
     }
 
-    public LiveData<List<VocabModel>> getMediatorVocabList(){
+    public LiveData<List<VocabModelA1>> getMediatorVocabList(){
         return mFlashcardRepository.getMediatorVocabList();
     }
 
 
 
-    public LiveData<VocabModel> getCurrentNode(){
+    public LiveData<VocabModelA1> getCurrentNode(){
         return mFlashcardRepository.getCurrentNode();
     }
 
 
     public void iWasright(){
-        mFlashcardRepository.getCurrentNode().getValue().fixScore();
+        //TODO mFlashcardRepository.getCurrentNode().getValue().fixScore();
         mFlashcardRepository.setCorrect(true);
         moveToNextNode();
     }
 
     public void checkAnswer(){
+        //TODO
+        /*
         if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
             boolean test = false;
-            //test entered answer against all possible answers in the VocabModel
+            //test entered answer against all possible answers in the VocabModelA1
             for (String s : mFlashcardRepository.getCurrentNode().getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
                 if (s.equalsIgnoreCase(answer)){
                     test = true;
@@ -158,7 +160,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             }
             if (test && !answer.equals("")) {
                 System.out.println("CORRECT");
-                mFlashcardRepository.getCurrentNode().getValue().increaseScore();
+                 mFlashcardRepository.getCurrentNode().getValue().increaseScore();
                 mFlashcardRepository.setCorrect(true);
                 setUpCorrectAnswerViews();
             } else if (!test && !answer.equals("")) {
@@ -174,6 +176,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             System.out.println("Moving to next node");
             moveToNextNode();
         }
+
+         */
     }
 
     private void setUpIncorrectAnswerViews(){
@@ -196,9 +200,13 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     }
 
     private void moveToNextNode(){
+        //TODO
+        /*
         if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
             mFlashcardRepository.getCurrentNode().getValue().setStudying(1);
         }
+
+         */
 
         if (mFlashcardRepository.isCorrect()){
             popNode();
@@ -239,7 +247,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     //TODO : fix this giving indexoutofbounds exception when lists are size 0
     private void popNode(){
-        List<VocabModel> list = mFlashcardRepository.getMediatorVocabList().getValue();//mediatorVocabList.getValue();
+        List<VocabModelA1> list = mFlashcardRepository.getMediatorVocabList().getValue();//mediatorVocabList.getValue();
         try {
             mFlashcardRepository.getFinishedList().add(mFlashcardRepository.getCurrentNode().getValue());//finishedList.add(currentNode.getValue());
             list.remove(0);
@@ -254,10 +262,10 @@ public class FlashcardViewModel extends ViewModel implements Observable {
      */
 
     private void moveNode(){
-        List<VocabModel> list =mFlashcardRepository.getMediatorVocabList().getValue();// mediatorVocabList.getValue();
+        List<VocabModelA1> list =mFlashcardRepository.getMediatorVocabList().getValue();// mediatorVocabList.getValue();
         System.out.println("Size is " + list.size());
 
-        VocabModel temp = list.get(0);
+        VocabModelA1 temp = list.get(0);
         int ranNum = 0;
 
         if (list.size() > 5){

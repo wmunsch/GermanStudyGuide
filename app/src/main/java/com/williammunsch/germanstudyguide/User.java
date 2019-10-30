@@ -1,10 +1,20 @@
 package com.williammunsch.germanstudyguide;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 /**
  * Handles saving data and uploading saved data to the server.
  */
+
+@Entity(tableName = "users_table")
 public class User {
-    private String username, email, password;
+    @PrimaryKey @NonNull
+    private String email;
+    private String username, password;
+    private String token;
+
 
     public User(String username, String email, String password){
         this.username = username;
@@ -24,5 +34,13 @@ public class User {
 
     public String getPassword(){
         return password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
