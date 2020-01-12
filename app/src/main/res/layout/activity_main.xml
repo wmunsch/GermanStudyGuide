@@ -70,7 +70,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:padding="10dp"
-                            android:text="Log In"
+                            android:text="@{mainactivityviewmodel.userName, default=@string/log_in}"
                             android:textColor="#000"
                             android:textSize="18sp" />
                     </LinearLayout>
@@ -140,9 +140,11 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/login_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:visibility="@{mainactivityviewmodel.loginVisibility}"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                 <Button
@@ -218,6 +220,7 @@
                         android:textAllCaps="false"
                         android:textColor="#ffffff"
                         android:textSize="16sp"
+                        android:onClick="@{() -> mainactivityviewmodel.setUpRegistration()}"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -273,6 +276,276 @@
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/profile_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="@{mainactivityviewmodel.profileVisibility}"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <LinearLayout
+                    android:id="@+id/tv_profilenames"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/ic_usericon2" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp">
+                        <TextView
+                            android:id="@+id/tv_name_in_drawer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="@{mainactivityviewmodel.userName}"
+                            tools:layout_editor_absoluteX="260dp"
+                            tools:layout_editor_absoluteY="13dp" />
+                        <TextView
+                            android:id="@+id/tv_email_in_drawer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="5dp"
+                            android:text="@{mainactivityviewmodel.userEmail}"
+                            tools:layout_editor_absoluteX="31dp"
+                            tools:layout_editor_absoluteY="121dp" />
+
+                    </LinearLayout>
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_profile_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    tools:layout_editor_absoluteX="1dp"
+                    tools:layout_editor_absoluteY="217dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_profilenames"/>
+                <Button
+                    android:id="@+id/button4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35sp"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/button_selector"
+                    android:textAllCaps="false"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"
+                    android:text="Log out"
+                    android:onClick="@{() -> mainactivityviewmodel.logOut()}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rv_profile_stats"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/signup_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{mainactivityviewmodel.registrationVisibility}">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                    <Button
+                        android:id="@+id/button_register"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35sp"
+                        android:layout_marginTop="15dp"
+                        android:background="@drawable/button_selector"
+                        android:text="@string/register"
+                        android:onClick="@{() -> mainactivityviewmodel.checkEmailAndPassword(etEmailR.getText(),etPasswordR.getText(),etUsernameR.getText())}"
+                        android:textAllCaps="false"
+                        android:textColor="#ffffff"
+                        android:textSize="16sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_incorrect_password" />
+
+                    <EditText
+                        android:id="@+id/et_usernameR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textPassword"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:background="@drawable/edittext_background"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_userNameR" />
+
+                    <EditText
+                        android:id="@+id/et_emailR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textEmailAddress"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:background="@drawable/edittext_background"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_emailR" />
+
+                    <EditText
+                        android:id="@+id/et_passwordR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:inputType="textPassword"
+                        android:text=""
+                        android:textAlignment="center"
+                        android:background="@drawable/edittext_background"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_passwordR" />
+
+
+                    <ImageView
+                        android:id="@+id/imageView3R"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="48dp"
+                        android:src="@drawable/ic_usericon2"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/tv_userNameR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/username"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/imageView3R" />
+                    <TextView
+                        android:id="@+id/tv_emailR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/email"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/et_usernameR" />
+
+                    <TextView
+                        android:id="@+id/tv_passwordR"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/password"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/et_emailR" />
+                    <TextView
+                        android:id="@+id/tv_email_taken"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:visibility="@{mainactivityviewmodel.emailTakenVisibility}"
+                        android:text="@string/email_taken"
+                        android:textColor="#ff0000"
+                        android:textSize="12sp"
+                        android:textAlignment="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/et_passwordR" />
+                    <TextView
+                        android:id="@+id/tv_email_valid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:visibility="@{mainactivityviewmodel.emailValidVisibility}"
+                        android:text="@string/email_valid"
+                        android:textColor="#ff0000"
+                        android:textSize="12sp"
+                        android:textAlignment="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_email_taken" />
+                    <TextView
+                        android:id="@+id/tv_incorrect_password"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:visibility="@{mainactivityviewmodel.passwordErrorVisibility}"
+                        android:text="@string/incorrect_password"
+                        android:textColor="#ff0000"
+                        android:textSize="12sp"
+                        android:textAlignment="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_email_valid" />
+
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/button_register"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/tv_already_registered"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="16dp"
+                            android:text="@string/already_registered"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/button_login" />
+
+                        <Button
+                            android:id="@+id/button_loginR"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35sp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/button_selector"
+                            android:text="@string/log_in"
+                            android:textAllCaps="false"
+                            android:textColor="#ffffff"
+                            android:textSize="16sp"
+                            android:onClick="@{() -> mainactivityviewmodel.setUpRegistrationF()}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+
+
 
         </com.google.android.material.navigation.NavigationView>
 

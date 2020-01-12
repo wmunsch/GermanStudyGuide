@@ -65,11 +65,19 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("LOGGING IN");
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
+            }else if (code==4){
+                //registered an account, close the drawer and show verification sent popup.
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Verification","A verification has been sent to your email.\nPlease click the link sent\nto complete the registration.");
+                loginDialogFragment.show(fm,"loginDialogFragment");
+                //TODO : Handle successful registration (auto-login?)
+                System.out.println("Sent registration");
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                closeKeyboard();
             }
         });
 
-        mainActivityViewModel.getUserName().observe(this, name ->
-                binding.textViewUsername.setText(name));
+       // mainActivityViewModel.getUserName().observe(this, name ->
+      //          binding.textViewUsername.setText(name));
 
 
         //Allows the bottom navigation bar to change viewPager items.

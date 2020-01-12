@@ -2,7 +2,10 @@ package com.williammunsch.germanstudyguide.repositories;
 
 
 import android.os.AsyncTask;
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.williammunsch.germanstudyguide.SaveDataResponse;
@@ -47,7 +50,22 @@ public class Repository {
     public DatabaseService apiService;
     private LiveData<User> currentUser;
     private LiveData<String> userName;
+    private LiveData<String> userEmail;
     private LiveData<List<VocabListItem>> vocabListItemList;
+
+    private MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> registrationVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> passwordErrorVisibility = new MutableLiveData<>();
+
+    private MutableLiveData<Integer> emailTakenVisibility = new MutableLiveData<>();
+
+
+    private MutableLiveData<Integer> emailValidVisibility = new MutableLiveData<>();
+
+    private MutableLiveData<Boolean> allGood = new MutableLiveData<>();
+    private LiveData<String> accountCreation;
+
 
     GermanDatabase db;
 
@@ -72,26 +90,99 @@ public class Repository {
 
         a1Count = db.vocabDao().count();
 
+
         dataSet = new ArrayList<>();
+
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+        emailTakenVisibility.setValue(View.GONE);
+        emailValidVisibility.setValue(View.GONE);
+
 
         //map username to currentuser.username to show username in top left of main screen
         userName = Transformations.map(currentUser, name->{
-            if (currentUser.getValue() != null)
-               return currentUser.getValue().getUsername();
+            if (currentUser.getValue() != null){
+                loginVisibility.setValue(View.GONE);
+                profileVisibility.setValue(View.VISIBLE);
+                return currentUser.getValue().getUsername();
+            }
+            loginVisibility.setValue(View.VISIBLE);
+            profileVisibility.setValue(View.GONE);
             return "Log In";
         } );
+
+        userEmail = Transformations.map(currentUser, name->{
+            if (currentUser.getValue() != null){
+                return currentUser.getValue().getEmail();
+            }
+            return "";
+        } );
+
+        accountCreation = Transformations.map(allGood, success->{
+           if (allGood.getValue()!=null && allGood.getValue()){
+               //call api here for registration
+               //change allGood back to false?
+               System.out.println("Registration successful.");
+               return "Registration successful.";
+           }
+            System.out.println("Error: Registration failed");
+           return "Error: Registration failed.";
+        });
 
         checkA1();
 
         vocabListItemList = mVocabListDao.getAllVocabLists();
     }
 
-    public void getUserInfoFromRoom(){
-        currentUser = mUserDao.getUser();
+    public boolean checkEmail(String email){
+        //check the database to see if email exists
+        return false;
+    }
+
+    public boolean checkPassword(String password){
+        //check password to see if
+
+        return false;
     }
 
 
 
+    public void getUserInfoFromRoom(){
+        currentUser = mUserDao.getUser();
+    }
+
+    public void setPasswordErrorVisibility(int i){
+        passwordErrorVisibility.setValue(i);
+    }
+
+    public void setRegistrationVisibility(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.VISIBLE);
+        passwordErrorVisibility.setValue(View.INVISIBLE);
+    }
+    public void setRegistrationVisibilityF(){
+        loginVisibility.setValue(View.VISIBLE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
+    public MutableLiveData<Integer> getEmailTakenVisibility() {
+        return emailTakenVisibility;
+    }
+
+    public void setEmailTakenVisibility(int i) {
+        this.emailTakenVisibility.setValue(i);
+    }
+
+
+    public LiveData<Integer> getEmailValidVisibility() {
+        return emailValidVisibility;
+    }
+
+    public void setEmailValidVisibility(int i) {
+        this.emailValidVisibility.setValue(i);
+    }
     public void logOut(){
         //deleteUser();
         deleteAllScores();
@@ -131,11 +222,25 @@ public class Repository {
     public LiveData<String> getUserName() {
         return userName;
     }
+    public LiveData<String> getUserEmail() {
+        return userEmail;
+    }
 
     public LiveData<Integer> getA1Count() {
         return a1Count;
     }
-
+    public LiveData<Integer> getPasswordErrorVisibility() {
+        return passwordErrorVisibility;
+    }
+    public LiveData<Integer> getProfileVisibility() {
+        return profileVisibility;
+    }
+    public LiveData<Integer> getRegistrationVisibility() {
+        return registrationVisibility;
+    }
+    public LiveData<Integer> getLoginVisibility() {
+        return loginVisibility;
+    }
     public LiveData<List<VocabListItem>> getVocabListItems(){
         return vocabListItemList;
         //MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
@@ -150,10 +255,14 @@ public class Repository {
 
 
     public void insert (VocabModelA1 vocabModelA1) {
-        new insertAsyncTask(mVocabDao).execute(vocabModelA1);
+        new insertAsyncTask(mVocabDao, mVocabListDao).execute(vocabModelA1);
     }
     public void insertUser(User user){
         new insertUserAsyncTask(mUserDao).execute(user);
+    }
+    public void deleteAllUsers(){new deleteUserAsyncTask(mUserDao).execute();}
+    public void checkUser(){
+      // new checkUserAsyncTask(mUserDao).execute();
     }
 
     public void update (VocabModelA1 vocabModelA1) {
@@ -187,7 +296,6 @@ public class Repository {
         private VocabListDao mVocabListDao;
         private DatabaseService apiService;
 
-
         checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao) {
             mAsyncTaskDao = dao;
             apiService = api;
@@ -211,17 +319,14 @@ public class Repository {
                     public void onResponse(Call<List<VocabModelA1>> call, Response<List<VocabModelA1>> response) {
                         List<VocabModelA1> vocabList = response.body();
                         VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
-                        new insertAsyncTask(mAsyncTaskDao).execute(vocabListArray);
+                        //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
+                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao).execute(vocabListArray);
                     }
                     @Override
                     public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
                         System.out.println("Error on call");
                     }
                 });
-
-                //Add the vocab list item
-                new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","A1",0,0,0));
-
             }else{
                 System.out.println("Already downloaded");
             }
@@ -233,9 +338,11 @@ public class Repository {
 
     private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
         private VocabDao mAsyncTaskDao;
+        private VocabListDao mVocabListDao;
 
-        insertAsyncTask(VocabDao dao) {
+        insertAsyncTask(VocabDao dao, VocabListDao vlDao) {
             mAsyncTaskDao = dao;
+            mVocabListDao = vlDao;
         }
 
         @Override
@@ -245,6 +352,13 @@ public class Repository {
             }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void v){
+            //Add the vocab list item
+            new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","A1",0,0,0));
+        }
+
     }
 
 
@@ -279,7 +393,31 @@ public class Repository {
         }
     }
 
+    /*
+    private static class checkUserAsyncTask extends AsyncTask<Void,  Void, User>{
+        private UserDao mAsyncTaskDao;
 
+        checkUserAsyncTask(UserDao dao ){mAsyncTaskDao = dao;}
+
+
+        @Override
+        protected User doInBackground(Void... params) {
+            LiveData<User> userData = mAsyncTaskDao.getUser();
+            System.out.println("COUNT : " + mAsyncTaskDao.count());
+            return userData.getValue();
+        }
+
+        @Override
+        protected void onPostExecute(User user){
+            if (user!=null){
+                System.out.println("Not null user");
+            }else{
+                System.out.println("No user found");
+            }
+           // System.out.println(user.getUsername());
+        }
+    }
+*/
 
 
 
@@ -296,6 +434,20 @@ public class Repository {
         @Override
         protected Void doInBackground(final User... params) {
             mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
+    private static class deleteUserAsyncTask extends AsyncTask<Void, Void, Void> {
+        private UserDao mAsyncTaskDao;
+
+        deleteUserAsyncTask(UserDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.deleteAll();
             return null;
         }
     }

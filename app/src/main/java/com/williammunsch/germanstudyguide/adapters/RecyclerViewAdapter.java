@@ -168,8 +168,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
      * Holds each widget in memory for it to be recycled.
      */
     public class ViewHolder extends RecyclerView.ViewHolder{
-
-
         private TextView listItemName, wordsLearned, image;
         private ProgressBar progressBar;
         private RelativeLayout parentLayout;

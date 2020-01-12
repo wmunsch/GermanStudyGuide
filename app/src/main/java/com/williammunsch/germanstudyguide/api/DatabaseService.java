@@ -1,4 +1,6 @@
 package com.williammunsch.germanstudyguide.api;
+import com.williammunsch.germanstudyguide.CheckEmailResponse;
+import com.williammunsch.germanstudyguide.CreateAccountResponse;
 import com.williammunsch.germanstudyguide.LoginResponse;
 import com.williammunsch.germanstudyguide.SaveDataResponse;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
@@ -38,6 +40,26 @@ public interface DatabaseService {
             @Field("freq") String freq,
             @Field("score") String score,
             @Field("studying") String studying
+    );
+
+    @FormUrlEncoded
+    @POST("api/checkEmail.php")
+    Call<CheckEmailResponse> checkEmail(
+            @Field("email") String email
+    );
+
+    @FormUrlEncoded
+    @POST("api/register.php")
+    Call<CreateAccountResponse> createAccount(
+            @Field("username") String username,
+            @Field("email") String email,
+            @Field("password") String password
+    );
+
+    @FormUrlEncoded
+    @POST("api/sendActivationEmail.php")
+    Call<CreateAccountResponse> sendActivationEmail(
+            @Field("email") String email
     );
 
 
