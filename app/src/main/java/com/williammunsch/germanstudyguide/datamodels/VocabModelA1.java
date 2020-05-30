@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey;
 
 
 /**
- * Table for the generic 700 vocabulary words with sentences.
+ * Table for the A1 700 vocabulary words with sentences.
  * Only gets updated if the database is changed, or downloaded on app installation.
  */
 @Entity(tableName = "vocab_tableA1")
@@ -13,16 +13,16 @@ public class VocabModelA1 {
     @PrimaryKey
     private int _id;
 
-  //  private int score;
-   // private int freq;
-   // private int studying;
+    private int score;
+    private int freq;
+    private int studying;
     private String german;
     private String english;
     private String gesent;
     private String esent;
     //private String[] englishStringsArray;
 
-    public VocabModelA1(int id, String german, String english, String gesent, String esent){//}, int score, int freq, int studying){
+    public VocabModelA1(int id, String german, String english, String gesent, String esent, int studying){//}, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
@@ -30,7 +30,7 @@ public class VocabModelA1 {
         this.esent = esent;
        // this.score = score;
        // this.freq = freq;
-       // this.studying = studying;
+        this.studying = studying;
 
     }
 
@@ -68,7 +68,7 @@ public class VocabModelA1 {
         return null;
 
     }
-/*
+
     public void increaseScore(){
         if (score < 95){
             score += 5;
@@ -94,7 +94,7 @@ public class VocabModelA1 {
         }
     }
 
- */
+
 
     public int getId() {
         return _id;
@@ -103,7 +103,7 @@ public class VocabModelA1 {
     public void setId(int id) {
         this._id = id;
     }
-/*
+
     public int getScore() {
         return score;
     }
@@ -128,7 +128,6 @@ public class VocabModelA1 {
         this.studying = studying;
     }
 
- */
 
     public String getGerman() {
         return german;

@@ -178,6 +178,10 @@ public class MainActivityViewModel extends ViewModel {
                             //CreateAccountResponse checkResponse2= response2.body();
                             // System.out.println(checkResponse2);
 
+
+                            mRepository.insertUser(new User(username, email,pw));
+                            errorCode.setValue(4);
+                            setLoginAndRegistrationVisibilityGone();
                         }
                         @Override
                         public void onFailure(Call<CreateAccountResponse> call2, Throwable t) {
@@ -211,6 +215,7 @@ public class MainActivityViewModel extends ViewModel {
     public void setUpRegistrationF(){
         mRepository.setRegistrationVisibilityF();
     }
+    public void setLoginAndRegistrationVisibilityGone(){mRepository.setLoginAndRegistrationVisibilityGone();}
 
     public LiveData<Integer> getA1Count() {
         return mRepository.getA1Count();

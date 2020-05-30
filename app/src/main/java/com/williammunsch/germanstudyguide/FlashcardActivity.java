@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
+import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
@@ -45,18 +46,16 @@ public class FlashcardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       //TODO ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
-        //TODO binding.setLifecycleOwner(this);
+        ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
+        binding.setLifecycleOwner(this);
 
        // Toolbar myToolbar = findViewById(R.id.toolbar);
         //setSupportActionBar(myToolbar);
-       //TODO setSupportActionBar(binding.toolbar);
 
+        setSupportActionBar(binding.toolbar);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
-
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
-
-        //TODO binding.setFlashcardviewmodel(flashcardViewModel);
+        binding.setFlashcardviewmodel(flashcardViewModel);
 
         Intent bIntent = getIntent();
         tableName =bIntent.getStringExtra("table");
@@ -84,6 +83,8 @@ public class FlashcardActivity extends AppCompatActivity {
                 }
             }
         });
+
+
     }
 
     /*

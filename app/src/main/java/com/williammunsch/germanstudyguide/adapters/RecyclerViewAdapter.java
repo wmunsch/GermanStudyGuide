@@ -27,7 +27,7 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
-    private Integer a1Max;
+    private Integer a1Max, a1Learned;
     private Context mContext;
     private VocabListViewModel vocabListViewModel;
    // private int a1Max;
@@ -64,7 +64,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
 
         if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + a1Max);}
-       else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + a1Max); }
+       //else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + a1Max); }
+        else{ viewHolder.wordsLearned.setText("Words learned : " + a1Learned + "/" + a1Max); }
 
 
 
@@ -160,6 +161,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setA1Max(Integer i){
         this.a1Max = i;
+        notifyDataSetChanged();
+    }
+
+    public void setA1Learned(Integer i ){
+        this.a1Learned = i;
         notifyDataSetChanged();
     }
 

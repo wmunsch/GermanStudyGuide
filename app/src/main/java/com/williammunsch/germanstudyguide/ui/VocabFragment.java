@@ -77,6 +77,7 @@ public class VocabFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+
         mVocabListViewModel.getVocabListItems().observe(this, new Observer<List<VocabListItem>>(){
 
             @Override
@@ -101,6 +102,13 @@ public class VocabFragment extends Fragment {
             @Override
             public void onChanged(Integer num) {
                 mAdapter.setA1Max(num);
+            }
+        });
+
+        mVocabListViewModel.getA1Learned().observe(this, new Observer<Integer>(){
+            @Override
+            public void onChanged(Integer num) {
+                mAdapter.setA1Learned(num);
             }
         });
 

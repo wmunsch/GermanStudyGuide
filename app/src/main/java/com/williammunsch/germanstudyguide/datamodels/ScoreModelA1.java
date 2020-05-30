@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 /**
  * Database for saving the user's current scores, frequencies,
  * and whether or not a word is being studied for the A1 vocabulary.
- * Updates every time user finishes a A1 vocabulary activity.
+ * Updates every time user finishes an A1 vocabulary activity.
  */
 @Entity(tableName = "score_tableA1")
 public class ScoreModelA1 {

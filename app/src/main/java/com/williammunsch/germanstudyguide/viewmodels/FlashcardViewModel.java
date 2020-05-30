@@ -149,7 +149,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     public void checkAnswer(){
         //TODO
-        /*
+
         if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
             boolean test = false;
             //test entered answer against all possible answers in the VocabModelA1
@@ -177,7 +177,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             moveToNextNode();
         }
 
-         */
+
     }
 
     private void setUpIncorrectAnswerViews(){
@@ -201,12 +201,12 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     private void moveToNextNode(){
         //TODO
-        /*
+
         if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
             mFlashcardRepository.getCurrentNode().getValue().setStudying(1);
         }
 
-         */
+         
 
         if (mFlashcardRepository.isCorrect()){
             popNode();

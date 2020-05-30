@@ -85,17 +85,18 @@ public class FlashcardRepository {
         this.db = db;
         mVocabDao = db.vocabDao();
         //TODO
-        /*
+
 
         vocabList = mVocabDao.getVocabQueue();
         wordsMax =mVocabDao.count();
         wordsLearned = mVocabDao.countLearned();
         wordsMax = mVocabDao.countMastered();
 
-         */
+
+
         //TODO : Add functionality to the progress bars and animation
 
-        //wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
+       //-- wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
 
         /*
         Every time the mediatorVocabList changes, the currentNode is set to the first entry,
@@ -103,12 +104,13 @@ public class FlashcardRepository {
         and the visibility for the different card types are set up.
          */
         //TODO
-        /*
+
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
                 cardsFinished.setValue(100 - (mediatorVocabList.getValue().size()*100/5));
                 cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size());
                 if (mediatorVocabList.getValue().size()>0){
+                    System.out.println("Studying is equal to " + mediatorVocabList.getValue().get(0).getStudying());
                     if (mediatorVocabList.getValue().get(0).getStudying()==0){
                         setUpViewsForNewCard();
                     }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
@@ -122,7 +124,7 @@ public class FlashcardRepository {
             }
         });
 
-         */
+
     }
 
     public void addSource(){
@@ -147,12 +149,15 @@ public class FlashcardRepository {
 
         updateNode(finishedList);
         finishedList.clear();
+        /*--
         System.out.println(" wordsleared : "+ wordsLearned.getValue() );
         System.out.println(" wordsmax : "+ wordsMax.getValue() );
         if (wordsLearned.getValue() != null && wordsMax.getValue()!=null){
             System.out.println("PERCENTS : " + wordsLearned.getValue() + " " + wordsMax.getValue() + " " +wordsLearned.getValue()*100/wordsMax.getValue() );
             wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
         }
+
+         */
     }
 
     private void setUpViewsForNewCard(){
@@ -223,7 +228,12 @@ public class FlashcardRepository {
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s){
         //new updateNodeAsyncTask(mVocabDao).execute(vocabModel);
-        new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
+        if (vocabModelA1s.size()==3){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
+        }else if (vocabModelA1s.size()==5){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
+        }
+        //new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
     }
 
     /**
@@ -385,8 +395,8 @@ public class FlashcardRepository {
 
 
     public void showSentence(){
-        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
-        else{mHintVisibility.setValue(VISIBLE);}
+       if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
+       else if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == INVISIBLE){mHintVisibility.setValue(VISIBLE);}
     }
 
 

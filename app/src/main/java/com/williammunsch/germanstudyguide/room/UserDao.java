@@ -7,6 +7,11 @@ import androidx.room.Query;
 
 import com.williammunsch.germanstudyguide.User;
 
+/**
+ * The data access object responsible for retrieving user accounts from the local ROOM database.
+ * ROOM creates the DAO at compile time.
+ */
+
 @Dao
 public interface UserDao {
 

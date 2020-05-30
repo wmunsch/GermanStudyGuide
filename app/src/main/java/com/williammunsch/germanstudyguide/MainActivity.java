@@ -62,17 +62,25 @@ public class MainActivity extends AppCompatActivity {
             }else if (code==3){
                 //login
                 //TODO : Handle successful login (change fragment?)
+                binding.etPassword.setText("");
+                binding.etEmail.setText("");
                 System.out.println("LOGGING IN");
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
             }else if (code==4){
                 //registered an account, close the drawer and show verification sent popup.
-                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Verification","A verification has been sent to your email.\nPlease click the link sent\nto complete the registration.");
+               // LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Verification","A verification has been sent to your email.\nPlease click the link sent\nto complete the registration.");
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account Created","Welcome to your German study guide!\nGet started by studying vocabulary,\nthen test your skills by reading.");
                 loginDialogFragment.show(fm,"loginDialogFragment");
-                //TODO : Handle successful registration (auto-login?)
-                System.out.println("Sent registration");
+
+                //System.out.println("Sent registration");
+                binding.etEmailR.setText("");
+                binding.etPasswordR.setText("");
+                binding.etUsernameR.setText("");
+
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
+
             }
         });
 

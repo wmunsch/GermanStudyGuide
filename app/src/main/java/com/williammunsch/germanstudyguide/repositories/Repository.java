@@ -167,6 +167,13 @@ public class Repository {
         registrationVisibility.setValue(View.GONE);
         passwordErrorVisibility.setValue(View.GONE);
     }
+
+    public void setLoginAndRegistrationVisibilityGone(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
     public MutableLiveData<Integer> getEmailTakenVisibility() {
         return emailTakenVisibility;
     }
@@ -253,6 +260,8 @@ public class Repository {
         return mVocabDao.count();
     }
 
+    public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
+
 
     public void insert (VocabModelA1 vocabModelA1) {
         new insertAsyncTask(mVocabDao, mVocabListDao).execute(vocabModelA1);
@@ -310,7 +319,7 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Integer vocabCount){
-            if (vocabCount!=14){
+            if (vocabCount!=700){
                 System.out.println("Downloading A1 table");
 
                 Call<List<VocabModelA1>> call = apiService.vocabList();

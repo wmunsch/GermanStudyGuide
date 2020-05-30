@@ -18,23 +18,30 @@ import javax.inject.Inject;
  * of vocabulary, which when clicked on open a new FlashcardActivity.
  */
 public class VocabListViewModel extends ViewModel {
+
     private Repository mRepository;//injected
     private FlashcardRepository flashcardRepository;//injected
 
     private LiveData<List<VocabModelA1>> mAllVocab;
     private LiveData<List<VocabListItem>> mVocabListItems;
     private LiveData<Integer> a1Max;
+    private LiveData<Integer> a1Learned;
    // private LiveData<Integer> wordCount;
 
     //TODO : in case where studying all words, or less than 5 are not studying, replace with studying=1 words for full 20
 
     @Inject
     public VocabListViewModel(Repository repository, FlashcardRepository flashcardRepository){
-        this.mRepository = repository;
+       this.mRepository = repository;
         this.flashcardRepository = flashcardRepository;
 
-        mVocabListItems = mRepository.getVocabListItems();
-        a1Max = mRepository.getA1Max();
+       mVocabListItems = mRepository.getVocabListItems();
+       a1Max = mRepository.getA1Max();
+       a1Learned = mRepository.getA1Learned();
+
+
+
+
      //  wordCount = mRepository.count();
 
       //  mAllVocab = mRepository.getAll();//this is the entire vocabmodel table from the ROOM database.
@@ -61,6 +68,7 @@ public class VocabListViewModel extends ViewModel {
     }
 
     public LiveData<Integer> getA1Max(){return a1Max;}
+    public LiveData<Integer> getA1Learned(){return a1Learned;}
 
     //public LiveData<Integer> getA1Count(){ return wordCount;}
 

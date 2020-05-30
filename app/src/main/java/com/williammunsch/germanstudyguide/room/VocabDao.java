@@ -12,6 +12,10 @@ import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
 import java.util.List;
 
+/**
+ * The data access object responsible for retrieving vocabulary data from the local ROOM database.
+ * ROOM creates the DAO at compile time.
+ */
 @Dao
 public interface VocabDao {
     @Query("SELECT * FROM vocab_tableA1")
@@ -28,8 +32,8 @@ public interface VocabDao {
 
 
     //Gets # of new vocab and # of old vocab for review combined
-    //@Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 3) ORDER BY studying ASC")
-  //  LiveData<List<VocabModelA1>> getVocabQueue();
+    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 3) ORDER BY studying ASC")
+    LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets # of new vocab and # of old vocab for review combined
    // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
@@ -48,6 +52,7 @@ public interface VocabDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(VocabModelA1 vocabModelA1);
 
+    //Deletes everything in the A1 table
     @Query("DELETE FROM vocab_tableA1")
     void deleteAll();
 
@@ -75,7 +80,7 @@ public interface VocabDao {
 
 
     /**
-     * Counts the number of entries in the table.
+     * Counts the number of entries in the A1 table.
      * @return The number of entries.
      */
     @Query("SELECT COUNT(*) FROM  vocab_tableA1")
@@ -85,14 +90,14 @@ public interface VocabDao {
      * Counts the number of learned words in the table.
      * @return The number of learned words.
      */
-    //@Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE studying = 1")
-   // LiveData<Integer> countLearned();
+    @Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE studying = 1")
+    LiveData<Integer> countLearned();
 
     /**
      * Counts the number of mastered words in the table.
      * @return The number of mastered words.
      */
-    //@Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score = 100")
-   // LiveData<Integer> countMastered();
+    @Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score = 100")
+    LiveData<Integer> countMastered();
 
 }
