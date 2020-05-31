@@ -69,7 +69,7 @@ public class Repository {
 
     GermanDatabase db;
 
-
+    private LiveData<Integer> a1Percent;
 
 
     private LiveData<Integer> a1Count;
@@ -132,6 +132,8 @@ public class Repository {
         checkA1();
 
         vocabListItemList = mVocabListDao.getAllVocabLists();
+
+
     }
 
     public boolean checkEmail(String email){
@@ -261,6 +263,8 @@ public class Repository {
     }
 
     public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
+
+    public LiveData<Integer> getA1Percent() {return mVocabDao.countLearned();}
 
 
     public void insert (VocabModelA1 vocabModelA1) {

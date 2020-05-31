@@ -27,7 +27,7 @@ import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
-    private Integer a1Max, a1Learned;
+    private Integer a1Max, a1Learned, a1Percent;
     private Context mContext;
     private VocabListViewModel vocabListViewModel;
    // private int a1Max;
@@ -57,8 +57,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, final int i) {
         viewHolder.listItemName.setText(mVocabList.get(i).getName());
         viewHolder.image.setText(mVocabList.get(i).getImage());
-        viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
-        viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
+        //viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
+       // viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
+       // a1Percent = (int)(((double)a1Learned/a1Max)*100);
+        //viewHolder.progressBar.setProgress((int)(((double)a1Learned/a1Max)*100)); //This sets the progressbar for each lesson on the main page
+        viewHolder.progressBar.setProgress(a1Percent);
 
 
 
@@ -166,6 +169,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setA1Learned(Integer i ){
         this.a1Learned = i;
+        a1Percent = (int)(((double)a1Learned/700)*100);
+        notifyDataSetChanged();
+    }
+
+    public void setA1Percent(Integer i){
+        this.a1Percent = i;
         notifyDataSetChanged();
     }
 

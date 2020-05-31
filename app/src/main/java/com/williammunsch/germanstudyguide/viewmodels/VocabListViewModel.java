@@ -26,6 +26,7 @@ public class VocabListViewModel extends ViewModel {
     private LiveData<List<VocabListItem>> mVocabListItems;
     private LiveData<Integer> a1Max;
     private LiveData<Integer> a1Learned;
+    private LiveData<Integer> a1Percent;
    // private LiveData<Integer> wordCount;
 
     //TODO : in case where studying all words, or less than 5 are not studying, replace with studying=1 words for full 20
@@ -38,6 +39,7 @@ public class VocabListViewModel extends ViewModel {
        mVocabListItems = mRepository.getVocabListItems();
        a1Max = mRepository.getA1Max();
        a1Learned = mRepository.getA1Learned();
+       a1Percent = mRepository.getA1Percent();
 
 
 

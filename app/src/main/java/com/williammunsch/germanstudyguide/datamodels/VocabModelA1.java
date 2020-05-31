@@ -79,18 +79,14 @@ public class VocabModelA1 {
     }
 
     public void fixScore(){
-        if (score == 0){
-            score += 5;
-        }else{
-            score+=10;
-        }
+        score+=10;
     }
 
     public void decreaseScore(){
-        if (score >5){
+        if (score >-95){
             score -=5;
         }else{
-            score = 0;
+            score = -100;
         }
     }
 

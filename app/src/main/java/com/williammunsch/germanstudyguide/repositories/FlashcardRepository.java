@@ -38,7 +38,8 @@ public class FlashcardRepository {
 
     private VocabDao mVocabDao;
 
-    private final int newWords = 5;
+    private double newWords = 5;
+    private boolean setAtBeginning = false;
 
     private MediatorLiveData<List<VocabModelA1>> mediatorVocabList = new MediatorLiveData<>();
     private LiveData<VocabModelA1> currentNode;
@@ -67,6 +68,7 @@ public class FlashcardRepository {
     private LiveData<Integer> wordsLearned;
     private LiveData<Integer> wordsMastered;
     private MutableLiveData<Integer> wordsLearnedPercent = new MutableLiveData<>();
+   // private LiveData<Integer> cardsForThisActivity;
 
 
     private boolean finished = false;
@@ -90,7 +92,7 @@ public class FlashcardRepository {
         vocabList = mVocabDao.getVocabQueue();
         wordsMax =mVocabDao.count();
         wordsLearned = mVocabDao.countLearned();
-        wordsMax = mVocabDao.countMastered();
+        wordsMastered = mVocabDao.countMastered();
 
 
 
@@ -107,8 +109,14 @@ public class FlashcardRepository {
 
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
-                cardsFinished.setValue(100 - (mediatorVocabList.getValue().size()*100/5));
-                cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size());
+                //reset the number of total cards for the activity (necessary for the progress bar because 1st time there are only 5 cards, then 10, then 15 then 20)
+                if (!setAtBeginning && mediatorVocabList.getValue().size() !=0){newWords =mediatorVocabList.getValue().size(); setAtBeginning=true;}
+                cardsFinished.setValue((int)(100 - (((double)mediatorVocabList.getValue().size())/newWords)*100)); //This determines the percentage bar
+                //(int)(((double)a1Learned/a1Max)*100)
+               // cardsFinished.setValue(100 - (mediatorVocabList.getValue().size()*100/newWords)); //This determines the percentage bar
+
+                cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size()); //This determines the cards left number
+
                 if (mediatorVocabList.getValue().size()>0){
                     System.out.println("Studying is equal to " + mediatorVocabList.getValue().get(0).getStudying());
                     if (mediatorVocabList.getValue().get(0).getStudying()==0){
@@ -149,6 +157,7 @@ public class FlashcardRepository {
 
         updateNode(finishedList);
         finishedList.clear();
+        setAtBeginning = false;
         /*--
         System.out.println(" wordsleared : "+ wordsLearned.getValue() );
         System.out.println(" wordsmax : "+ wordsMax.getValue() );
@@ -224,14 +233,27 @@ public class FlashcardRepository {
 
     /**
      * Creates an updateNodeAsyncTask and executes it.
-     * @param vocabModelA1s
+     * @param vocabModelA1s The list of all the nodes that will be updated.
+     *  This needs to add every node to the execute portion manually.
+     *  Could this be improved by sending the list as a parameter instead of each vocabModel individually?
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s){
-        //new updateNodeAsyncTask(mVocabDao).execute(vocabModel);
         if (vocabModelA1s.size()==3){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
         }else if (vocabModelA1s.size()==5){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
+        }else if (vocabModelA1s.size()==10){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+                    vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9));
+        }else if (vocabModelA1s.size()==15){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+                    vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
+                    vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14));
+        }else if (vocabModelA1s.size()==20){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+                    vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
+                    vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14),
+                    vocabModelA1s.get(15), vocabModelA1s.get(16), vocabModelA1s.get(17), vocabModelA1s.get(18), vocabModelA1s.get(19));
         }
         //new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
     }
@@ -252,7 +274,7 @@ public class FlashcardRepository {
         protected Void doInBackground(final VocabModelA1... params) {
             for (VocabModelA1 model : params){
                 mAsyncTaskDao.updateNode(model);
-               // System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+                System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
             }
             //mAsyncTaskDao.updateNode(params[0]);
             //System.out.println("Updating node to " + params[0].getScore());

@@ -6,8 +6,8 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="mainactivityviewmodel"
-            type="com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel" />
+            name="vocablistviewmodel"
+            type="com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel" />
     </data>
 <RelativeLayout
     android:layout_width="match_parent"
@@ -77,8 +77,7 @@
             android:layout_height="60dp"
             android:background="@drawable/a1circle"
             android:text="A1"
-            android:textAlignment="center"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:layout_margin="10dp"
             android:textSize="30sp"
             android:textStyle="bold"
@@ -110,14 +109,13 @@
                 android:layout_marginTop="15dp"
                 android:progressBackgroundTint=" #000000"
                 android:progressTint=" #ffe869 "
-                android:progress="35"
-                android:secondaryProgress="50"
+                android:progress="40"
                 android:secondaryProgressTint=" #e1b71c"
                 android:secondaryProgressTintMode="src_over"/>
         </LinearLayout>
     </LinearLayout>
 
-
+    <!--  android:progress="@{vocablistviewmodel.a1Learned, default = 0}" -->
 
 
 

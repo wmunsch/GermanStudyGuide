@@ -112,6 +112,8 @@ public class VocabFragment extends Fragment {
             }
         });
 
+
+
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

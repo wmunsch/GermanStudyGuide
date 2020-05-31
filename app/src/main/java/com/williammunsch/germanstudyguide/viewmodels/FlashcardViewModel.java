@@ -142,7 +142,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
 
     public void iWasright(){
-        //TODO mFlashcardRepository.getCurrentNode().getValue().fixScore();
+        mFlashcardRepository.getCurrentNode().getValue().fixScore();
         mFlashcardRepository.setCorrect(true);
         moveToNextNode();
     }

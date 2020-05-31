@@ -32,7 +32,7 @@ public interface VocabDao {
 
 
     //Gets # of new vocab and # of old vocab for review combined
-    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 2) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 3) ORDER BY studying ASC")
+    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY studying ASC")
     LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets # of new vocab and # of old vocab for review combined
@@ -99,5 +99,7 @@ public interface VocabDao {
      */
     @Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score = 100")
     LiveData<Integer> countMastered();
+
+
 
 }
