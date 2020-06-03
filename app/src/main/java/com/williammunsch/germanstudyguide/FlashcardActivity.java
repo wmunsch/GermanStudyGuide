@@ -33,12 +33,7 @@ import javax.inject.Inject;
  */
 public class FlashcardActivity extends AppCompatActivity {
 
-    //TODO : Set up the finished list with the progress bar on toolbar
-    private int shortAnimationDuration;
-
-
     @Inject ViewModelFactory viewModelFactory;
-
 
     FlashcardViewModel flashcardViewModel;
     private String tableName;
@@ -77,7 +72,7 @@ public class FlashcardActivity extends AppCompatActivity {
             public void onChanged(List<VocabModelA1> vocabModelA1s) {
                 if (vocabModelA1s != null) {
                     for (int i = 0; i < vocabModelA1s.size(); i++){
-                        System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i).getGerman() + " " + vocabModelA1s.get(i).getScore());// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
+                        System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i).getGerman() + " " + vocabModelA1s.get(i).getScore() + " " + vocabModelA1s.get(i).getGsentence());// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
 
                     }
                 }

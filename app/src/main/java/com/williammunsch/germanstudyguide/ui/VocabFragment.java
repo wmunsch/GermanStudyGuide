@@ -112,6 +112,13 @@ public class VocabFragment extends Fragment {
             }
         });
 
+        mVocabListViewModel.getA1Mastered().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer num) {
+                mAdapter.setA1Mastered(num);
+            }
+        });
+
 
 
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);

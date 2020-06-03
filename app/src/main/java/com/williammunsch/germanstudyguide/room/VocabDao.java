@@ -35,6 +35,11 @@ public interface VocabDao {
     @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY studying ASC")
     LiveData<List<VocabModelA1>> getVocabQueue();
 
+    //Gets 20 learned vocab for review after learning all
+    @Query("SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 20")
+    LiveData<List<VocabModelA1>> getVocabQueueFinished();
+
+
     //Gets # of new vocab and # of old vocab for review combined
    // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
     //List<VocabModelA1>getVocabQueue();
@@ -47,6 +52,8 @@ public interface VocabDao {
     void updateNode(VocabModelA1... vocabModelA1s);
    // @Query("UPDATE vocab_table SET score = score")
    // void updateNode(VocabModelA1 vocabModel);
+
+
 
     //Inserts the A1 data, will replace unique constraints in case of a non-fully downloaded previous attempt
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -97,9 +104,8 @@ public interface VocabDao {
      * Counts the number of mastered words in the table.
      * @return The number of mastered words.
      */
-    @Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score = 100")
+    @Query("SELECT COUNT(*) FROM  vocab_tableA1 WHERE score >= 100")
     LiveData<Integer> countMastered();
-
 
 
 }

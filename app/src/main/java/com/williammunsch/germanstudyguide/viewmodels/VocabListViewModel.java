@@ -26,6 +26,7 @@ public class VocabListViewModel extends ViewModel {
     private LiveData<List<VocabListItem>> mVocabListItems;
     private LiveData<Integer> a1Max;
     private LiveData<Integer> a1Learned;
+    private LiveData<Integer> a1Mastered;
     private LiveData<Integer> a1Percent;
    // private LiveData<Integer> wordCount;
 
@@ -39,6 +40,7 @@ public class VocabListViewModel extends ViewModel {
        mVocabListItems = mRepository.getVocabListItems();
        a1Max = mRepository.getA1Max();
        a1Learned = mRepository.getA1Learned();
+       a1Mastered = mRepository.getA1Mastered();
        a1Percent = mRepository.getA1Percent();
 
 
@@ -71,6 +73,7 @@ public class VocabListViewModel extends ViewModel {
 
     public LiveData<Integer> getA1Max(){return a1Max;}
     public LiveData<Integer> getA1Learned(){return a1Learned;}
+    public LiveData<Integer> getA1Mastered(){return a1Mastered;}
 
     //public LiveData<Integer> getA1Count(){ return wordCount;}
 

@@ -18,16 +18,16 @@ public class VocabModelA1 {
     private int studying;
     private String german;
     private String english;
-    private String gesent;
-    private String esent;
+    private String gsentence;
+    private String esentence;
     //private String[] englishStringsArray;
 
-    public VocabModelA1(int id, String german, String english, String gesent, String esent, int studying){//}, int score, int freq, int studying){
+    public VocabModelA1(int id, String german, String english, String gsentence, String esentence, int studying){//}, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
-        this.gesent = gesent;
-        this.esent = esent;
+        this.gsentence = gsentence;
+        this.esentence = esentence;
        // this.score = score;
        // this.freq = freq;
         this.studying = studying;
@@ -53,9 +53,9 @@ public class VocabModelA1 {
 
     public String toSentence(int score){
         if (score > 50){
-            return esent;
+            return esentence;
         }else{
-            return gesent;
+            return gsentence;
         }
     }
 
@@ -71,7 +71,7 @@ public class VocabModelA1 {
 
     public void increaseScore(){
         if (score < 95){
-            score += 5;
+            score += 70; //should be 5
         }else{
             score = 100;
         }
@@ -79,8 +79,8 @@ public class VocabModelA1 {
     }
 
     public void fixScore(){
-        score+=10;
-    }
+        score+=70;
+    } //should be 10
 
     public void decreaseScore(){
         if (score >-95){
@@ -144,19 +144,19 @@ public class VocabModelA1 {
         this.english = english;
     }
 
-    public String getGesent() {
-        return gesent;
+    public String getGsentence() {
+        return gsentence;
     }
 
-    public void setGesent(String gesent) {
-        this.gesent = gesent;
+    public void setGsentence(String gsentence) {
+        this.gsentence = gsentence;
     }
 
-    public String getEsent() {
-        return esent;
+    public String getEsentence() {
+        return esentence;
     }
 
-    public void setEsent(String esent) {
-        this.esent = esent;
+    public void setEsentence(String esentence) {
+        this.esentence = esentence;
     }
 }

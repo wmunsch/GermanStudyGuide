@@ -83,6 +83,9 @@ public class Repository {
         this.db = db;
 
         mVocabDao = db.vocabDao();
+
+
+
         mVocabListDao = db.vocabListDao();
         mUserDao = db.userDao();
 
@@ -263,7 +266,7 @@ public class Repository {
     }
 
     public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
-
+    public LiveData<Integer> getA1Mastered() {return mVocabDao.countMastered();}
     public LiveData<Integer> getA1Percent() {return mVocabDao.countLearned();}
 
 
@@ -369,7 +372,9 @@ public class Repository {
         @Override
         protected void onPostExecute(Void v){
             //Add the vocab list item
-            new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","A1",0,0,0));
+            new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","  A1",0,0,0));
+           // new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 2","  A2",0,0,0));
+          //  new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Intermediate Level 1","  B1",0,0,0));
         }
 
     }

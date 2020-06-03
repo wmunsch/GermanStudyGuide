@@ -54,6 +54,7 @@ public class FlashcardRepository {
     private MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> finishButtonVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> checkButtonVisibility = new MutableLiveData<>();
+    //End of activity views
     private MutableLiveData<Integer> goodJobVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> tv_wordsLearnedVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> progressBar_wordsLearnedVisibility = new MutableLiveData<>();
@@ -68,6 +69,8 @@ public class FlashcardRepository {
     private LiveData<Integer> wordsLearned;
     private LiveData<Integer> wordsMastered;
     private MutableLiveData<Integer> wordsLearnedPercent = new MutableLiveData<>();
+    private LiveData<Integer> wordsLearnedP;
+    private LiveData<Integer> wordsMasteredP;
    // private LiveData<Integer> cardsForThisActivity;
 
 
@@ -111,7 +114,8 @@ public class FlashcardRepository {
             if (mediatorVocabList.getValue() != null){
                 //reset the number of total cards for the activity (necessary for the progress bar because 1st time there are only 5 cards, then 10, then 15 then 20)
                 if (!setAtBeginning && mediatorVocabList.getValue().size() !=0){newWords =mediatorVocabList.getValue().size(); setAtBeginning=true;}
-                cardsFinished.setValue((int)(100 - (((double)mediatorVocabList.getValue().size())/newWords)*100)); //This determines the percentage bar
+                cardsFinished.setValue((int)(100 - (((double)mediatorVocabList.getValue().size())/newWords)*100)); //This determines the percentage bar for flashcard actvity
+               // wordsLearnedPercent.setValue((int)(((double)wordsLearned.getValue()/700)*100));
                 //(int)(((double)a1Learned/a1Max)*100)
                // cardsFinished.setValue(100 - (mediatorVocabList.getValue().size()*100/newWords)); //This determines the percentage bar
 
@@ -133,6 +137,28 @@ public class FlashcardRepository {
         });
 
 
+        /*
+         * Every time a new word is set to learned in the room database,
+         * the wordsLearnedP livedata gets updated to reflect this.
+         * wordsLearnedP is the percentage of words learned out of all A1 words.
+         */
+        wordsLearnedP = Transformations.map(wordsLearned, value -> {
+            if (wordsLearned.getValue() != null){
+                return (int)(((double)wordsLearned.getValue()/700)*100);
+            }
+            return 0;
+
+        });
+
+        wordsMasteredP = Transformations.map(wordsMastered, value -> {
+            if (wordsMastered.getValue() != null){
+                return (int)(((double)wordsMastered.getValue()/700)*100);
+            }
+            return 0;
+
+        });
+
+
     }
 
     public void addSource(){
@@ -149,24 +175,12 @@ public class FlashcardRepository {
      */
     public void updateAllNodes(){
         System.out.println("UPDATING ALL NODES");
-        //for (int i = 0 ; i < finishedList.size();i++){
-        //    updateNode(finishedList.get(i));
-        //}
-       // finishedList.clear();
-
 
         updateNode(finishedList);
         finishedList.clear();
         setAtBeginning = false;
-        /*--
-        System.out.println(" wordsleared : "+ wordsLearned.getValue() );
-        System.out.println(" wordsmax : "+ wordsMax.getValue() );
-        if (wordsLearned.getValue() != null && wordsMax.getValue()!=null){
-            System.out.println("PERCENTS : " + wordsLearned.getValue() + " " + wordsMax.getValue() + " " +wordsLearned.getValue()*100/wordsMax.getValue() );
-            wordsLearnedPercent.setValue(wordsLearned.getValue()*100/wordsMax.getValue());
-        }
 
-         */
+        System.out.println("Finished updating nodes");
     }
 
     private void setUpViewsForNewCard(){
@@ -191,6 +205,14 @@ public class FlashcardRepository {
         textView_wordsMasteredOutOfVisibility.setValue(GONE);
         correct = false;
 
+
+        goodJobVisibility.setValue(INVISIBLE);
+        tv_wordsLearnedVisibility.setValue(INVISIBLE);
+        progressBar_wordsLearnedVisibility.setValue(INVISIBLE);
+        textView_wordsLearnedOutOfVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredVisibility.setValue(INVISIBLE);
+        progressBar_wordsMasteredVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredOutOfVisibility.setValue(INVISIBLE);
     }
 
     private void setUpViewsForOldCard(){
@@ -198,6 +220,14 @@ public class FlashcardRepository {
         checkButtonText.setValue("Check");
         finished = false;
         //setAnswer("");
+        goodJobVisibility.setValue(INVISIBLE);
+        tv_wordsLearnedVisibility.setValue(INVISIBLE);
+        progressBar_wordsLearnedVisibility.setValue(INVISIBLE);
+        textView_wordsLearnedOutOfVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredVisibility.setValue(INVISIBLE);
+        progressBar_wordsMasteredVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredOutOfVisibility.setValue(INVISIBLE);
+
         checkmarkVisibility.setValue(INVISIBLE);
         xmarkVisibility.setValue(INVISIBLE);
         correctLayoutVisibility.setValue(INVISIBLE);
@@ -229,8 +259,6 @@ public class FlashcardRepository {
     }
 
 
-
-
     /**
      * Creates an updateNodeAsyncTask and executes it.
      * @param vocabModelA1s The list of all the nodes that will be updated.
@@ -238,13 +266,20 @@ public class FlashcardRepository {
      *  Could this be improved by sending the list as a parameter instead of each vocabModel individually?
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s){
+        System.out.println("vocabmodea1s sidze = " +vocabModelA1s.size());
         if (vocabModelA1s.size()==3){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
+        }else if (vocabModelA1s.size()==4){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3));
         }else if (vocabModelA1s.size()==5){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
         }else if (vocabModelA1s.size()==10){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9));
+        }else if (vocabModelA1s.size()==14){
+            new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+                    vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
+                    vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13));
         }else if (vocabModelA1s.size()==15){
             new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
@@ -254,6 +289,8 @@ public class FlashcardRepository {
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14),
                     vocabModelA1s.get(15), vocabModelA1s.get(16), vocabModelA1s.get(17), vocabModelA1s.get(18), vocabModelA1s.get(19));
+        }else{
+            System.out.println("ERROR UPDATENODE DIDNT WORK");
         }
         //new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
     }
@@ -289,6 +326,12 @@ public class FlashcardRepository {
    /*
    Getters and setters
     */
+
+   public LiveData<Integer> getWordsLearned(){return wordsLearned;}
+    public LiveData<Integer> getWordsLearnedP(){return wordsLearnedP;}
+    public LiveData<Integer> getWordsMasteredP(){return wordsMasteredP;}
+
+    public LiveData<Integer> getA1Learned(){return mVocabDao.countLearned();}
     public ArrayList<VocabModelA1> getFinishedList() {
         return finishedList;
     }
@@ -363,7 +406,6 @@ public class FlashcardRepository {
 
     public LiveData<Integer> getWordsLearnedPercent(){return wordsLearnedPercent;}
     public LiveData<Integer> getWordsMax(){return wordsMax;}
-    public LiveData<Integer> getWordsLearned(){return wordsLearned;}
     public LiveData<Integer> getWordsMastered(){return wordsMastered;}
 
     public LiveData<String> getCardsFinishedText(){return cardsFinishedText;}

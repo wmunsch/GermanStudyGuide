@@ -33,6 +33,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     private SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
 
     private SingleLiveEvent<Boolean> addSourceEvent = new SingleLiveEvent<>();
+    private LiveData<Integer> a1Learned;
 
     /**
      * Keeps track of the order of flashcards in the live data here,
@@ -42,12 +43,19 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public FlashcardViewModel(FlashcardRepository flashcardRepository) {
         this.mFlashcardRepository = flashcardRepository;
 
+        a1Learned = mFlashcardRepository.getA1Learned();
+
     }
 
     public void finishActivity(){
         navigateToMainActivity.call();
         //mFlashcardRepository.addSource();
     }
+
+
+    public LiveData<Integer> getWordsLearned(){return mFlashcardRepository.getWordsLearned();}
+    public LiveData<Integer> getWordsLearnedP(){ return mFlashcardRepository.getWordsLearnedP();}
+    public LiveData<Integer> getWordsMasteredP(){ return mFlashcardRepository.getWordsMasteredP();}
 
     public LiveData<Integer> getWordsMax() {
         return mFlashcardRepository.getWordsMax();
@@ -269,10 +277,10 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         int ranNum = 0;
 
         if (list.size() > 5){
-            ranNum = random.nextInt(3)+3;  //index 0-5+  between 3 and 5
+           ranNum = 5;// ranNum = random.nextInt(3)+3;  //index 0-5+  between 3 and 5
         }
         else if (list.size() == 5){
-            ranNum = random.nextInt(2)+3;   //index 0-4 between 3 and 4
+           ranNum = 4;// ranNum = random.nextInt(2)+3;   //index 0-4 between 3 and 4
         }
         else if (list.size() == 4){
             ranNum = random.nextInt(2)+2; //index 0-3   between 2 and 3
