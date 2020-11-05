@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Adapter that holds the vocabulary tabs such as (A1) Beginner Level 1 and the experience bar
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
@@ -188,7 +188,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void setA1Learned(Integer i ){
         this.a1Learned = i;
         //TODO change the 14 back to 700
-        a1Percent = (int)(((double)a1Learned/10)*100); //Sets the progress bar for the main page activities A1, etc.
+        a1Percent = (int)(((double)a1Learned/700)*100); //Sets the progress bar for the main page activities A1, etc.
 
         notifyDataSetChanged();
     }
@@ -196,7 +196,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void setA1Mastered(Integer i){
         this.a1Mastered = i;
         //TODO change the 14 back to 700
-        a1MasteredPercent = (int)(((double)a1Mastered/10)*100); //Sets the progress bar for the main page activities A1, etc.
+        a1MasteredPercent = (int)(((double)a1Mastered/700)*100); //Sets the progress bar for the main page activities A1, etc.
         notifyDataSetChanged();
     }
 

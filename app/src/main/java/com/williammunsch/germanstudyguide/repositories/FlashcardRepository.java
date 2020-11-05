@@ -10,8 +10,11 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
+import com.williammunsch.germanstudyguide.room.UserDao;
 import com.williammunsch.germanstudyguide.room.VocabDao;
 
 import java.util.ArrayList;
@@ -78,6 +81,13 @@ public class FlashcardRepository {
 
     private boolean correct = false;
 
+
+   // public DatabaseService apiService;
+   // private MutableLiveData<Integer> logginedIn = new MutableLiveData<>();
+    //private LiveData<User> currentUser;
+    //private UserDao mUserDao;
+    //private LiveData<String> userName;
+
     private ArrayList<VocabModelA1> finishedList = new ArrayList<>();
     //private VocabModelA1[] finishedList = new VocabModelA1[5];
 
@@ -87,16 +97,15 @@ public class FlashcardRepository {
      */
     @Inject
     public FlashcardRepository(GermanDatabase db){
+        //this.apiService = apiService;
         this.db = db;
         mVocabDao = db.vocabDao();
-        //TODO
-
-
         vocabList = mVocabDao.getVocabQueue();
         wordsMax =mVocabDao.count();
         wordsLearned = mVocabDao.countLearned();
         wordsMastered = mVocabDao.countMastered();
-
+        //mUserDao = db.userDao();
+        //getUserInfoFromRoom();
 
 
         //TODO : Add functionality to the progress bars and animation
@@ -159,6 +168,10 @@ public class FlashcardRepository {
         });
 
 
+    }
+
+    public void getUserInfoFromRoom(){
+       // currentUser = mUserDao.getUser();
     }
 
     public void addSource(){
@@ -263,7 +276,7 @@ public class FlashcardRepository {
      * Creates an updateNodeAsyncTask and executes it.
      * @param vocabModelA1s The list of all the nodes that will be updated.
      *  This needs to add every node to the execute portion manually.
-     *  Could this be improved by sending the list as a parameter instead of each vocabModel individually?
+     *  Could this be improved by sending the list as a parameter instead of each vocabModel individually? No
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s){
         System.out.println("vocabmodea1s sidze = " +vocabModelA1s.size());
@@ -292,6 +305,7 @@ public class FlashcardRepository {
         }else{
             System.out.println("ERROR UPDATENODE DIDNT WORK");
         }
+
         //new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
     }
 
@@ -318,6 +332,10 @@ public class FlashcardRepository {
             return null;
         }
     }
+
+
+
+
 
 
 

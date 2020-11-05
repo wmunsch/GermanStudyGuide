@@ -66,6 +66,8 @@ public class Repository {
     private MutableLiveData<Boolean> allGood = new MutableLiveData<>();
     private LiveData<String> accountCreation;
 
+    private MutableLiveData<Integer> errorConnectingToDatabaseVisibility = new MutableLiveData<>();
+
 
     GermanDatabase db;
 
@@ -73,6 +75,7 @@ public class Repository {
 
 
     private LiveData<Integer> a1Count;
+
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -100,6 +103,7 @@ public class Repository {
         passwordErrorVisibility.setValue(View.GONE);
         emailTakenVisibility.setValue(View.GONE);
         emailValidVisibility.setValue(View.GONE);
+        errorConnectingToDatabaseVisibility.setValue(View.GONE);
 
 
         //map username to currentuser.username to show username in top left of main screen
@@ -107,19 +111,24 @@ public class Repository {
             if (currentUser.getValue() != null){
                 loginVisibility.setValue(View.GONE);
                 profileVisibility.setValue(View.VISIBLE);
+                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^currentuser is not null");
                 return currentUser.getValue().getUsername();
             }
             loginVisibility.setValue(View.VISIBLE);
             profileVisibility.setValue(View.GONE);
+            System.out.println("^^^^^^^^^^^^^^^^^^^^^^^currentuser IS null");
             return "Log In";
         } );
 
+
+        /*
         userEmail = Transformations.map(currentUser, name->{
             if (currentUser.getValue() != null){
                 return currentUser.getValue().getEmail();
             }
             return "";
         } );
+*/
 
         accountCreation = Transformations.map(allGood, success->{
            if (allGood.getValue()!=null && allGood.getValue()){
@@ -139,6 +148,10 @@ public class Repository {
 
     }
 
+    public LiveData<User> getCurrentUser() {
+        return currentUser;
+    }
+
     public boolean checkEmail(String email){
         //check the database to see if email exists
         return false;
@@ -155,6 +168,8 @@ public class Repository {
     public void getUserInfoFromRoom(){
         currentUser = mUserDao.getUser();
     }
+
+
 
     public void setPasswordErrorVisibility(int i){
         passwordErrorVisibility.setValue(i);
@@ -197,8 +212,10 @@ public class Repository {
     }
     public void logOut(){
         //deleteUser();
-        deleteAllScores();
+        //deleteAllScores();
+        mVocabDao.resetAllScores();
     }
+
 
     /**
      * Called when logging in.
@@ -291,6 +308,8 @@ public class Repository {
 
     public void deleteAllScores(){new deleteA1AsyncTask(mVocabDao).execute();}
 
+    public void resetAllScores(){new resetA1AsyncTask(mVocabDao).execute();}
+
     public LiveData<Integer> count() {
         return mVocabDao.count();
     }
@@ -341,6 +360,7 @@ public class Repository {
                     @Override
                     public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
                         System.out.println("Error on call");
+
                     }
                 });
             }else{
@@ -512,6 +532,17 @@ public class Repository {
             return null;
         }
 
+    }
+
+    private static class resetA1AsyncTask extends AsyncTask<Void, Void, Void>{
+        private VocabDao mAsyncTaskDao;
+
+        resetA1AsyncTask(VocabDao dao) {mAsyncTaskDao = dao;}
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mAsyncTaskDao.resetAllScores();
+            return null;
+        }
     }
 
 

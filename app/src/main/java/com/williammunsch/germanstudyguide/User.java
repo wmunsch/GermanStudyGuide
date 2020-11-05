@@ -11,26 +11,27 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "users_table")
 public class User {
     @PrimaryKey @NonNull
-    private String email;
-    private String username, password;
+    //private String email;
+    private String username;
+    private String password;
     private String token;
 
 
-    public User(String username, String email, String password){
+    public User(String username, String password){
         this.username = username;
-        this.email = email;
+       // this.email = email;
         this.password = password;
     }
 
-    public String toString(){return username + " " + email + " " + password;}
+    public String toString(){return username + " " + password;}
 
     public String getUsername(){
         return username;
     }
 
-    public String getEmail(){
-        return email;
-    }
+   // public String getEmail(){
+   //     return email;
+    //}
 
     public String getPassword(){
         return password;

@@ -40,6 +40,10 @@ public interface VocabDao {
     LiveData<List<VocabModelA1>> getVocabQueueFinished();
 
 
+    //Gets all studying from ROOM for uploading to remote database
+   // @Query("SELECT studying FROM vocab_tableA1 ORDER BY _id")
+   // LiveData<String> getStudyingData();
+
     //Gets # of new vocab and # of old vocab for review combined
    // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
     //List<VocabModelA1>getVocabQueue();
@@ -62,6 +66,12 @@ public interface VocabDao {
     //Deletes everything in the A1 table
     @Query("DELETE FROM vocab_tableA1")
     void deleteAll();
+
+    //Resets scores, freqs, and studying to 0 when logging out.
+    @Query("UPDATE vocab_tableA1 SET studying = 0, score=0,freq=0")
+    void resetAllScores();
+
+
 
    // @Query("SELECT * FROM vocab_TableA1 WHERE studying = 1 ORDER BY score;")
     //List<VocabModelA1> getFiveOldVocab();

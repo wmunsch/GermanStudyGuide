@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         fm = getSupportFragmentManager();
         mainActivityViewModel.getErrorCode().observe(this, code ->{
             if (code==1){
-                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account not found","The email you provided is not registered.\nPlease make sure you entered the\ncorrect email and try again.");
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account not found","The username you provided is not registered.\nPlease make sure you entered the\ncorrect username and try again.");
                 loginDialogFragment.show(fm,"loginDialogFrament");
             }else if (code==2){
                 LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Incorrect password","The password you entered was incorrect.\nPlease make sure you entered the\ncorrect password and try again.");
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 //login
                 //TODO : Handle successful login (change fragment?)
                 binding.etPassword.setText("");
-                binding.etEmail.setText("");
+               // binding.etEmail.setText("");
                 System.out.println("LOGGING IN");
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 loginDialogFragment.show(fm,"loginDialogFragment");
 
                 //System.out.println("Sent registration");
-                binding.etEmailR.setText("");
+                //binding.etEmailR.setText("");
                 binding.etPasswordR.setText("");
                 binding.etUsernameR.setText("");
 
