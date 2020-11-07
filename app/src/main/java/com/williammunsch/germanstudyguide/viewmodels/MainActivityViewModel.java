@@ -79,6 +79,7 @@ public class MainActivityViewModel extends ViewModel {
                         //profileVisibility.setValue((View.VISIBLE));
                         //TODO : reset the ROOM database scores and reload them with new values?
                         //mRepository.getScoresFromServer();
+                        mRepository.downloadSaveData(loginResponse.getUsername());
                     }
 
                 }

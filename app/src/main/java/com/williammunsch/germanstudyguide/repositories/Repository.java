@@ -218,25 +218,31 @@ public class Repository {
 
 
     /**
-     * Called when logging in.
+     * Called when logging in. Gets the user's save data and inputs it into the ROOM database.
      */
-    public void downloadSaveData(){
-        Call<SaveDataResponse> call = apiService.getSaveData();
+    public void downloadSaveData(String userN){
+
+        Call<SaveDataResponse> call = apiService.getSaveData(userN);
         call.enqueue(new Callback<SaveDataResponse>() {
             @Override
             public void onResponse(Call<SaveDataResponse> call, Response<SaveDataResponse> response) {
                 System.out.println("Response to call: ");
-                int statusCode = response.code();
+                System.out.println(response);
                 SaveDataResponse data = response.body();
+                System.out.println("Data body: ");
+                System.out.println(data);
 
                 if (data!=null){
-                    String dataSet = data.toString();
-                    String temp = "";
-                    for (int i = 0; i < 700; i ++){
+                    //Format the score data into an array
+                    String[] scores = data.getScore().split(",");
+
+                    //TODO : Create a new asynctask that takes in the array of scores and studying numbers then updates the ROOM database
+                    //NO! The loop should be in the asynctask!
+                    //for (int i = 0; i < 700; i ++){
                         //insert each entry into ScoreModelA1 table
-                        temp=dataSet.substring(i,i+6);
-                        mVocabDao.insertIntoScoreModelA1(new ScoreModelA1(i,Integer.parseInt(temp.substring(0,1)),Integer.parseInt(temp.substring(2,4)),Integer.parseInt((temp.substring(5)))));
-                    }
+                       // temp=dataSet.substring(i,i+6);
+                        //mVocabDao.insertIntoScoreModelA1(new ScoreModelA1(i,Integer.parseInt(temp.substring(0,1)),Integer.parseInt(temp.substring(2,4)),Integer.parseInt((temp.substring(5)))));
+                    //}
                 }
 
 
@@ -285,6 +291,8 @@ public class Repository {
     public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
     public LiveData<Integer> getA1Mastered() {return mVocabDao.countMastered();}
     public LiveData<Integer> getA1Percent() {return mVocabDao.countLearned();}
+
+   // public LiveData<Integer> getA1Score(){return mVocabDao.getA1Scores();}
 
 
     public void insert (VocabModelA1 vocabModelA1) {

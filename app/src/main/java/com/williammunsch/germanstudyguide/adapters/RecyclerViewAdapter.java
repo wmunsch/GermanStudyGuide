@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
-    private Integer a1Max, a1Learned, a1Percent,a1Mastered, a1MasteredPercent;
+    private Integer a1Max=0, a1Learned=0, a1Percent=0,a1Mastered=0, a1MasteredPercent=0;
     private Context mContext;
     private VocabListViewModel vocabListViewModel;
    // private int a1Max;

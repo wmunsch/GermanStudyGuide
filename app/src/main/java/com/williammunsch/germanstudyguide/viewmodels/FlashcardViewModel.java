@@ -56,10 +56,15 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     }
 
+    /**
+     * Uploads the flashcard save data to the remote database
+     */
     public void updateRemoteDatabase(){
         //TODO need to get apiservice into flashcard repository and way to get username and tablename
+        //ON!!! get tablename, scorelist, freqlist, studyinglist
 
         //System.out.println("nameveee" + userName.getValue());
+        //System.out.println("what im looking for: "+ mRepository.getA1Score().getValue());
         Call<CreateUploadDataResponse> call = mRepository.apiService.uploadData(userName.getValue(),"A1","abcde","2","2");//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
         call.enqueue(new Callback<CreateUploadDataResponse>() {
             @Override
@@ -76,6 +81,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
                 System.out.println("Error on call when creating save data" + t);
             }
         });
+        //System.out.println("what im looking for: "+ mRepository.getA1Score().getValue());
     }
 
     public void finishActivity(){
@@ -169,11 +175,15 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             mFlashcardRepository.setXmarkVisibility(GONE);
             mFlashcardRepository.removeMediatorSource();
             mFlashcardRepository.setFinishButtonVisibility(VISIBLE);
-            mFlashcardRepository.updateAllNodes();
+           // mFlashcardRepository.updateAllNodes();
 
             //If logged in, update remote database too
             if (mRepository.getCurrentUser().getValue()!=null){
-                updateRemoteDatabase();
+               // update with remote database call
+                mFlashcardRepository.updateAllNodes();
+            }else{
+                //update without remote database call
+                mFlashcardRepository.updateAllNodes();
             }
 
             //TODO : Display stats from the activity.

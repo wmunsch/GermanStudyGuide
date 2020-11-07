@@ -10,6 +10,7 @@ import androidx.room.Update;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -89,6 +90,12 @@ public interface VocabDao {
     @Query("DELETE FROM score_tableA1")
     void deleteAllScores();
 
+
+    /**
+     * Get all scores in one string to upload to remote database.
+     */
+    @Query("SELECT score FROM vocab_tableA1")
+    List<Integer> getA1Scores();
 
     //@Query("SELECT * FROM vocab_table WHERE ")
 

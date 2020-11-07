@@ -33,8 +33,11 @@ public interface DatabaseService {
             @Field("password") String password
     );
 
-    @GET("api/getdata.php")
-    Call<SaveDataResponse> getSaveData();
+    @FormUrlEncoded
+    @POST("api/geta1data.php")
+    Call<SaveDataResponse> getSaveData(
+            @Field("username") String username
+    );
 
     @FormUrlEncoded
     @POST("api/savedata.php")
@@ -83,6 +86,7 @@ public interface DatabaseService {
     );
 
 
+    //Used to upload flashcard save data to the remote database.
     @FormUrlEncoded
     @POST("api/uploaddata.php")
     Call<CreateUploadDataResponse> uploadData(
