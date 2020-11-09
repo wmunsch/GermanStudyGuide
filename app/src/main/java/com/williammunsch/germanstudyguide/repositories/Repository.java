@@ -1,10 +1,12 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
@@ -67,6 +69,8 @@ public class Repository {
     private LiveData<String> accountCreation;
 
     private MutableLiveData<Integer> errorConnectingToDatabaseVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> showLoadingBar = new MutableLiveData<>();
+    private MutableLiveData<Integer> showViewPager = new MutableLiveData<>();
 
 
     GermanDatabase db;
@@ -104,6 +108,8 @@ public class Repository {
         emailTakenVisibility.setValue(View.GONE);
         emailValidVisibility.setValue(View.GONE);
         errorConnectingToDatabaseVisibility.setValue(View.GONE);
+        showLoadingBar.setValue(View.GONE);
+        showViewPager.setValue(View.VISIBLE);
 
 
         //map username to currentuser.username to show username in top left of main screen
@@ -234,8 +240,10 @@ public class Repository {
 
                 if (data!=null){
                     //Format the score data into an array
+                    //int[] scores = Integer.parseInt(data.getScore().split(","));
                     String[] scores = data.getScore().split(",");
 
+                    updateVocabDataOnLogin(scores);
                     //TODO : Create a new asynctask that takes in the array of scores and studying numbers then updates the ROOM database
                     //NO! The loop should be in the asynctask!
                     //for (int i = 0; i < 700; i ++){
@@ -283,6 +291,8 @@ public class Repository {
         //return data;
     }
 
+    public LiveData<Integer> getShowLoadingBar(){return showLoadingBar;}
+    public LiveData<Integer> getShowViewPager(){return showViewPager;}
 
     public LiveData<Integer> getA1Max(){
         return mVocabDao.count();
@@ -439,35 +449,73 @@ public class Repository {
         }
     }
 
-    /*
-    private static class checkUserAsyncTask extends AsyncTask<Void,  Void, User>{
-        private UserDao mAsyncTaskDao;
 
-        checkUserAsyncTask(UserDao dao ){mAsyncTaskDao = dao;}
-
-
-        @Override
-        protected User doInBackground(Void... params) {
-            LiveData<User> userData = mAsyncTaskDao.getUser();
-            System.out.println("COUNT : " + mAsyncTaskDao.count());
-            return userData.getValue();
-        }
-
-        @Override
-        protected void onPostExecute(User user){
-            if (user!=null){
-                System.out.println("Not null user");
-            }else{
-                System.out.println("No user found");
-            }
-           // System.out.println(user.getUsername());
-        }
+    /**
+     * Updates the vocabmodelA1 activity data when logging in.
+     */
+    private void updateVocabDataOnLogin(String[] data){
+        //showLoadingBar.setValue(1);
+        new updateVocabDataOnLoginAsyncTask(mVocabDao,showLoadingBar,showViewPager).execute(data);
     }
+
+    private static class updateVocabDataOnLoginAsyncTask extends AsyncTask<String, Void, Void>{
+        private final VocabDao mAsyncTaskDao;
+        private final MutableLiveData<Integer> muld;
+        private final MutableLiveData<Integer> muld2;
+
+        updateVocabDataOnLoginAsyncTask(VocabDao dao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
+            mAsyncTaskDao = dao;
+            muld = mld;
+            muld2 = mld2;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            muld.setValue(View.VISIBLE);
+            muld2.setValue(View.INVISIBLE);
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            /*
+            int[] numArray = new int[700];
+            for (int i =0;i<700;i++){
+                numArray[i] = i+1;
+            }
+            System.out.println("BEGGINING UPDATING SCORES");
+            mAsyncTaskDao.updateVocabScore(strings,numArray);
+            System.out.println("END UPDATING SCORES");
 */
 
+            System.out.println("BEGGINING UPDATING SCORES");
+            for (int i = 0;i < 700;i++){
+                mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
+            }
+            System.out.println("END UPDATING SCORES");
 
+            /*
+            System.out.println("Getting full empty list");
+            VocabModelA1[] vocabList = mAsyncTaskDao.getFullA1List();
+            System.out.println("finished full empty list get");
+            //String[] scores = strings;
+            for (int i = 0;i < 700;i++){
+                //vocabList[i-1].setId(i);
+                System.out.println("Updating node");
+                vocabList[i].setScore(Integer.parseInt(strings[i]));
+                mAsyncTaskDao.updateVocabScoresOnLogin(vocabList[i]);
+            }
+            System.out.println("$$$$$$ Finshed updating vocablist from remote");
+            return null;
+             */
+            return null;
+        }
 
-
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            muld.setValue(View.GONE);
+            muld2.setValue(View.VISIBLE);
+        }
+    }
 
 
     private static class insertUserAsyncTask extends AsyncTask<User, Void, Void> {

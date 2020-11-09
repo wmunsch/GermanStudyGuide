@@ -59,6 +59,22 @@ public interface VocabDao {
    // void updateNode(VocabModelA1 vocabModel);
 
 
+    /**
+     * Called when logging in.
+     */
+    @Update
+    void updateVocabScoresOnLogin(VocabModelA1... vocabModelA1s);
+
+    @Query("SELECT * FROM vocab_tableA1")
+    VocabModelA1[] getFullA1List();
+
+
+    /**
+     *Better way of updating vocab scores when logging in
+     */
+    @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
+    void updateVocabScore(int score, int id);
+
 
     //Inserts the A1 data, will replace unique constraints in case of a non-fully downloaded previous attempt
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -74,15 +90,13 @@ public interface VocabDao {
 
 
 
+
+
    // @Query("SELECT * FROM vocab_TableA1 WHERE studying = 1 ORDER BY score;")
     //List<VocabModelA1> getFiveOldVocab();
 
 
-    /**
-     * Called when logging in.
-     */
-    @Insert
-    void insertIntoScoreModelA1(ScoreModelA1... scoreModelA1s);
+
 
     /**
      * Called when logging out.

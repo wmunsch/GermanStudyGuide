@@ -15,6 +15,7 @@
 
     </data>
 
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
@@ -26,6 +27,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
              tools:context=".MainActivity">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading Data"
+                android:textColor="@color/colorAccent"
+                android:visibility="@{mainactivityviewmodel.showLoadingBar, default=gone}"
+                app:layout_constraintBottom_toTopOf="@id/progressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="@{mainactivityviewmodel.showLoadingBar, default=gone}"
+                android:indeterminateTint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -103,26 +126,25 @@
                 android:id="@+id/nav_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
                 android:background="?android:attr/windowBackground"
+                android:theme="@style/NavBarTheme"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:menu="@menu/bottom_nav_menu"
-                android:theme="@style/NavBarTheme"
-                >
-            </com.google.android.material.bottomnavigation.BottomNavigationView>
+                app:menu="@menu/bottom_nav_menu" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:visibility="@{mainactivityviewmodel.showViewPager, default=visible}"
                 app:layout_constraintBottom_toTopOf="@id/nav_view"
                 app:layout_constraintTop_toBottomOf="@id/toolbar"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
             </androidx.viewpager.widget.ViewPager>
 
 

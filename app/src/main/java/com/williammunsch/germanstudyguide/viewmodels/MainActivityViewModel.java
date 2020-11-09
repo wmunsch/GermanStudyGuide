@@ -31,6 +31,8 @@ public class MainActivityViewModel extends ViewModel {
     private LiveData<String> userEmail;
     //private MutableLiveData<String> userName = new MutableLiveData<>();
     private LoginResponse loginResponse;
+    private LiveData<Integer> showLoadingBar;
+    private LiveData<Integer> showViewPager;
 
     //private MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
     //private MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
@@ -40,6 +42,9 @@ public class MainActivityViewModel extends ViewModel {
         this.mRepository = repository;
         userName=mRepository.getUserName();
         userEmail=mRepository.getUserEmail();
+
+        showLoadingBar = mRepository.getShowLoadingBar();
+        showViewPager = mRepository.getShowViewPager();
        // userName.setValue("Log in");
 
 
@@ -48,6 +53,7 @@ public class MainActivityViewModel extends ViewModel {
 
 
     }
+
 
 
     /**
@@ -272,6 +278,9 @@ public class MainActivityViewModel extends ViewModel {
         mRepository.setRegistrationVisibilityF();
     }
     public void setLoginAndRegistrationVisibilityGone(){mRepository.setLoginAndRegistrationVisibilityGone();}
+
+    public LiveData<Integer> getShowLoadingBar(){return showLoadingBar;}
+    public LiveData<Integer> getShowViewPager(){return showViewPager;}
 
     public LiveData<Integer> getA1Count() {
         return mRepository.getA1Count();

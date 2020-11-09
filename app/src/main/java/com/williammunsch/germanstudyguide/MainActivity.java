@@ -2,9 +2,11 @@ package com.williammunsch.germanstudyguide;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityMainBinding;
 import com.williammunsch.germanstudyguide.ui.LoginDialogFragment;
@@ -116,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageScrollStateChanged(int i) { }
         });
+
+
+
+
     }
 
 
