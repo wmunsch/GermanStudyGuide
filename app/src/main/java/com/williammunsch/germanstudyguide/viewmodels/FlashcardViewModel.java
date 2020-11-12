@@ -56,33 +56,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     }
 
-    /**
-     * Uploads the flashcard save data to the remote database
-     */
-    public void updateRemoteDatabase(){
-        //TODO need to get apiservice into flashcard repository and way to get username and tablename
-        //ON!!! get tablename, scorelist, freqlist, studyinglist
 
-        //System.out.println("nameveee" + userName.getValue());
-        //System.out.println("what im looking for: "+ mRepository.getA1Score().getValue());
-        Call<CreateUploadDataResponse> call = mRepository.apiService.uploadData(userName.getValue(),"A1","abcde","2","2");//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
-        call.enqueue(new Callback<CreateUploadDataResponse>() {
-            @Override
-            public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
-                System.out.println("Response to creating save data");
-                System.out.println(response);
-                CreateUploadDataResponse lr = response.body();
-                System.out.println(lr);
-
-            }
-
-            @Override
-            public void onFailure(Call<CreateUploadDataResponse> call, Throwable t) {
-                System.out.println("Error on call when creating save data" + t);
-            }
-        });
-        //System.out.println("what im looking for: "+ mRepository.getA1Score().getValue());
-    }
 
     public void finishActivity(){
         navigateToMainActivity.call();
@@ -102,11 +76,24 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
             boolean test = false;
             //test entered answer against all possible answers in the VocabModelA1
-            for (String s : mFlashcardRepository.getCurrentNode().getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
-                if (s.equalsIgnoreCase(answer)){
+            if (mFlashcardRepository.getCurrentNode().getValue().getScore()>50){
+                //Test english -> german
+                if ( mFlashcardRepository.getCurrentNode().getValue().getGerman().equalsIgnoreCase(answer)){
                     test = true;
                 }
+            }else{
+                //Test german -> english
+                for (String s : mFlashcardRepository.getCurrentNode().getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
+                    System.out.println("Testing " + s + " against: "+ answer);
+                    if (s.equalsIgnoreCase(answer)) {
+                        test = true;
+                        break;
+                    }
+                }
             }
+
+
+
             if (test && !answer.equals("")) {
                 System.out.println("CORRECT");
                  mFlashcardRepository.getCurrentNode().getValue().increaseScore();
@@ -180,10 +167,10 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             //If logged in, update remote database too
             if (mRepository.getCurrentUser().getValue()!=null){
                // update with remote database call
-                mFlashcardRepository.updateAllNodes();
+                mFlashcardRepository.updateAllNodes(true);
             }else{
                 //update without remote database call
-                mFlashcardRepository.updateAllNodes();
+                mFlashcardRepository.updateAllNodes(false);
             }
 
             //TODO : Display stats from the activity.

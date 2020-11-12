@@ -100,7 +100,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         //if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.learnButton.setText("Study");}
        // if ((int)mVocabList.get(i).getMasteredPercent()==100){viewHolder.learnButton.setText("Review");}
 
-
+/*
         viewHolder.viewButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -119,6 +119,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
         });
+*/
 
         viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -149,8 +150,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
             public void onClick(View view){
+                      //TODO : set minimum height and isExpanded when clicking on other ones
                       if (!viewHolder.isExpanded){
-                          viewHolder.parentLayout.setMinimumHeight(500);
+                          viewHolder.parentLayout.setMinimumHeight(450);
                           viewHolder.buttonLayout.setVisibility(View.VISIBLE);
                           //viewHolder.buttonLayout.startAnimation(slideDown);
                           viewHolder.isExpanded=true;}
@@ -224,7 +226,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             parentLayout = itemView.findViewById(R.id.parent_layout);
             buttonLayout = itemView.findViewById(R.id.buttonLayout);
             wordsLearned = itemView.findViewById(R.id.wordsLearnedTV);
-            viewButton = itemView.findViewById(R.id.viewButton);
+//            viewButton = itemView.findViewById(R.id.viewButton);
             learnButton = itemView.findViewById(R.id.learnButton);
         }
     }

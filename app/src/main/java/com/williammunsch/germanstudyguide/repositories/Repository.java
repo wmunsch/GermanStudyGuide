@@ -23,6 +23,7 @@ import com.williammunsch.germanstudyguide.room.VocabListDao;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -64,6 +65,8 @@ public class Repository {
 
 
     private MutableLiveData<Integer> emailValidVisibility = new MutableLiveData<>();
+
+    private MutableLiveData<Integer> couldNotConnectVisibility = new MutableLiveData<>();
 
     private MutableLiveData<Boolean> allGood = new MutableLiveData<>();
     private LiveData<String> accountCreation;
@@ -110,7 +113,7 @@ public class Repository {
         errorConnectingToDatabaseVisibility.setValue(View.GONE);
         showLoadingBar.setValue(View.GONE);
         showViewPager.setValue(View.VISIBLE);
-
+        couldNotConnectVisibility.setValue(View.GONE);
 
         //map username to currentuser.username to show username in top left of main screen
         userName = Transformations.map(currentUser, name->{
@@ -208,7 +211,8 @@ public class Repository {
         this.emailTakenVisibility.setValue(i);
     }
 
-
+    public LiveData<Integer> getCouldNotConnectVisibility(){return couldNotConnectVisibility;}
+    public void setCouldNotConnectVisibility(int i){couldNotConnectVisibility.setValue(i);}
     public LiveData<Integer> getEmailValidVisibility() {
         return emailValidVisibility;
     }
@@ -242,8 +246,9 @@ public class Repository {
                     //Format the score data into an array
                     //int[] scores = Integer.parseInt(data.getScore().split(","));
                     String[] scores = data.getScore().split(",");
+                    String[] studying = data.getStudying().split(",");
 
-                    updateVocabDataOnLogin(scores);
+                    updateVocabDataOnLogin(scores, studying);
                     //TODO : Create a new asynctask that takes in the array of scores and studying numbers then updates the ROOM database
                     //NO! The loop should be in the asynctask!
                     //for (int i = 0; i < 700; i ++){
@@ -305,9 +310,10 @@ public class Repository {
    // public LiveData<Integer> getA1Score(){return mVocabDao.getA1Scores();}
 
 
-    public void insert (VocabModelA1 vocabModelA1) {
-        new insertAsyncTask(mVocabDao, mVocabListDao).execute(vocabModelA1);
-    }
+    //public void insert (VocabModelA1 vocabModelA1) {
+    //    new insertAsyncTask(mVocabDao, mVocabListDao).execute(vocabModelA1);
+    //}
+
     public void insertUser(User user){
         new insertUserAsyncTask(mUserDao).execute(user);
     }
@@ -338,7 +344,7 @@ public class Repository {
 
 
     public void checkA1(){
-        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao).execute();
+        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao,showLoadingBar,couldNotConnectVisibility).execute();
     }
     /**
      * Checks to see if the A1 table has been downloaded to the local database, if not, downloads it.
@@ -348,11 +354,19 @@ public class Repository {
         private VocabDao mAsyncTaskDao;
         private VocabListDao mVocabListDao;
         private DatabaseService apiService;
+        private final MutableLiveData<Integer> muld, muld2;
 
-        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao) {
+        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2) {
             mAsyncTaskDao = dao;
             apiService = api;
             mVocabListDao = vDao;
+            muld=mld;
+            muld2 = mld2;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            muld2.setValue(View.GONE);
         }
 
         @Override
@@ -365,7 +379,6 @@ public class Repository {
         protected void onPostExecute(Integer vocabCount){
             if (vocabCount!=700){
                 System.out.println("Downloading A1 table");
-
                 Call<List<VocabModelA1>> call = apiService.vocabList();
                 call.enqueue(new Callback<List<VocabModelA1>>() {
                     @Override
@@ -373,11 +386,13 @@ public class Repository {
                         List<VocabModelA1> vocabList = response.body();
                         VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
                         //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
-                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao).execute(vocabListArray);
+                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld).execute(vocabListArray);
                     }
                     @Override
                     public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
-                        System.out.println("Error on call");
+                        System.out.println("Error on call" + t);
+                        muld2.setValue(View.VISIBLE);
+                        //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
 
                     }
                 });
@@ -393,10 +408,17 @@ public class Repository {
     private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
         private VocabDao mAsyncTaskDao;
         private VocabListDao mVocabListDao;
+        private final MutableLiveData<Integer> muld;
 
-        insertAsyncTask(VocabDao dao, VocabListDao vlDao) {
+        insertAsyncTask(VocabDao dao, VocabListDao vlDao, MutableLiveData<Integer> mld) {
             mAsyncTaskDao = dao;
             mVocabListDao = vlDao;
+            muld=mld;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            muld.setValue(View.VISIBLE);
         }
 
         @Override
@@ -410,6 +432,7 @@ public class Repository {
         @Override
         protected void onPostExecute(Void v){
             //Add the vocab list item
+            muld.setValue(View.GONE);
             new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","  A1",0,0,0));
            // new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 2","  A2",0,0,0));
           //  new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Intermediate Level 1","  B1",0,0,0));
@@ -453,12 +476,12 @@ public class Repository {
     /**
      * Updates the vocabmodelA1 activity data when logging in.
      */
-    private void updateVocabDataOnLogin(String[] data){
+    private void updateVocabDataOnLogin(String[] data, String[] dataStudying){
         //showLoadingBar.setValue(1);
-        new updateVocabDataOnLoginAsyncTask(mVocabDao,showLoadingBar,showViewPager).execute(data);
+        new updateVocabDataOnLoginAsyncTask(mVocabDao,showLoadingBar,showViewPager).execute(data, dataStudying);
     }
 
-    private static class updateVocabDataOnLoginAsyncTask extends AsyncTask<String, Void, Void>{
+    private static class updateVocabDataOnLoginAsyncTask extends AsyncTask<String[], Void, Void>{
         private final VocabDao mAsyncTaskDao;
         private final MutableLiveData<Integer> muld;
         private final MutableLiveData<Integer> muld2;
@@ -476,7 +499,7 @@ public class Repository {
         }
 
         @Override
-        protected Void doInBackground(String... strings) {
+        protected Void doInBackground(String[]... strings) {
             /*
             int[] numArray = new int[700];
             for (int i =0;i<700;i++){
@@ -487,9 +510,13 @@ public class Repository {
             System.out.println("END UPDATING SCORES");
 */
 
+            //mAsyncTaskDao.resetAllScores();
+
+            String[] scoreArray = strings[0];
+            String[] studyingArray = strings[1];
             System.out.println("BEGGINING UPDATING SCORES");
             for (int i = 0;i < 700;i++){
-                mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
+                mAsyncTaskDao.updateVocabScore(Integer.parseInt(scoreArray[i]),Integer.parseInt(studyingArray[i]),i+1);//mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
             }
             System.out.println("END UPDATING SCORES");
 

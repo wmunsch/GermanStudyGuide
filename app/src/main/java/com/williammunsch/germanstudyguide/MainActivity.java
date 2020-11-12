@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         binding.loginClickable.setOnClickListener((View view)->
                 binding.drawerLayout.openDrawer(GravityCompat.START));
 
+
         //TODO : Close the keyboard when clicking off of the login page drawer
         fm = getSupportFragmentManager();
         mainActivityViewModel.getErrorCode().observe(this, code ->{
@@ -84,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
 
+            }else if (code==5){
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Error connecting","Check to see if you're connected\nto the internet and try again.");
+                loginDialogFragment.show(fm,"loginDialogFrament");
             }
         });
 

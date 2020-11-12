@@ -23,10 +23,50 @@
         android:fitsSystemWindows="true">
 
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
              tools:context=".MainActivity">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:translationZ="1dp"
+                android:onClick="@{() -> mainactivityviewmodel.retryDownloads()}"
+                android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Error downloading data\nTap to try again"
+                    android:textColor="#737373"
+                    android:textAlignment="center"
+                    android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                    app:layout_constraintBottom_toTopOf="@id/errorDownloadingImage"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/errorDownloadingImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_cached_48px"
+                    android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </LinearLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -49,6 +89,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+
+
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -100,12 +143,12 @@
 
 
 
-
+<!--   streak stuff
                     <ImageView
                         android:id="@+id/streakIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_streak6"
+                        android:src="@drawable/ic_whatshot_24px"
                         android:layout_marginEnd="15dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -118,6 +161,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@id/streakIcon"
                         />
+ -->
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>

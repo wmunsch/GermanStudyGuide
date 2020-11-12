@@ -72,8 +72,11 @@ public interface VocabDao {
     /**
      *Better way of updating vocab scores when logging in
      */
-    @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
-    void updateVocabScore(int score, int id);
+    @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying WHERE _id = :id")
+    void updateVocabScore(int score, int studying, int id);
+
+   // @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
+   // void updateVocabScore(int score, int id);
 
 
     //Inserts the A1 data, will replace unique constraints in case of a non-fully downloaded previous attempt
@@ -116,6 +119,12 @@ public interface VocabDao {
     @Query("SELECT COUNT(*) FROM  vocab_tableA1")
     Integer countA1();
 
+
+    /**
+     * Get all studying list in one string to upload to remote database.
+     */
+    @Query("SELECT studying FROM vocab_tableA1")
+    List<Integer> getA1Studying();
 
     /**
      * Counts the number of entries in the A1 table.

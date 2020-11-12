@@ -194,10 +194,10 @@ public class FlashcardRepository {
      * based on a finished List that all words are sent to after being popped from
      * the mediatorVocabList.
      */
-    public void updateAllNodes(){
+    public void updateAllNodes(boolean login){
         System.out.println("UPDATING ALL NODES");
 
-        updateNode(finishedList);
+        updateNode(finishedList, login);
         finishedList.clear();
         setAtBeginning = false;
 
@@ -286,27 +286,27 @@ public class FlashcardRepository {
      *  This needs to add every node to the execute portion manually.
      *  Could this be improved by sending the list as a parameter instead of each vocabModel individually? No
      */
-    private void updateNode(List<VocabModelA1> vocabModelA1s){
+    private void updateNode(List<VocabModelA1> vocabModelA1s, boolean loggedIn){
         System.out.println("vocabmodea1s sidze = " +vocabModelA1s.size());
         if (vocabModelA1s.size()==3){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
         }else if (vocabModelA1s.size()==4){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3));
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3));
         }else if (vocabModelA1s.size()==5){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
         }else if (vocabModelA1s.size()==10){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9));
         }else if (vocabModelA1s.size()==14){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13));
         }else if (vocabModelA1s.size()==15){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14));
         }else if (vocabModelA1s.size()==20){
-            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue()).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
+            new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4),
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14),
                     vocabModelA1s.get(15), vocabModelA1s.get(16), vocabModelA1s.get(17), vocabModelA1s.get(18), vocabModelA1s.get(19));
@@ -325,14 +325,17 @@ public class FlashcardRepository {
 
         private VocabDao mAsyncTaskDao;
         private String scoreList="";
-        private String tempS;
+        private String studyingList="";
+        private String tempS,tempS2;
         private DatabaseService apiService;
         private String username;
+        private boolean loggedIn;
 
-        updateNodeAsyncTask(VocabDao dao, DatabaseService api, String username) {
+        updateNodeAsyncTask(VocabDao dao, DatabaseService api, String username, boolean login) {
             mAsyncTaskDao = dao;
             apiService = api;
             this.username = username;
+            loggedIn=login;
 
         }
 
@@ -342,47 +345,45 @@ public class FlashcardRepository {
                 mAsyncTaskDao.updateNode(model);
                 System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
             }
-            //mAsyncTaskDao.updateNode(params[0]);
-            //System.out.println("Updating node to " + params[0].getScore());
 
             //This works, now just get the entire string with a separator per entry
             System.out.println("what im looking for: "+ mAsyncTaskDao.getA1Scores());
             scoreList = mAsyncTaskDao.getA1Scores().toString();
+            studyingList = mAsyncTaskDao.getA1Studying().toString();
             System.out.println(scoreList);
             tempS = scoreList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
-            //scoreList.replaceAll("\\[","");
-           // scoreList.replaceAll("\\]","");
-           // System.out.println(tempS);
-            //remove [] and spaces
+            tempS2 = studyingList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
             return null;
         }
 
         @Override
         protected void onPostExecute(Void v){
-            //TODO : build the call here to send to the remote database
-            System.out.println("Finished updating room database, calling to update remote database.");
-            System.out.println(tempS);
-            //NEED TO CHEKC IF LOGGED IN SOMEHOW (make a separate async task without the post execute call and check in the flashcardviewmodel  movetonextnode method?)
-            //scoreList ...
-            //Make the call to update the remote database
-            System.out.println(username);
+            if (loggedIn){
+                System.out.println("Finished updating room database, calling to update remote database.");
+                System.out.println(tempS);
+                //NEED TO CHEKC IF LOGGED IN SOMEHOW (make a separate async task without the post execute call and check in the flashcardviewmodel  movetonextnode method?)
+                //scoreList ...
+                //Make the call to update the remote database
+                System.out.println(username);
 
-            Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,"3","3");//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
-            call.enqueue(new Callback<CreateUploadDataResponse>() {
-                @Override
-                public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
-                    System.out.println("Response to creating save data");
-                    System.out.println(response);
-                    CreateUploadDataResponse lr = response.body();
-                    System.out.println(lr);
+                Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,"3",tempS2);//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
+                call.enqueue(new Callback<CreateUploadDataResponse>() {
+                    @Override
+                    public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
+                        System.out.println("Response to creating save data");
+                        System.out.println(response);
+                        CreateUploadDataResponse lr = response.body();
+                        System.out.println(lr);
 
-                }
+                    }
 
-                @Override
-                public void onFailure(Call<CreateUploadDataResponse> call, Throwable t) {
-                    System.out.println("Error on call when creating save data" + t);
-                }
-            });
+                    @Override
+                    public void onFailure(Call<CreateUploadDataResponse> call, Throwable t) {
+                        System.out.println("Error on call when creating save data" + t);
+                    }
+                });
+            }
+
 
 
 

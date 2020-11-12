@@ -80,7 +80,7 @@ public class VocabListViewModel extends ViewModel {
     /**
      * wrapper insert() method that calls the Repository's insert() method. In this way, the implementation of insert() is completely hidden from the UI.
      */
-    public void insert(VocabModelA1 vocabModelA1) {mRepository.insert(vocabModelA1);}
+   // public void insert(VocabModelA1 vocabModelA1) {mRepository.insert(vocabModelA1);}
 
   //  public Integer count() {return mRepository.count();}
 

@@ -72,6 +72,7 @@ public class VocabModelA1 {
     public void increaseScore(){
         if (score < 95){
             score += 70; //should be 5
+            if (score >100){score=100;}
         }else{
             score = 100;
         }
@@ -80,6 +81,7 @@ public class VocabModelA1 {
 
     public void fixScore(){
         score+=70;
+        if (score > 100){score=100;}
     } //should be 10
 
     public void decreaseScore(){
