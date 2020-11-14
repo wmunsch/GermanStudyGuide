@@ -189,10 +189,10 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     /**
      * Removes the top item from the mediatorLiveData list
      */
-    //TODO : fix this giving indexoutofbounds exception when lists are size 0
     private void popNode(){
         List<VocabModelA1> list = mFlashcardRepository.getMediatorVocabList().getValue();//mediatorVocabList.getValue();
         try {
+            mFlashcardRepository.getCurrentNode().getValue().increaseFrequency();
             mFlashcardRepository.getFinishedList().add(mFlashcardRepository.getCurrentNode().getValue());//finishedList.add(currentNode.getValue());
             list.remove(0);
         }catch(NullPointerException e){

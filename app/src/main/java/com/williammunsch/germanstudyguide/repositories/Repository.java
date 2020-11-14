@@ -231,7 +231,7 @@ public class Repository {
      * Called when logging in. Gets the user's save data and inputs it into the ROOM database.
      */
     public void downloadSaveData(String userN){
-
+        System.out.println("Calling downloadsavedata");
         Call<SaveDataResponse> call = apiService.getSaveData(userN);
         call.enqueue(new Callback<SaveDataResponse>() {
             @Override
@@ -240,22 +240,21 @@ public class Repository {
                 System.out.println(response);
                 SaveDataResponse data = response.body();
                 System.out.println("Data body: ");
-                System.out.println(data);
+                System.out.println(data + " is null?");
 
                 if (data!=null){
-                    //Format the score data into an array
-                    //int[] scores = Integer.parseInt(data.getScore().split(","));
-                    String[] scores = data.getScore().split(",");
-                    String[] studying = data.getStudying().split(",");
+                    if (data.getTablename()==null || data.getScore()==null || data.getStudying()==null || data.getFreq()==null){
+                       // createNewEntryAndUpload();
+                    }else{
+                        System.out.println("Data not null, inputting data");
+                        //Format the score data into an array
+                        String[] scores = data.getScore().split(",");
+                        String[] studying = data.getStudying().split(",");
+                        String[] freq = data.getFreq().split(",");
+                        updateVocabDataOnLogin(scores, studying, freq);
+                    }
 
-                    updateVocabDataOnLogin(scores, studying);
-                    //TODO : Create a new asynctask that takes in the array of scores and studying numbers then updates the ROOM database
-                    //NO! The loop should be in the asynctask!
-                    //for (int i = 0; i < 700; i ++){
-                        //insert each entry into ScoreModelA1 table
-                       // temp=dataSet.substring(i,i+6);
-                        //mVocabDao.insertIntoScoreModelA1(new ScoreModelA1(i,Integer.parseInt(temp.substring(0,1)),Integer.parseInt(temp.substring(2,4)),Integer.parseInt((temp.substring(5)))));
-                    //}
+
                 }
 
 
@@ -476,9 +475,9 @@ public class Repository {
     /**
      * Updates the vocabmodelA1 activity data when logging in.
      */
-    private void updateVocabDataOnLogin(String[] data, String[] dataStudying){
+    private void updateVocabDataOnLogin(String[] data, String[] dataStudying, String[] dataFreq){
         //showLoadingBar.setValue(1);
-        new updateVocabDataOnLoginAsyncTask(mVocabDao,showLoadingBar,showViewPager).execute(data, dataStudying);
+        new updateVocabDataOnLoginAsyncTask(mVocabDao,showLoadingBar,showViewPager).execute(data, dataStudying, dataFreq);
     }
 
     private static class updateVocabDataOnLoginAsyncTask extends AsyncTask<String[], Void, Void>{
@@ -514,10 +513,15 @@ public class Repository {
 
             String[] scoreArray = strings[0];
             String[] studyingArray = strings[1];
+            String[] freqArray = strings[2];
             System.out.println("BEGGINING UPDATING SCORES");
             for (int i = 0;i < 700;i++){
-                mAsyncTaskDao.updateVocabScore(Integer.parseInt(scoreArray[i]),Integer.parseInt(studyingArray[i]),i+1);//mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
-            }
+                try {
+                    mAsyncTaskDao.updateVocabScore(Integer.parseInt(scoreArray[i]), Integer.parseInt(studyingArray[i]), Integer.parseInt(freqArray[i]), i + 1);//mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
+                }catch(Exception e){
+                    break;
+                }
+                }
             System.out.println("END UPDATING SCORES");
 
             /*

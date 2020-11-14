@@ -92,6 +92,11 @@ public class VocabModelA1 {
         }
     }
 
+    public void increaseFrequency(){
+        freq +=1;
+        if (freq > 100){freq=100;}
+    }
+
 
 
     public int getId() {

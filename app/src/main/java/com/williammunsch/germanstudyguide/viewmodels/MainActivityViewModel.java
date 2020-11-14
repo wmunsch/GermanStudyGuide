@@ -13,6 +13,7 @@ import com.williammunsch.germanstudyguide.CreateAccountResponse;
 import com.williammunsch.germanstudyguide.CreateUploadDataResponse;
 import com.williammunsch.germanstudyguide.LoginResponse;
 import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ import retrofit2.Response;
 
 public class MainActivityViewModel extends ViewModel {
     private Repository mRepository;//injected
+    private FlashcardRepository mFlashcardRepository;
 
     private MutableLiveData<Integer> errorCode = new MutableLiveData<>();
     private LiveData<String> userName;
@@ -39,8 +41,9 @@ public class MainActivityViewModel extends ViewModel {
     //private MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
 
     @Inject
-    public MainActivityViewModel(Repository repository){
+    public MainActivityViewModel(Repository repository, FlashcardRepository flashcardRepository){
         this.mRepository = repository;
+        this.mFlashcardRepository = flashcardRepository;
         userName=mRepository.getUserName();
         userEmail=mRepository.getUserEmail();
 
@@ -65,7 +68,8 @@ public class MainActivityViewModel extends ViewModel {
      */
 
     public void logIn(Editable username, Editable password){
-        //Make a loading bar here?
+        //Reset the flashcard activity data so nothing gets messed up when changing accounts.
+        mFlashcardRepository.resetEverything();
 
         Call<LoginResponse> call = mRepository.apiService.logIn(username.toString().toLowerCase().trim(),password.toString().toLowerCase().trim());
         call.enqueue(new Callback<LoginResponse>() {
@@ -277,6 +281,7 @@ public class MainActivityViewModel extends ViewModel {
     public void logOut(){
         mRepository.deleteAllUsers();
         mRepository.resetAllScores();
+        mFlashcardRepository.resetEverything();
     }
 
     public LiveData<Integer> getEmailValidVisibility() {

@@ -125,7 +125,6 @@ public class FlashcardRepository {
         and the values for the top progress bar and text are set,
         and the visibility for the different card types are set up.
          */
-        //TODO
 
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
@@ -178,6 +177,14 @@ public class FlashcardRepository {
 
     }
 
+    public void resetEverything(){
+        finishedList.clear();
+        setAtBeginning = false;
+       // mediatorVocabList = null;
+        //vocabList = mVocabDao.getVocabQueue();
+       // finishedList.clear();
+    }
+
     public void getUserInfoFromRoom(){
        // currentUser = mUserDao.getUser();
     }
@@ -185,7 +192,12 @@ public class FlashcardRepository {
     public void addSource(){
         if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
             System.out.println("*\n*\nADDING SOURCE\n*\n*");
-            mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+            try {
+                mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+            }catch(Exception e){
+                System.out.println("Error: " + e);
+
+            }
         }
     }
 
@@ -326,7 +338,8 @@ public class FlashcardRepository {
         private VocabDao mAsyncTaskDao;
         private String scoreList="";
         private String studyingList="";
-        private String tempS,tempS2;
+        private String freqList="";
+        private String tempS,tempS2,tempS3;
         private DatabaseService apiService;
         private String username;
         private boolean loggedIn;
@@ -350,9 +363,11 @@ public class FlashcardRepository {
             System.out.println("what im looking for: "+ mAsyncTaskDao.getA1Scores());
             scoreList = mAsyncTaskDao.getA1Scores().toString();
             studyingList = mAsyncTaskDao.getA1Studying().toString();
+            freqList = mAsyncTaskDao.getA1Freq().toString();
             System.out.println(scoreList);
             tempS = scoreList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
             tempS2 = studyingList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
+            tempS3 = freqList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
             return null;
         }
 
@@ -360,20 +375,15 @@ public class FlashcardRepository {
         protected void onPostExecute(Void v){
             if (loggedIn){
                 System.out.println("Finished updating room database, calling to update remote database.");
-                System.out.println(tempS);
-                //NEED TO CHEKC IF LOGGED IN SOMEHOW (make a separate async task without the post execute call and check in the flashcardviewmodel  movetonextnode method?)
-                //scoreList ...
-                //Make the call to update the remote database
-                System.out.println(username);
 
-                Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,"3",tempS2);//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
+                Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,tempS3,tempS2);//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
                 call.enqueue(new Callback<CreateUploadDataResponse>() {
                     @Override
                     public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
                         System.out.println("Response to creating save data");
                         System.out.println(response);
                         CreateUploadDataResponse lr = response.body();
-                        System.out.println(lr);
+                        System.out.println("Body is : " + lr);
 
                     }
 

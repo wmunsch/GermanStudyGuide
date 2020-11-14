@@ -3,9 +3,9 @@ package com.williammunsch.germanstudyguide;
 import java.util.List;
 
 public class CreateUploadDataResponse {
-    List<String> response;
+    String response;
 
-    public CreateUploadDataResponse(List<String> response){
+    public CreateUploadDataResponse(String response){
         this.response = response;
     }
 

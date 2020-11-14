@@ -15,6 +15,7 @@ public class SaveDataResponse {
 
     }
 
+    public String getTablename(){return tablename;}
     public String getFreq() {
         return freq;
     }

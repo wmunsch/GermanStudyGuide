@@ -33,7 +33,7 @@ public interface VocabDao {
 
 
     //Gets # of new vocab and # of old vocab for review combined
-    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY studying ASC")
+    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score,freq LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY score ASC")
     LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets 20 learned vocab for review after learning all
@@ -72,8 +72,8 @@ public interface VocabDao {
     /**
      *Better way of updating vocab scores when logging in
      */
-    @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying WHERE _id = :id")
-    void updateVocabScore(int score, int studying, int id);
+    @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
+    void updateVocabScore(int score, int studying, int freq, int id);
 
    // @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
    // void updateVocabScore(int score, int id);
@@ -119,6 +119,12 @@ public interface VocabDao {
     @Query("SELECT COUNT(*) FROM  vocab_tableA1")
     Integer countA1();
 
+
+    /**
+     * Get the freq list in one string to upload to the remote database.
+     */
+    @Query("SELECT freq FROM vocab_tableA1")
+    List<Integer> getA1Freq();
 
     /**
      * Get all studying list in one string to upload to remote database.
