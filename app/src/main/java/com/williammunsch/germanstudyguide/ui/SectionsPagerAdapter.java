@@ -65,9 +65,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         if (position==0){
             return VocabFragment.newInstance(0);
         }else if (position==1){
-            return StoriesFragment.newInstance(1);
+            return GrammarFragment.newInstance(1);
         }else{
-            return OptionsFragment.newInstance(2);
+            return StoriesFragment.newInstance(2);
         }
 
     }

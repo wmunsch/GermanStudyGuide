@@ -29,6 +29,11 @@ public abstract class ViewModelModule {
     @ViewModelKey(MainActivityViewModel.class)
     abstract ViewModel bindMainActivityViewModel(MainActivityViewModel mainActivityViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(NounGenderViewModel.class)
+    abstract ViewModel bindNounGenderViewModel(NounGenderViewModel nounGenderViewModel);
+
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);

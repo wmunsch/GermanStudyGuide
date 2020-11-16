@@ -172,7 +172,9 @@ public class Repository {
         return false;
     }
 
-
+    public VocabDao getmVocabDao() {
+        return mVocabDao;
+    }
 
     public void getUserInfoFromRoom(){
         currentUser = mUserDao.getUser();

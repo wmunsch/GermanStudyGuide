@@ -6,12 +6,17 @@ import android.app.Application;
 import com.williammunsch.germanstudyguide.FlashcardActivity;
 import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.MainActivity;
+import com.williammunsch.germanstudyguide.NounGenderActivity;
+import com.williammunsch.germanstudyguide.adapters.GrammarRecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
+import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
+import com.williammunsch.germanstudyguide.ui.GrammarFragment;
 import com.williammunsch.germanstudyguide.ui.ProfileFragment;
 import com.williammunsch.germanstudyguide.ui.VocabFragment;
 import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel;
+import com.williammunsch.germanstudyguide.viewmodels.NounGenderViewModel;
 import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 
 import javax.inject.Singleton;
@@ -50,6 +55,15 @@ public interface AppComponent {
     void inject(MainActivityViewModel mainActivityViewModel);
 
     void inject(ProfileFragment profileFragment);
+
+    void inject(NounGenderActivity nounGenderActivity);
+
+    void inject(GrammarFragment grammarFragment);
+
+    void inject(NounGenderViewModel nounGenderViewModel);
+
+    void inject(NounGenderRepository nounGenderRepository);
+
 
 
 

@@ -48,8 +48,8 @@
                     android:textColor="#000000"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toTopOf="@+id/flashcardProgressBar"
-                    app:layout_constraintEnd_toStartOf="@+id/streakIcon"
-                    app:layout_constraintStart_toEndOf="@+id/userIcon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ProgressBar
@@ -62,28 +62,11 @@
                     android:progressBackgroundTint="#333333"
                     android:progressTint="#ffe869"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/streakIcon"
-                    app:layout_constraintStart_toEndOf="@+id/userIcon">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
                 </ProgressBar>
 
-                <ImageView
-                    android:id="@+id/streakIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
-                    android:src="@drawable/ic_streak6"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12"
-                    android:textColor="#000"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/streakIcon" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.appcompat.widget.Toolbar>

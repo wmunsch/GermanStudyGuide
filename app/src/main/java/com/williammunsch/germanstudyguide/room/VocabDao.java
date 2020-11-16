@@ -40,6 +40,13 @@ public interface VocabDao {
     @Query("SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 20")
     LiveData<List<VocabModelA1>> getVocabQueueFinished();
 
+    //Gets 20 nouns for the noun gender activity
+    @Query("SELECT * FROM vocab_tableA1 WHERE article!=''")
+    LiveData<List<VocabModelA1>> getNounQueue();
+
+    //Gets 1 noun to add for the noun gender activity
+    @Query("SELECT * FROM vocab_tableA1 WHERE article!='' LIMIT 1")
+    LiveData<VocabModelA1> getOneNoun();
 
     //Gets all studying from ROOM for uploading to remote database
    // @Query("SELECT studying FROM vocab_tableA1 ORDER BY _id")

@@ -18,11 +18,12 @@ public class VocabModelA1 {
     private int studying;
     private String german;
     private String english;
+    private String article;
     private String gsentence;
     private String esentence;
     //private String[] englishStringsArray;
 
-    public VocabModelA1(int id, String german, String english, String gsentence, String esentence, int studying){//}, int score, int freq, int studying){
+    public VocabModelA1(int id, String german, String english, String gsentence, String esentence, int studying, String article){//}, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
@@ -31,6 +32,7 @@ public class VocabModelA1 {
        // this.score = score;
        // this.freq = freq;
         this.studying = studying;
+        this.article = article;
 
     }
 
@@ -98,6 +100,8 @@ public class VocabModelA1 {
     }
 
 
+    public String getArticle(){return article;}
+    public void setArticle(String a){this.article = a;}
 
     public int getId() {
         return _id;
