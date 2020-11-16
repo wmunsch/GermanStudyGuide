@@ -25,9 +25,12 @@ import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter that holds the vocabulary tabs such as (A1) Beginner Level 1 and the experience bar
+ */
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
     private List<VocabListItem> mVocabList;
-    private Integer a1Max;
+    private Integer a1Max=0, a1Learned=0, a1Percent=0,a1Mastered=0, a1MasteredPercent=0;
     private Context mContext;
     private VocabListViewModel vocabListViewModel;
    // private int a1Max;
@@ -57,33 +60,52 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, final int i) {
         viewHolder.listItemName.setText(mVocabList.get(i).getName());
         viewHolder.image.setText(mVocabList.get(i).getImage());
-        viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
-        viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
+        //viewHolder.progressBar.setSecondaryProgress(mVocabList.get(i).getLearnedPercent());
+       // viewHolder.progressBar.setProgress(mVocabList.get(i).getMasteredPercent());
+       // a1Percent = (int)(((double)a1Learned/a1Max)*100);
+        //viewHolder.progressBar.setProgress((int)(((double)a1Learned/a1Max)*100)); //This sets the progressbar for each lesson on the main page
+        viewHolder.progressBar.setProgress(a1MasteredPercent);
+        viewHolder.progressBar.setSecondaryProgress(a1Percent);
 
 
+        if (a1Learned < a1Max){
+            viewHolder.wordsLearned.setText("Words learned : " + a1Learned + "/" + a1Max);
+            viewHolder.learnButton.setText("Learn");
+        }else{
+            viewHolder.wordsLearned.setText("Words mastered: " + a1Mastered + "/" + a1Max);
+            viewHolder.learnButton.setText("Study");
+        }
 
-
-        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + a1Max);}
-       else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + a1Max); }
+       // if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.wordsLearned.setText("Words mastered : " + mVocabList.get(i).getWordsMastered() + "/" + a1Max);}
+       //else{ viewHolder.wordsLearned.setText("Words learned : " + mVocabList.get(i).getWordsLearned() + "/" + a1Max); }
+       // else{ viewHolder.wordsLearned.setText("Words learned : " + a1Learned + "/" + a1Max); }
 
 
 
         if (i==0 || i ==1){
-            viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle,null));
+           // System.out.println("words : " + a1Learned + "   /   " + a1Max );
+            if (a1Learned<a1Max){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle1,null));}//a1circle1
+            else{
+                if (a1Mastered<a1Max){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle2,null));} //a1circle2
+                else{viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle3,null));}//a1circle3
+            }
         }else if (i==2 || i==3){
-            viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.bcircle,null));
+            //TODO create the circles for b1,b2 and the if statements here
+            viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle3,null));
         }else if (i==4||i==5){
+            //TODO create the circles for c1,c2 and the if statements here
             viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ccircle,null));
         }
 
-        if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.learnButton.setText("Study");}
-        if ((int)mVocabList.get(i).getMasteredPercent()==100){viewHolder.learnButton.setText("Review");}
+        //if ((int)mVocabList.get(i).getLearnedPercent()==100){viewHolder.learnButton.setText("Study");}
+       // if ((int)mVocabList.get(i).getMasteredPercent()==100){viewHolder.learnButton.setText("Review");}
 
-
+/*
         viewHolder.viewButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 System.out.println("Clicked on viewbutton");
+
 
                 if (viewHolder.getAdapterPosition()==0){
                     Intent intent = new Intent(mContext, ViewActivity.class);
@@ -97,6 +119,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
         });
+*/
 
         viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -127,8 +150,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
                   @Override
             public void onClick(View view){
+                      //TODO : set minimum height and isExpanded when clicking on other ones
                       if (!viewHolder.isExpanded){
-                          viewHolder.parentLayout.setMinimumHeight(500);
+                          viewHolder.parentLayout.setMinimumHeight(450);
                           viewHolder.buttonLayout.setVisibility(View.VISIBLE);
                           //viewHolder.buttonLayout.startAnimation(slideDown);
                           viewHolder.isExpanded=true;}
@@ -163,6 +187,26 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
+    public void setA1Learned(Integer i ){
+        this.a1Learned = i;
+        //TODO change the 14 back to 700
+        a1Percent = (int)(((double)a1Learned/700)*100); //Sets the progress bar for the main page activities A1, etc.
+
+        notifyDataSetChanged();
+    }
+
+    public void setA1Mastered(Integer i){
+        this.a1Mastered = i;
+        //TODO change the 14 back to 700
+        a1MasteredPercent = (int)(((double)a1Mastered/700)*100); //Sets the progress bar for the main page activities A1, etc.
+        notifyDataSetChanged();
+    }
+
+    public void setA1Percent(Integer i){
+        this.a1Percent = i;
+        notifyDataSetChanged();
+    }
+
 
     /**
      * Holds each widget in memory for it to be recycled.
@@ -182,7 +226,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             parentLayout = itemView.findViewById(R.id.parent_layout);
             buttonLayout = itemView.findViewById(R.id.buttonLayout);
             wordsLearned = itemView.findViewById(R.id.wordsLearnedTV);
-            viewButton = itemView.findViewById(R.id.viewButton);
+//            viewButton = itemView.findViewById(R.id.viewButton);
             learnButton = itemView.findViewById(R.id.learnButton);
         }
     }

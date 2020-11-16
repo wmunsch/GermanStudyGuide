@@ -10,7 +10,11 @@ import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
-@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class}, version = 3)
+/**
+ * The ROOM database which stores vocab, sentences, score, frequency, and isStudying
+ */
+
+@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class}, version = 4, exportSchema = false)
 public abstract class GermanDatabase extends RoomDatabase {
     //private static GermanDatabase instance;
 

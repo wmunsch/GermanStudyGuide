@@ -2,9 +2,11 @@ package com.williammunsch.germanstudyguide;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityMainBinding;
 import com.williammunsch.germanstudyguide.ui.LoginDialogFragment;
@@ -47,11 +50,12 @@ public class MainActivity extends AppCompatActivity {
         binding.loginClickable.setOnClickListener((View view)->
                 binding.drawerLayout.openDrawer(GravityCompat.START));
 
+
         //TODO : Close the keyboard when clicking off of the login page drawer
         fm = getSupportFragmentManager();
         mainActivityViewModel.getErrorCode().observe(this, code ->{
             if (code==1){
-                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account not found","The email you provided is not registered.\nPlease make sure you entered the\ncorrect email and try again.");
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account not found","The username you provided is not registered.\nPlease make sure you entered the\ncorrect username and try again.");
                 loginDialogFragment.show(fm,"loginDialogFrament");
             }else if (code==2){
                 LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Incorrect password","The password you entered was incorrect.\nPlease make sure you entered the\ncorrect password and try again.");
@@ -62,17 +66,28 @@ public class MainActivity extends AppCompatActivity {
             }else if (code==3){
                 //login
                 //TODO : Handle successful login (change fragment?)
+                binding.etPassword.setText("");
+               // binding.etEmail.setText("");
                 System.out.println("LOGGING IN");
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
             }else if (code==4){
                 //registered an account, close the drawer and show verification sent popup.
-                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Verification","A verification has been sent to your email.\nPlease click the link sent\nto complete the registration.");
+               // LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Verification","A verification has been sent to your email.\nPlease click the link sent\nto complete the registration.");
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Account Created","Welcome to your German study guide!\nGet started by studying vocabulary,\nthen test your skills by reading.");
                 loginDialogFragment.show(fm,"loginDialogFragment");
-                //TODO : Handle successful registration (auto-login?)
-                System.out.println("Sent registration");
+
+                //System.out.println("Sent registration");
+                //binding.etEmailR.setText("");
+                binding.etPasswordR.setText("");
+                binding.etUsernameR.setText("");
+
                 binding.drawerLayout.closeDrawer(GravityCompat.START);
                 closeKeyboard();
+
+            }else if (code==5){
+                LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance("Error connecting","Check to see if you're connected\nto the internet and try again.");
+                loginDialogFragment.show(fm,"loginDialogFrament");
             }
         });
 
@@ -108,6 +123,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageScrollStateChanged(int i) { }
         });
+
+
+
+
     }
 
 

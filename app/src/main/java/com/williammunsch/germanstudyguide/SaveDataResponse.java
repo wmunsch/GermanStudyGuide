@@ -1,25 +1,32 @@
 package com.williammunsch.germanstudyguide;
 
 public class SaveDataResponse {
-    private String freqList;
-    private String scoreList;
-    private String studyingList;
+    private String error;
+    private String tablename;
+    private String freq;
+    private String score;
+    private String studying;
 
-    public SaveDataResponse(String freqList, String scoreList, String studyingList) {
-        this.freqList = freqList;
-        this.scoreList = scoreList;
-        this.studyingList = studyingList;
+    public SaveDataResponse(String tablename, String score, String freq, String studying) {
+        this.tablename = tablename;
+        this.freq = freq;
+        this.score = score;
+        this.studying = studying;
+
     }
 
-    public String getFreqList() {
-        return freqList;
+    public String getTablename(){return tablename;}
+    public String getFreq() {
+        return freq;
     }
 
-    public String getScoreList() {
-        return scoreList;
+    public String getScore() {
+        return score;
     }
 
-    public String getStudyingList() {
-        return studyingList;
+    public String getStudying() {
+        return studying;
     }
+
+    public String toString() {return tablename + "\n" + score + "\n" + freq + "\n" + studying;}
 }

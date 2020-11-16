@@ -15,6 +15,7 @@
 
     </data>
 
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
@@ -22,10 +23,75 @@
         android:fitsSystemWindows="true">
 
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
              tools:context=".MainActivity">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:translationZ="1dp"
+                android:onClick="@{() -> mainactivityviewmodel.retryDownloads()}"
+                android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:focusable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Error downloading data\nTap to try again"
+                    android:textColor="#737373"
+                    android:textAlignment="center"
+                    android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                    app:layout_constraintBottom_toTopOf="@id/errorDownloadingImage"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/errorDownloadingImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_cached_48px"
+                    android:visibility="@{mainactivityviewmodel.couldNotConnectVisibility, default=gone}"
+                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading Data"
+                android:textColor="@color/colorAccent"
+                android:visibility="@{mainactivityviewmodel.showLoadingBar, default=gone}"
+                app:layout_constraintBottom_toTopOf="@id/progressBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="@{mainactivityviewmodel.showLoadingBar, default=gone}"
+                android:indeterminateTint="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -77,12 +143,12 @@
 
 
 
-
+<!--   streak stuff
                     <ImageView
                         android:id="@+id/streakIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_streak6"
+                        android:src="@drawable/ic_whatshot_24px"
                         android:layout_marginEnd="15dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -95,6 +161,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@id/streakIcon"
                         />
+ -->
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.appcompat.widget.Toolbar>
@@ -103,26 +170,25 @@
                 android:id="@+id/nav_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
                 android:background="?android:attr/windowBackground"
+                android:theme="@style/NavBarTheme"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:menu="@menu/bottom_nav_menu"
-                android:theme="@style/NavBarTheme"
-                >
-            </com.google.android.material.bottomnavigation.BottomNavigationView>
+                app:menu="@menu/bottom_nav_menu" />
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:visibility="@{mainactivityviewmodel.showViewPager, default=visible}"
                 app:layout_constraintBottom_toTopOf="@id/nav_view"
                 app:layout_constraintTop_toBottomOf="@id/toolbar"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
             </androidx.viewpager.widget.ViewPager>
 
 
@@ -134,6 +200,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            android:fitsSystemWindows="true"
             android:background="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -144,6 +211,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:layout_marginTop="0dp"
+                android:paddingTop="15dp"
+                android:fitsSystemWindows="true"
                 android:visibility="@{mainactivityviewmodel.loginVisibility}"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -154,7 +224,7 @@
                     android:layout_marginTop="15dp"
                     android:background="@drawable/button_selector"
                     android:text="@string/log_in"
-                    android:onClick="@{() -> mainactivityviewmodel.logIn(etEmail.getText(),etPassword.getText())}"
+                    android:onClick="@{() -> mainactivityviewmodel.logIn(etUsername.getText(),etPassword.getText())}"
                     android:textAllCaps="false"
                     android:textColor="#ffffff"
                     android:textSize="16sp"
@@ -163,11 +233,11 @@
                     app:layout_constraintTop_toBottomOf="@+id/button3" />
 
                 <EditText
-                    android:id="@+id/et_email"
+                    android:id="@+id/et_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:inputType="textEmailAddress"
+                    android:inputType="text"
                     android:text=""
                     android:textAlignment="center"
                     android:background="@drawable/edittext_background"
@@ -241,7 +311,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@string/email"
+                    android:text="@string/username"
                     android:textColor="#000000"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -258,7 +328,7 @@
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/et_email" />
+                    app:layout_constraintTop_toBottomOf="@+id/et_username" />
 
                 <TextView
                     android:id="@+id/button3"
@@ -283,6 +353,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:layout_marginTop="0dp"
+                android:paddingTop="25dp"
                 android:visibility="@{mainactivityviewmodel.profileVisibility}"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -314,14 +386,7 @@
                             android:text="@{mainactivityviewmodel.userName}"
                             tools:layout_editor_absoluteX="260dp"
                             tools:layout_editor_absoluteY="13dp" />
-                        <TextView
-                            android:id="@+id/tv_email_in_drawer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="5dp"
-                            android:text="@{mainactivityviewmodel.userEmail}"
-                            tools:layout_editor_absoluteX="31dp"
-                            tools:layout_editor_absoluteY="121dp" />
+
 
                     </LinearLayout>
                 </LinearLayout>
@@ -360,7 +425,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-
+                    android:paddingTop="15dp"
+                    android:fitsSystemWindows="true"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                     <Button
@@ -370,7 +436,7 @@
                         android:layout_marginTop="15dp"
                         android:background="@drawable/button_selector"
                         android:text="@string/register"
-                        android:onClick="@{() -> mainactivityviewmodel.checkEmailAndPassword(etEmailR.getText(),etPasswordR.getText(),etUsernameR.getText())}"
+                        android:onClick="@{() -> mainactivityviewmodel.checkEmailAndPassword(etPasswordR.getText(),etUsernameR.getText())}"
                         android:textAllCaps="false"
                         android:textColor="#ffffff"
                         android:textSize="16sp"
@@ -391,18 +457,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_userNameR" />
 
-                    <EditText
-                        android:id="@+id/et_emailR"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:inputType="textEmailAddress"
-                        android:text=""
-                        android:textAlignment="center"
-                        android:background="@drawable/edittext_background"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_emailR" />
+
 
                     <EditText
                         android:id="@+id/et_passwordR"
@@ -440,17 +495,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/imageView3R" />
-                    <TextView
-                        android:id="@+id/tv_emailR"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/email"
-                        android:textColor="#000000"
-                        android:textSize="18sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/et_usernameR" />
+
 
                     <TextView
                         android:id="@+id/tv_passwordR"
@@ -462,7 +507,7 @@
                         android:textSize="18sp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/et_emailR" />
+                        app:layout_constraintTop_toBottomOf="@+id/et_usernameR" />
                     <TextView
                         android:id="@+id/tv_email_taken"
                         android:layout_width="wrap_content"

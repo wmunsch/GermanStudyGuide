@@ -77,6 +77,7 @@ public class VocabFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+
         mVocabListViewModel.getVocabListItems().observe(this, new Observer<List<VocabListItem>>(){
 
             @Override
@@ -103,6 +104,22 @@ public class VocabFragment extends Fragment {
                 mAdapter.setA1Max(num);
             }
         });
+
+        mVocabListViewModel.getA1Learned().observe(this, new Observer<Integer>(){
+            @Override
+            public void onChanged(Integer num) {
+                mAdapter.setA1Learned(num);
+            }
+        });
+
+        mVocabListViewModel.getA1Mastered().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer num) {
+                mAdapter.setA1Mastered(num);
+            }
+        });
+
+
 
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
