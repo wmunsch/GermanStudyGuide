@@ -5,6 +5,8 @@ import com.williammunsch.germanstudyguide.CreateAccountResponse;
 import com.williammunsch.germanstudyguide.CreateUploadDataResponse;
 import com.williammunsch.germanstudyguide.LoginResponse;
 import com.williammunsch.germanstudyguide.SaveDataResponse;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
 import java.util.List;
@@ -96,5 +98,11 @@ public interface DatabaseService {
             @Field("freq_list") String freq_list,
             @Field("studying_list") String studying_list
     );
+
+    @GET("api/downloadhagsentences.php")
+    Call<List<Hag_Sentences>> downloadHagSentences();
+
+    @GET("api/downloadhagwords.php")
+    Call<List<Hag_Words>> downloadHagWords();
 
 }

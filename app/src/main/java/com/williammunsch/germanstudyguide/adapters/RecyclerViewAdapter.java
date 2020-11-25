@@ -175,7 +175,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     /**
-     * This method allows the recyclerview to be updated with livedata in the fragment while observing
+     * This function allows the recyclerview to be updated with livedata in the fragment while observing
      */
     public void setVocabList(List<VocabListItem> vocabList){
         this.mVocabList = vocabList;

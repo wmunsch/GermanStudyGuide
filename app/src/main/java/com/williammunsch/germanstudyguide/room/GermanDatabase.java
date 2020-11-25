@@ -5,7 +5,10 @@ import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
 import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
+import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
 import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
@@ -14,7 +17,7 @@ import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
  * The ROOM database which stores vocab, sentences, score, frequency, and isStudying
  */
 
-@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class}, version = 5, exportSchema = false)
+@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class, StoriesListItem.class, Hag_Sentences.class, Hag_Words.class}, version = 8, exportSchema = false)
 public abstract class GermanDatabase extends RoomDatabase {
     //private static GermanDatabase instance;
 
@@ -25,6 +28,7 @@ public abstract class GermanDatabase extends RoomDatabase {
     public abstract StoryDao storyDao();
 
     public abstract UserDao userDao();
+
 
     private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
 

@@ -54,6 +54,15 @@
                 android:value=".MainActivity" />
         </activity>
 
+        <activity
+            android:name=".StoryActivity"
+            android:parentActivityName=".MainActivity"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
 
 
         <meta-data android:name="android.max_aspect" android:value="5.0" />

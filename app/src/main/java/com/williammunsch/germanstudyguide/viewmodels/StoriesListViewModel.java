@@ -9,30 +9,29 @@ import androidx.lifecycle.ViewModel;
 import androidx.annotation.NonNull;
 
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
+import com.williammunsch.germanstudyguide.repositories.Repository;
 import com.williammunsch.germanstudyguide.repositories.StoriesRepository;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * View model for the stories recyclerView in mainActivity.
  */
-public class StoriesViewModel extends AndroidViewModel {
+public class StoriesListViewModel extends ViewModel {
 
-    private MutableLiveData<List<StoriesListItem>> mStoriesListItems;
-    private StoriesRepository mRepo;
+    private LiveData<List<StoriesListItem>> mStoriesListItems;
+    private StoriesRepository storiesRepository;
+    private Repository repository;
 
-    public StoriesViewModel(@NonNull Application application) {
-        super(application);
+    @Inject
+    public StoriesListViewModel(Repository repository) {
+        this.repository = repository;
+        //this.storiesRepository = storiesRepository;
+        mStoriesListItems = repository.getStoriesListItems();
     }
 
-    public void init(){
-        if (mStoriesListItems != null){
-            return;
-        }
-        //Storing all data in the repository in this viewModel
-        mRepo = StoriesRepository.getInstance();
-        mStoriesListItems = mRepo.getStoriesListItems(getApplication().getApplicationContext());
-    }
 
     public LiveData<List<StoriesListItem>> getStoriesListItems(){
         return mStoriesListItems;

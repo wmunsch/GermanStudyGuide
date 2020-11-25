@@ -34,6 +34,16 @@ public abstract class ViewModelModule {
     @ViewModelKey(NounGenderViewModel.class)
     abstract ViewModel bindNounGenderViewModel(NounGenderViewModel nounGenderViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(StoriesListViewModel.class)
+    abstract ViewModel bindStoriesListViewModel(StoriesListViewModel storiesListViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(StoryViewModel.class)
+    abstract ViewModel bindStoryViewModel(StoryViewModel storyViewModel);
+
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);

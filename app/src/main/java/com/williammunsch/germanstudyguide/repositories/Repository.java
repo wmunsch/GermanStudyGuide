@@ -13,10 +13,14 @@ import androidx.lifecycle.Transformations;
 import com.williammunsch.germanstudyguide.SaveDataResponse;
 import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
+import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
+import com.williammunsch.germanstudyguide.room.StoryDao;
 import com.williammunsch.germanstudyguide.room.UserDao;
 import com.williammunsch.germanstudyguide.room.VocabDao;
 import com.williammunsch.germanstudyguide.room.VocabListDao;
@@ -49,12 +53,14 @@ public class Repository {
     private VocabDao mVocabDao;
     private VocabListDao mVocabListDao;
     private UserDao mUserDao;
+    private StoryDao storyDao;
     private List<VocabListItem> dataSet;
     public DatabaseService apiService;
     private LiveData<User> currentUser;
     private LiveData<String> userName;
     private LiveData<String> userEmail;
     private LiveData<List<VocabListItem>> vocabListItemList;
+    private LiveData<List<StoriesListItem>> storiesListItems;
 
     private MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
@@ -93,7 +99,7 @@ public class Repository {
         this.db = db;
 
         mVocabDao = db.vocabDao();
-
+        storyDao = db.storyDao();
 
 
         mVocabListDao = db.vocabListDao();
@@ -151,9 +157,10 @@ public class Repository {
         });
 
         checkA1();
+        checkStories();
 
         vocabListItemList = mVocabListDao.getAllVocabLists();
-
+        storiesListItems = storyDao.getAllStoriesLists();
 
     }
 
@@ -228,6 +235,9 @@ public class Repository {
         mVocabDao.resetAllScores();
     }
 
+    public LiveData<List<StoriesListItem>> getStoriesListItems(){
+        return storiesListItems;
+    }
 
     /**
      * Called when logging in. Gets the user's save data and inputs it into the ROOM database.
@@ -344,6 +354,11 @@ public class Repository {
     }
 
 
+    public void checkStories(){
+        System.out.println("CHECKING STORIES");
+        new checkStoriesAsyncTask(storyDao,apiService).execute();
+    }
+
     public void checkA1(){
         new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao,showLoadingBar,couldNotConnectVisibility).execute();
     }
@@ -405,7 +420,6 @@ public class Repository {
         }
     }
 
-
     private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
         private VocabDao mAsyncTaskDao;
         private VocabListDao mVocabListDao;
@@ -441,7 +455,6 @@ public class Repository {
 
     }
 
-
     private static class insertVocabListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
         private VocabListDao mAsyncTaskDao;
 
@@ -455,8 +468,6 @@ public class Repository {
             return null;
         }
     }
-
-
 
     private static class insertListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
 
@@ -472,6 +483,137 @@ public class Repository {
             return null;
         }
     }
+
+    /**
+     * Async task to check whether or not the story data has been downloaded from the remote database.
+     */
+    private static class checkStoriesAsyncTask extends AsyncTask<Void, Void, Integer>{
+        private StoryDao storyDao;
+        private DatabaseService apiService;
+
+        public checkStoriesAsyncTask(StoryDao storyDao, DatabaseService databaseService){
+            this.storyDao = storyDao;
+            this.apiService = databaseService;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            System.out.println("COUNT STORIES : " + storyDao.countStories());
+            return storyDao.countStories();
+        }
+
+        @Override
+        protected void onPostExecute(Integer storyCount){
+            if (storyCount!=1){
+                System.out.println("Story count not correct, adding");
+                //Call to download the story here
+                Call<List<Hag_Sentences>> call = apiService.downloadHagSentences();
+                call.enqueue(new Callback<List<Hag_Sentences>>() {
+                    @Override
+                    public void onResponse(Call<List<Hag_Sentences>> call, Response<List<Hag_Sentences>> response) {
+                        List<Hag_Sentences> sentenceList = response.body();
+                        Hag_Sentences[] sentenceListArray = sentenceList.toArray(new Hag_Sentences[sentenceList.size()]);
+                        //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
+                        new insertSentencesAsyncTask(storyDao,apiService).execute(sentenceListArray);
+                       // new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld).execute(vocabListArray);
+                    }
+                    @Override
+                    public void onFailure(Call<List<Hag_Sentences>> call, Throwable t) {
+                        System.out.println("Error on call" + t);
+                        //muld2.setValue(View.VISIBLE);
+                        //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
+
+                    }
+                });
+            }
+         }
+    }
+
+    /**
+     * Async task to insert the story ROOM database data from the call to the remote database.
+     */
+    private static class insertSentencesAsyncTask extends AsyncTask<Hag_Sentences, Void, Void>{
+        private final StoryDao storyDao;
+        private DatabaseService apiService;
+
+        insertSentencesAsyncTask(StoryDao storyDao,DatabaseService databaseService){
+            this.storyDao = storyDao;
+            this.apiService = databaseService;
+        }
+
+        @Override
+        protected Void doInBackground(final Hag_Sentences... params) {
+            for (Hag_Sentences model : params){
+                storyDao.insertHagSentence(model);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v){
+            //Call to download the words here
+            Call<List<Hag_Words>> call = apiService.downloadHagWords();
+            call.enqueue(new Callback<List<Hag_Words>>() {
+                @Override
+                public void onResponse(Call<List<Hag_Words>> call, Response<List<Hag_Words>> response) {
+                    List<Hag_Words> wordList = response.body();
+                    Hag_Words[] wordListArray = wordList.toArray(new Hag_Words[wordList.size()]);
+                    new insertHagWordsAsyncTask(storyDao).execute(wordListArray);
+
+                }
+                @Override
+                public void onFailure(Call<List<Hag_Words>> call, Throwable t) {
+                    System.out.println("Error on call" + t);
+                    //muld2.setValue(View.VISIBLE);
+                    //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
+
+                }
+            });
+
+        }
+
+    }
+
+    private static class insertHagWordsAsyncTask extends AsyncTask<Hag_Words, Void, Void>{
+        private final StoryDao storyDao;
+        insertHagWordsAsyncTask(StoryDao storyDao){
+            this.storyDao = storyDao;
+        }
+
+        @Override
+        protected Void doInBackground(final Hag_Words... params) {
+            for (Hag_Words model : params){
+                storyDao.insertHagWord(model);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v){
+            new insertStoryListAsyncTask(storyDao).execute(new StoriesListItem("Hänsel und Gretel","der Brüder Grimm"));
+        }
+
+    }
+
+    /**
+     * Async task to insert the story into the story list ROOM table, so the viewpager will show it on the 3rd recyclerview.
+     */
+    private static class insertStoryListAsyncTask extends AsyncTask<StoriesListItem, Void, Void> {
+        private final StoryDao storyDao;
+
+        insertStoryListAsyncTask(StoryDao dao) {
+            this.storyDao=dao;
+        }
+
+        @Override
+        protected Void doInBackground(final StoriesListItem... params) {
+            storyDao.insert(params[0]);
+            System.out.println("Added the story!");
+            return null;
+        }
+    }
+
+
 
 
     /**
