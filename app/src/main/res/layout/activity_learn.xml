@@ -31,14 +31,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/userIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_usericon2"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textView4"
@@ -152,12 +144,8 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
             android:padding="10dp"
-
-
-
             android:text="@{flashcardviewmodel.currentNode.gsentence}"
             android:textAlignment="center"
-
             android:textSize="16sp"
             android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
             app:layout_constraintEnd_toEndOf="parent"

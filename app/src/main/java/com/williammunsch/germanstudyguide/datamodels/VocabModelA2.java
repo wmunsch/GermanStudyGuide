@@ -3,13 +3,8 @@ package com.williammunsch.germanstudyguide.datamodels;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-
-/**
- * Table for the A1 700 vocabulary words with sentences.
- * Only gets updated if the database is changed, or downloaded on app installation.
- */
-@Entity(tableName = "vocab_tableA1")
-public class VocabModelA1 {
+@Entity(tableName = "vocab_tableA2")
+public class VocabModelA2 {
     @PrimaryKey
     private int _id;
 
@@ -21,16 +16,15 @@ public class VocabModelA1 {
     private String article;
     private String gsentence;
     private String esentence;
-    //private String[] englishStringsArray;
 
-    public VocabModelA1(int id, String german, String english, String gsentence, String esentence, int studying, String article){//}, int score, int freq, int studying){
+    public VocabModelA2(int id, String german, String english, String gsentence, String esentence, int studying, String article){//}, int score, int freq, int studying){
         this._id = id;
         this.german = german;
         this.english = english;
         this.gsentence = gsentence;
         this.esentence = esentence;
-       // this.score = score;
-       // this.freq = freq;
+        // this.score = score;
+        // this.freq = freq;
         this.studying = studying;
         this.article = article;
 
@@ -38,12 +32,11 @@ public class VocabModelA1 {
 
     public String toString(int score){
         if (score > 50){
-            String tempS = english.replace(",",", ");
-            return tempS;
+            return english;
         }else{
             return german;
         }
-       // return _id+ " " + german+ " " +english;
+        // return _id+ " " + german+ " " +english;
     }
 
     public String getAnswer(int score){

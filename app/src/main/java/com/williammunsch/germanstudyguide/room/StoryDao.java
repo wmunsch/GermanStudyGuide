@@ -49,6 +49,10 @@ public interface StoryDao {
     LiveData<Hag_Words> getWord2(String german);
 
 
+    @Query("SELECT * FROM hag_words WHERE german = 'und'")
+    Hag_Words getWord3();
+
+
 
 
 }

@@ -226,6 +226,7 @@ public class MainActivityViewModel extends ViewModel {
      */
     public void retryDownloads(){
         mRepository.checkA1();
+        //mRepository.checkStories();
     }
 
 

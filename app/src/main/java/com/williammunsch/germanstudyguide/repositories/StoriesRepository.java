@@ -80,7 +80,7 @@ public class StoriesRepository {
         });
 
         currentSentenceWordList = Transformations.map(mediatorSentence, value -> {
-            pageNumberText.setValue(pageOn+1 + " / 200");
+            pageNumberText.setValue(pageOn+1 + " / 106");
             if (mediatorSentence.getValue() != null){
                 String tempString = mediatorSentence.getValue().get(pageOn).getGerman();
                 //tempString = tempString.replace(";","");
@@ -99,6 +99,7 @@ public class StoriesRepository {
 
         hagWordLive = Transformations.map(mHagWord, value -> {
             if (mHagWord.getValue() != null){
+                mHagWord.getValue().setGerman(mHagWord.getValue().getGerman() + "  -  ");
                 return mHagWord.getValue();
             }
             return null;
@@ -111,7 +112,7 @@ public class StoriesRepository {
 
 
     public void pageForward(){
-        if (pageOn<6){//mediatorSentence.getValue().size()-1){
+        if (pageOn<105){//mediatorSentence.getValue().size()-1){
             pageOn++;
         }
         mediatorSentence.setValue(mediatorSentence.getValue());
@@ -176,9 +177,11 @@ public class StoriesRepository {
             }else{
                 tempString ="";
             }
-            new getHagWordAsyncTask(tempString,storyDao,mHagWord).execute();
+            System.out.println("looking for : " + tempString);
+            new getHagWordAsyncTask(storyDao,mHagWord).execute(tempString);
         }
         catch(Exception e){
+            System.out.println("EXCEPTION");
             mHagWord.setValue(new Hag_Words("","",""));
         }
 
@@ -195,26 +198,33 @@ public class StoriesRepository {
     /**
      * Takes the word that was clicked on and searches for it in the ROOM database.
      */
-    private static class getHagWordAsyncTask extends AsyncTask<Void, Void, Void> {
+    private static class getHagWordAsyncTask extends AsyncTask<String, Void, Void> {
         StoryDao storyDao;
         Hag_Words hagWord;
-        String s;
+        //String s;
         MediatorLiveData<Hag_Words> mld;
-        getHagWordAsyncTask(String s, StoryDao storyDao, MediatorLiveData<Hag_Words> mld){
+        getHagWordAsyncTask(StoryDao storyDao, MediatorLiveData<Hag_Words> mld){
             this.storyDao = storyDao;
-            this.s = s;
+            //this.s = s;
             this.mld = mld;
         }
 
         @Override
-        protected Void doInBackground( Void... params) {
-            hagWord = storyDao.getWord(s);
-            if (hagWord == null) {s = s.toLowerCase();hagWord = storyDao.getWord(s);}
+        protected Void doInBackground(String... params) {
+            System.out.println("running search for " + params[0]);
+            hagWord = storyDao.getWord(params[0]);
+            if (hagWord == null) {
+                System.out.println("First was null, running again in lower case");
+                String tempS= "";
+                tempS = params[0].toLowerCase();
+                hagWord = storyDao.getWord(tempS);
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            System.out.println(hagWord);
             mld.setValue(hagWord);
         }
     }

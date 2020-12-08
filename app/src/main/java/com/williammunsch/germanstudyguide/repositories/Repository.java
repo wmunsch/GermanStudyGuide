@@ -15,8 +15,10 @@ import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
+import com.williammunsch.germanstudyguide.datamodels.LocalSaveA1;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
+import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
@@ -157,7 +159,7 @@ public class Repository {
         });
 
         checkA1();
-        checkStories();
+        //checkStories();
 
         vocabListItemList = mVocabListDao.getAllVocabLists();
         storiesListItems = storyDao.getAllStoriesLists();
@@ -233,6 +235,7 @@ public class Repository {
         //deleteUser();
         //deleteAllScores();
         mVocabDao.resetAllScores();
+        //TODO : get save data from local unlogged save
     }
 
     public LiveData<List<StoriesListItem>> getStoriesListItems(){
@@ -265,11 +268,7 @@ public class Repository {
                         String[] freq = data.getFreq().split(",");
                         updateVocabDataOnLogin(scores, studying, freq);
                     }
-
-
                 }
-
-
             }
             @Override
             public void onFailure(Call<SaveDataResponse> call, Throwable t) {
@@ -343,7 +342,7 @@ public class Repository {
 
     public void deleteAllScores(){new deleteA1AsyncTask(mVocabDao).execute();}
 
-    public void resetAllScores(){new resetA1AsyncTask(mVocabDao).execute();}
+    public void resetAllScores(){new resetA1AsyncTask(mVocabDao,showLoadingBar,showViewPager).execute();}
 
     public LiveData<Integer> count() {
         return mVocabDao.count();
@@ -356,11 +355,11 @@ public class Repository {
 
     public void checkStories(){
         System.out.println("CHECKING STORIES");
-        new checkStoriesAsyncTask(storyDao,apiService).execute();
+        //new checkStoriesAsyncTask(storyDao,apiService).execute();
     }
 
     public void checkA1(){
-        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao,showLoadingBar,couldNotConnectVisibility).execute();
+        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao,showLoadingBar,couldNotConnectVisibility,showViewPager,storyDao).execute();
     }
     /**
      * Checks to see if the A1 table has been downloaded to the local database, if not, downloads it.
@@ -369,20 +368,24 @@ public class Repository {
     private static class checkA1AsyncTask extends AsyncTask<Void, Void, Integer> {
         private VocabDao mAsyncTaskDao;
         private VocabListDao mVocabListDao;
+        private StoryDao storyDao;
         private DatabaseService apiService;
-        private final MutableLiveData<Integer> muld, muld2;
+        private final MutableLiveData<Integer> muld, muld2, muld3;
 
-        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2) {
+        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2, MutableLiveData<Integer> mld3,StoryDao storyDao) {
             mAsyncTaskDao = dao;
             apiService = api;
             mVocabListDao = vDao;
             muld=mld;
             muld2 = mld2;
+            muld3 = mld3;
+            this.storyDao = storyDao;
         }
 
         @Override
         protected void onPreExecute() {
             muld2.setValue(View.GONE);
+            //muld3.setValue(View.GONE);
         }
 
         @Override
@@ -402,12 +405,13 @@ public class Repository {
                         List<VocabModelA1> vocabList = response.body();
                         VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
                         //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
-                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld).execute(vocabListArray);
+                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld,muld3,storyDao,apiService).execute(vocabListArray);
                     }
                     @Override
                     public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
                         System.out.println("Error on call" + t);
                         muld2.setValue(View.VISIBLE);
+                        muld3.setValue(View.GONE);
                         //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
 
                     }
@@ -423,23 +427,32 @@ public class Repository {
     private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
         private VocabDao mAsyncTaskDao;
         private VocabListDao mVocabListDao;
-        private final MutableLiveData<Integer> muld;
+        private StoryDao storyDao;
+        private DatabaseService apiService;
+        private final MutableLiveData<Integer> muld,muld2;
 
-        insertAsyncTask(VocabDao dao, VocabListDao vlDao, MutableLiveData<Integer> mld) {
+        insertAsyncTask(VocabDao dao, VocabListDao vlDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2,StoryDao storyDao,DatabaseService apiService) {
             mAsyncTaskDao = dao;
             mVocabListDao = vlDao;
             muld=mld;
+            muld2 = mld2;
+            this.storyDao = storyDao;
+            this.apiService = apiService;
         }
 
         @Override
         protected void onPreExecute() {
             muld.setValue(View.VISIBLE);
+            muld2.setValue(View.GONE);
         }
 
         @Override
         protected Void doInBackground(final VocabModelA1... params) {
+            int incremental = 1;
             for (VocabModelA1 model : params){
                 mAsyncTaskDao.insert(model);
+                mAsyncTaskDao.insertLocal(new LocalSaveA1(incremental,0,0,0));
+                incremental++;
             }
             return null;
         }
@@ -447,9 +460,12 @@ public class Repository {
         @Override
         protected void onPostExecute(Void v){
             //Add the vocab list item
-            muld.setValue(View.GONE);
+            //muld.setValue(View.GONE);
+            //muld2.setValue(View.VISIBLE);
             new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","  A1",0,0,0));
-           // new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 2","  A2",0,0,0));
+
+            new checkStoriesAsyncTask(storyDao,apiService,muld,muld2).execute();
+            // new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 2","  A2",0,0,0));
           //  new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Intermediate Level 1","  B1",0,0,0));
         }
 
@@ -490,10 +506,13 @@ public class Repository {
     private static class checkStoriesAsyncTask extends AsyncTask<Void, Void, Integer>{
         private StoryDao storyDao;
         private DatabaseService apiService;
+        private final MutableLiveData<Integer> muld,muld2;
 
-        public checkStoriesAsyncTask(StoryDao storyDao, DatabaseService databaseService){
+        public checkStoriesAsyncTask(StoryDao storyDao, DatabaseService databaseService,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
             this.storyDao = storyDao;
             this.apiService = databaseService;
+            muld = mld;
+            muld2 = mld2;
         }
 
         @Override
@@ -514,7 +533,7 @@ public class Repository {
                         List<Hag_Sentences> sentenceList = response.body();
                         Hag_Sentences[] sentenceListArray = sentenceList.toArray(new Hag_Sentences[sentenceList.size()]);
                         //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
-                        new insertSentencesAsyncTask(storyDao,apiService).execute(sentenceListArray);
+                        new insertSentencesAsyncTask(storyDao,apiService,muld,muld2).execute(sentenceListArray);
                        // new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld).execute(vocabListArray);
                     }
                     @Override
@@ -535,10 +554,13 @@ public class Repository {
     private static class insertSentencesAsyncTask extends AsyncTask<Hag_Sentences, Void, Void>{
         private final StoryDao storyDao;
         private DatabaseService apiService;
+        private final MutableLiveData<Integer> muld,muld2;
 
-        insertSentencesAsyncTask(StoryDao storyDao,DatabaseService databaseService){
+        insertSentencesAsyncTask(StoryDao storyDao,DatabaseService databaseService,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
             this.storyDao = storyDao;
             this.apiService = databaseService;
+            muld = mld;
+            muld2 = mld2;
         }
 
         @Override
@@ -558,7 +580,7 @@ public class Repository {
                 public void onResponse(Call<List<Hag_Words>> call, Response<List<Hag_Words>> response) {
                     List<Hag_Words> wordList = response.body();
                     Hag_Words[] wordListArray = wordList.toArray(new Hag_Words[wordList.size()]);
-                    new insertHagWordsAsyncTask(storyDao).execute(wordListArray);
+                    new insertHagWordsAsyncTask(storyDao,muld,muld2).execute(wordListArray);
 
                 }
                 @Override
@@ -576,8 +598,11 @@ public class Repository {
 
     private static class insertHagWordsAsyncTask extends AsyncTask<Hag_Words, Void, Void>{
         private final StoryDao storyDao;
-        insertHagWordsAsyncTask(StoryDao storyDao){
+        private final MutableLiveData<Integer> muld,muld2;
+        insertHagWordsAsyncTask(StoryDao storyDao,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
             this.storyDao = storyDao;
+            muld = mld;
+            muld2 = mld2;
         }
 
         @Override
@@ -590,6 +615,8 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Void v){
+            muld.setValue(View.GONE);
+            muld2.setValue(View.VISIBLE);
             new insertStoryListAsyncTask(storyDao).execute(new StoriesListItem("Hänsel und Gretel","der Brüder Grimm"));
         }
 
@@ -660,6 +687,7 @@ public class Repository {
             String[] freqArray = strings[2];
             System.out.println("BEGGINING UPDATING SCORES");
             for (int i = 0;i < 700;i++){
+                if (Integer.parseInt(studyingArray[i])==0){break;}
                 try {
                     mAsyncTaskDao.updateVocabScore(Integer.parseInt(scoreArray[i]), Integer.parseInt(studyingArray[i]), Integer.parseInt(freqArray[i]), i + 1);//mAsyncTaskDao.updateVocabScore(Integer.parseInt(strings[i]),i);
                 }catch(Exception e){
@@ -766,13 +794,38 @@ public class Repository {
     }
 
     private static class resetA1AsyncTask extends AsyncTask<Void, Void, Void>{
-        private VocabDao mAsyncTaskDao;
+        private final VocabDao mAsyncTaskDao;
+        private final MutableLiveData<Integer> muld;
+        private final MutableLiveData<Integer> muld2;
 
-        resetA1AsyncTask(VocabDao dao) {mAsyncTaskDao = dao;}
+        resetA1AsyncTask(VocabDao dao,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2) {
+            mAsyncTaskDao = dao;
+            muld = mld;
+            muld2 = mld2;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            muld.setValue(View.VISIBLE);
+            muld2.setValue(View.INVISIBLE);
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
-            mAsyncTaskDao.resetAllScores();
+           // mAsyncTaskDao.resetAllScores();
+            //Resets all scores in vocab_tableA1 to the local_tableA1 scores
+            //TODO : hide begginer level 1 tab and show loadnig bar until done
+            LocalSaveA1[] saveList = mAsyncTaskDao.getFullLocalSaveList();
+            for (LocalSaveA1 item : saveList){
+                mAsyncTaskDao. updateVocabScore(item.getScore(), item.getStudying(), item.getFreq(), item.get_id());
+            }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            muld.setValue(View.GONE);
+            muld2.setValue(View.VISIBLE);
         }
     }
 

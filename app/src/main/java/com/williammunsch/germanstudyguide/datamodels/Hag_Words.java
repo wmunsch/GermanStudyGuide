@@ -21,7 +21,7 @@ public class Hag_Words {
     }
 
     public String getGerman() {
-        return german + "  -  ";
+        return german;
     }
 
     public void setGerman(String german) {
@@ -37,8 +37,7 @@ public class Hag_Words {
     }
 
     public String getNotes() {
-        String tempString = notes.replace(";","\n");
-        return tempString;
+        return notes.replace(";","\n");
     }
 
     public void setNotes(String notes) {

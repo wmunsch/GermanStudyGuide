@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.williammunsch.germanstudyguide.datamodels.LocalSaveA1;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
@@ -65,6 +66,11 @@ public interface VocabDao {
    // @Query("UPDATE vocab_table SET score = score")
    // void updateNode(VocabModelA1 vocabModel);
 
+    /**
+     * Update the local save Model word with the new score.
+     */
+    @Query("UPDATE local_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
+    void updateLocalNode(int score, int studying, int freq, int id);
 
     /**
      * Called when logging in.
@@ -75,12 +81,15 @@ public interface VocabDao {
     @Query("SELECT * FROM vocab_tableA1")
     VocabModelA1[] getFullA1List();
 
-
+    @Query("SELECT * FROM local_tableA1")
+    LocalSaveA1[] getFullLocalSaveList();
     /**
      *Better way of updating vocab scores when logging in
      */
     @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
     void updateVocabScore(int score, int studying, int freq, int id);
+
+
 
    // @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
    // void updateVocabScore(int score, int id);
@@ -90,6 +99,10 @@ public interface VocabDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(VocabModelA1 vocabModelA1);
 
+    //Inserts the A1 local savedata, will replace unique constraints in case of a non-fully downloaded previous attempt
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertLocal(LocalSaveA1 localSaveA1);
+
     //Deletes everything in the A1 table
     @Query("DELETE FROM vocab_tableA1")
     void deleteAll();
@@ -97,6 +110,10 @@ public interface VocabDao {
     //Resets scores, freqs, and studying to 0 when logging out.
     @Query("UPDATE vocab_tableA1 SET studying = 0, score=0,freq=0")
     void resetAllScores();
+
+    //Resets scores, freqs, and studying to 0 when logging out.
+    @Query("UPDATE vocab_tableA1 SET studying = :studying, score= :score,freq=:freq WHERE _id = :id")
+    void resetAllScoresToLocal(int studying, int score, int freq, int id);
 
 
 

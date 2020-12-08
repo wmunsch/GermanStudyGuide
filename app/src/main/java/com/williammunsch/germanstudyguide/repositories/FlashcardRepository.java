@@ -354,9 +354,21 @@ public class FlashcardRepository {
 
         @Override
         protected Void doInBackground(final VocabModelA1... params) {
-            for (VocabModelA1 model : params){
-                mAsyncTaskDao.updateNode(model);
-                System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+            //for (VocabModelA1 model : params){
+            //    mAsyncTaskDao.updateNode(model);
+            //    System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+           // }
+            if (!loggedIn){
+                for (VocabModelA1 model : params){
+                    mAsyncTaskDao.updateNode(model);
+                    mAsyncTaskDao.updateLocalNode(model.getScore(),model.getStudying(),model.getFreq(),model.getId());
+                    System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+                }
+            }else{
+                for (VocabModelA1 model : params){
+                    mAsyncTaskDao.updateNode(model);
+                    System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+                }
             }
 
             //This works, now just get the entire string with a separator per entry
