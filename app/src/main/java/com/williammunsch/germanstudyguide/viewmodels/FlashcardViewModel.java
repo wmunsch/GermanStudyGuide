@@ -128,6 +128,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     private void setUpCorrectAnswerViews(){
         System.out.println("calling setupcorrectanswerviews");
         mFlashcardRepository.setCheckmarkVisibility(VISIBLE);
+        mFlashcardRepository.setXmarkVisibility(GONE);
         //TODO : set linearLayout_correct to visible to show other answers?
 
         mFlashcardRepository.setCheckButtonText("Next");

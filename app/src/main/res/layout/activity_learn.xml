@@ -63,47 +63,81 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <Button
-            android:id="@+id/button_next"
-            android:layout_width="200dp"
-            android:layout_height="35sp"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/button_selector"
-            android:onClick="@{() -> flashcardviewmodel.checkAnswer()}"
-            android:text="@{flashcardviewmodel.checkButtonText, default = Next}"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:visibility="@{flashcardviewmodel.checkButtonVisibility, default=invisible}"
+        <LinearLayout
+            android:id="@+id/twobottombuttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toEndOf="@+id/button_iwasright"
-            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/button_selector"
+                android:onClick="@{() -> flashcardviewmodel.iWasright()}"
+                android:text="I was right"
+                android:textAllCaps="false"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:visibility="@{flashcardviewmodel.iwasrightVisibility, default=gone}" />
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="35sp"
+                android:background="@drawable/button_selector"
+                android:onClick="@{() -> flashcardviewmodel.checkAnswer()}"
+                android:text="@{flashcardviewmodel.checkButtonText, default = Next}"
+                android:textAllCaps="false"
+                android:textColor="#ffffff"
+                android:textSize="20sp"
+                android:visibility="@{flashcardviewmodel.checkButtonVisibility, default=invisible}" />
+        </LinearLayout>
+
 
         <TextView
             android:id="@+id/textView_germanWord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="44dp"
-            android:layout_marginEnd="8dp"
             android:text="@{flashcardviewmodel.currentNode.toString(flashcardviewmodel.currentNode.score)}"
             android:textColor="#000000"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.493"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/edittextandrightorwrong"/>
 
+
+        <LinearLayout
+            android:id="@+id/edittextandrightorwrong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="5dp"
+            app:layout_constraintEnd_toStartOf="@id/editText_entry"
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"
+            app:layout_constraintBottom_toTopOf="@id/linearLayout_correct">
+
+            <ImageView
+                android:id="@+id/imageView_checkmark"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/checkmark"
+                android:visibility="@{flashcardviewmodel.checkmarkVisibility, default=gone}" />
+
+            <ImageView
+                android:id="@+id/imageView_xmark"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/xmark"
+                android:visibility="@{flashcardviewmodel.xmarkVisibility, default=invisible}" />
+
+        </LinearLayout>
         <EditText
             android:id="@+id/editText_entry"
             android:layout_width="200dp"
             android:layout_height="55dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="8dp"
             android:background="@drawable/edittext_background"
             android:ems="10"
             android:gravity="center"
@@ -116,131 +150,87 @@
             android:textCursorDrawable="@null"
             android:visibility="@{flashcardviewmodel.editTextVisibility, default=invisible}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"
+            app:layout_constraintBottom_toTopOf="@id/linearLayout_correct"/>
 
         <TextView
             android:id="@+id/textView_englishWord"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="20dp"
             android:text="@{flashcardviewmodel.currentNode.english}"
             android:textAlignment="center"
             android:textSize="20sp"
             android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
+            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord"/>
 
-        <TextView
-            android:id="@+id/textView_germanSentence"
+        <LinearLayout
+            android:id="@+id/sentenceslayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:padding="10dp"
-            android:text="@{flashcardviewmodel.currentNode.gsentence}"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_seeSentence" />
+            app:layout_constraintTop_toBottomOf="@+id/button_seeSentence"
+            app:layout_constraintBottom_toTopOf="@id/twobottombuttons">
 
-        <TextView
-            android:id="@+id/textView_englishSentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="8dp"
-            android:padding="10dp"
-            android:text="@{flashcardviewmodel.currentNode.esentence}"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_germanSentence" />
+            <TextView
+                android:id="@+id/textView_germanSentence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{flashcardviewmodel.currentNode.gsentence}"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:visibility="@{flashcardviewmodel.hintVisibility, default=invisible}"/>
+
+            <TextView
+                android:id="@+id/textView_englishSentence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{flashcardviewmodel.currentNode.esentence}"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:layout_marginTop="10dp"
+                android:visibility="@{flashcardviewmodel.englishTextVisibility, default=invisible}"/>
+
+        </LinearLayout>
+
 
         <Button
             android:id="@+id/button_seeSentence"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
             android:background="@drawable/button_selector"
             android:onClick="@{() -> flashcardviewmodel.showSentence()}"
             android:text="Hint"
             android:textAllCaps="false"
             android:textColor="#ffffff"
             android:textSize="16sp"
-            android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=invisible}"
+            android:visibility="@{flashcardviewmodel.hintButtonVisibility, default=gone}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct" />
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout_correct"
+            app:layout_constraintBottom_toTopOf="@id/sentenceslayout"/>
 
-        <ImageView
-            android:id="@+id/imageView_checkmark"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="40dp"
-            android:src="@drawable/checkmark"
-            android:visibility="@{flashcardviewmodel.checkmarkVisibility, default=invisible}"
-            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-        <ImageView
-            android:id="@+id/imageView_xmark"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="40dp"
-            android:src="@drawable/xmark"
-            android:visibility="@{flashcardviewmodel.xmarkVisibility, default=invisible}"
-            app:layout_constraintEnd_toStartOf="@+id/editText_entry"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_germanWord" />
 
-        <Button
-            android:id="@+id/button_iwasright"
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/button_selector"
-            android:onClick="@{() -> flashcardviewmodel.iWasright()}"
-            android:text="I was right"
-            android:textAllCaps="false"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:visibility="@{flashcardviewmodel.iwasrightVisibility, default=gone}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_englishSentence"
-            app:layout_constraintVertical_bias="1.0" />
+
 
         <LinearLayout
             android:id="@+id/linearLayout_correct"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_marginTop="20dp"
             android:background=" #ff9999 "
             android:orientation="vertical"
             android:visibility="@{flashcardviewmodel.correctLayoutVisibility, default=gone}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText_entry">
+            app:layout_constraintTop_toBottomOf="@id/edittextandrightorwrong"
+            app:layout_constraintBottom_toTopOf="@id/button_seeSentence">
 
             <TextView
                 android:id="@+id/textView_correctanswer"
@@ -264,6 +254,131 @@
 
         </LinearLayout>
 
+
+        <TextView
+            android:id="@+id/textView_goodJob"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#333333"
+            android:visibility="@{flashcardviewmodel.goodJobVisibility, default=visible}"
+            android:text="Good Job!"
+            android:textSize="45sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/wordslearnedlayout"/>
+
+        <LinearLayout
+            android:id="@+id/wordslearnedlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_goodJob"
+            app:layout_constraintBottom_toTopOf="@id/masteredlayout">
+
+            <TextView
+                android:id="@+id/textView_wordsLearned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:text="Words Learned"
+                android:visibility="@{flashcardviewmodel.tv_wordsLearnedVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_goodJob"
+                app:layout_constraintBottom_toTopOf="@id/progressBar_wordsLearned"/>
+            <ProgressBar
+                android:id="@+id/progressBar_wordsLearned"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="200dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:progress="@{flashcardviewmodel.wordsLearnedP}"
+                android:progressBackgroundTint="#333333"
+                android:progressTint="#ffe869"
+                android:visibility="@{flashcardviewmodel.progressBar_wordsLearnedVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_wordsLearned"
+                app:layout_constraintBottom_toTopOf="@id/textView_wordsLearnedOutOf"/>
+            <TextView
+                android:id="@+id/textView_wordsLearnedOutOf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:text="@{String.valueOf(flashcardviewmodel.wordsLearned)+@string/outOf700}"
+                android:visibility="@{flashcardviewmodel.textView_wordsLearnedOutOfVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsLearned"
+                app:layout_constraintBottom_toTopOf="@id/textView_wordsMastered"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/masteredlayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/wordslearnedlayout"
+            app:layout_constraintBottom_toTopOf="@id/button_finish">
+
+            <TextView
+                android:id="@+id/textView_wordsMastered"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:textAlignment="center"
+                android:text="Words Mastered"
+                android:visibility="@{flashcardviewmodel.textView_wordsMasteredVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/wordslearnedlayout"
+                app:layout_constraintBottom_toTopOf="@id/progressBar_wordsMastered"/>
+            <ProgressBar
+                android:id="@+id/progressBar_wordsMastered"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="200dp"
+                android:layout_height="8dp"
+                android:progress="@{flashcardviewmodel.wordsMasteredP}"
+                android:progressBackgroundTint="#333333"
+                android:progressTint="#ffe869"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:visibility="@{flashcardviewmodel.progressBar_wordsMasteredVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView_wordsMastered"
+                app:layout_constraintBottom_toTopOf="@id/textView_wordsMasteredOutOf"/>
+
+            <TextView
+                android:id="@+id/textView_wordsMasteredOutOf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:text="@{String.valueOf(flashcardviewmodel.wordsMastered)+@string/outOf700}"
+                android:visibility="@{flashcardviewmodel.textView_wordsMasteredOutOfVisibility, default=visible}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsMastered"
+                app:layout_constraintBottom_toTopOf="@id/button_finish"/>
+
+        </LinearLayout>
+
+
+
         <Button
             android:id="@+id/button_finish"
             android:layout_width="200dp"
@@ -278,100 +393,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_wordsMasteredOutOf" />
-
-        <ProgressBar
-            android:id="@+id/progressBar_wordsLearned"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="200dp"
-            android:layout_height="8dp"
-            android:layout_marginTop="20dp"
-            android:progress="@{flashcardviewmodel.wordsLearnedP}"
-            android:progressBackgroundTint="#333333"
-            android:progressTint="#ffe869"
-            android:visibility="@{flashcardviewmodel.progressBar_wordsLearnedVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_wordsLearned" />
-
-        <ProgressBar
-            android:id="@+id/progressBar_wordsMastered"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="200dp"
-            android:layout_height="8dp"
-            android:layout_marginTop="20dp"
-            android:progress="@{flashcardviewmodel.wordsMasteredP}"
-            android:progressBackgroundTint="#333333"
-            android:progressTint="#ffe869"
-            android:visibility="@{flashcardviewmodel.progressBar_wordsMasteredVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_wordsMastered" />
-
-        <TextView
-            android:id="@+id/textView_wordsLearned"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:textSize="20sp"
-            android:textColor="#333333"
-            android:text="Words Learned"
-            android:visibility="@{flashcardviewmodel.tv_wordsLearnedVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_goodJob" />
-
-        <TextView
-            android:id="@+id/textView_wordsLearnedOutOf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="#333333"
-            android:text="@{String.valueOf(flashcardviewmodel.wordsLearned)+@string/outOf700}"
-            android:visibility="@{flashcardviewmodel.textView_wordsLearnedOutOfVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsLearned" />
-
-        <TextView
-            android:id="@+id/textView_wordsMastered"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
-            android:textSize="20sp"
-            android:textColor="#333333"
-            android:text="Words Mastered"
-            android:visibility="@{flashcardviewmodel.textView_wordsMasteredVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_wordsLearnedOutOf" />
-
-        <TextView
-            android:id="@+id/textView_wordsMasteredOutOf"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:textColor="#333333"
-            android:text="@{String.valueOf(flashcardviewmodel.wordsMastered)+@string/outOf700}"
-            android:visibility="@{flashcardviewmodel.textView_wordsMasteredOutOfVisibility, default=visible}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progressBar_wordsMastered" />
-
-        <TextView
-            android:id="@+id/textView_goodJob"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="35dp"
-            android:textColor="#333333"
-            android:visibility="@{flashcardviewmodel.goodJobVisibility, default=visible}"
-            android:text="Good Job!"
-            android:textSize="45sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@id/masteredlayout" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

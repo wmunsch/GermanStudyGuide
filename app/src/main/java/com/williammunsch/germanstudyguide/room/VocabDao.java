@@ -34,7 +34,7 @@ public interface VocabDao {
 
 
     //Gets # of new vocab and # of old vocab for review combined
-    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score,freq LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY score ASC")
+    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score,freq LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY studying,score,freq ASC")
     LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets 20 learned vocab for review after learning all

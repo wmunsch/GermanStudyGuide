@@ -226,7 +226,7 @@ public class FlashcardRepository {
         iwasrightVisibility.setValue(GONE);
         correctLayoutVisibility.setValue(GONE);
         editTextVisibility.setValue(INVISIBLE);
-        hintButtonVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(GONE);
         finishButtonVisibility.setValue(INVISIBLE);
         checkButtonVisibility.setValue(VISIBLE);
         goodJobVisibility.setValue(GONE);
