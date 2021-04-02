@@ -1,24 +1,20 @@
 package com.williammunsch.germanstudyguide.repositories;
 
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.view.View;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.williammunsch.germanstudyguide.SaveDataResponse;
+import com.williammunsch.germanstudyguide.responses.SaveDataResponse;
 import com.williammunsch.germanstudyguide.User;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.LocalSaveA1;
-import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.datamodels.Story;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
@@ -29,7 +25,6 @@ import com.williammunsch.germanstudyguide.room.VocabListDao;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -42,8 +37,6 @@ import retrofit2.Response;
 
 /**
  *  A Repository class handles data operations. It provides a clean API to the rest of the app for app data.
- *  Manages query threads and allows you to use multiple backends. In the most common example,
- *  the Repository implements the logic for deciding whether to fetch data from a network or use results cached in a local database.
  *
  *  Base repository that handles api calls and ROOM updates.
  *
@@ -61,9 +54,11 @@ public class Repository {
     private LiveData<User> currentUser;
     private LiveData<String> userName;
     private LiveData<String> userEmail;
+    private LiveData<String> A1DownloadedText;
+    private LiveData<String> HAGDownloadedText;
+
     private LiveData<List<VocabListItem>> vocabListItemList;
     private LiveData<List<StoriesListItem>> storiesListItems;
-
     private MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> registrationVisibility = new MutableLiveData<>();
@@ -84,6 +79,9 @@ public class Repository {
     private MutableLiveData<Integer> showViewPager = new MutableLiveData<>();
 
 
+    private MutableLiveData<Integer> A1Downloaded = new MutableLiveData<>();
+    private MutableLiveData<Integer> HAGDownloaded = new MutableLiveData<>();
+
     GermanDatabase db;
 
     private LiveData<Integer> a1Percent;
@@ -92,6 +90,16 @@ public class Repository {
     private LiveData<Integer> a1Count;
 
 
+    private MutableLiveData<Integer> downloadProgressVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> downloadButtonVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> wordsLearnedVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> wordsDownloadedVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> errorDownloadingVisibility = new MutableLiveData<>();
+
+    private MutableLiveData<Integer> hagErrorVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> hagButtonVisibility = new MutableLiveData<>();
+    private MutableLiveData<Integer> hagPartsDownloadedVisibility = new MutableLiveData<>();
+
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
      */
@@ -99,169 +107,117 @@ public class Repository {
      public Repository(DatabaseService apiService, GermanDatabase db) {
         this.apiService = apiService;
         this.db = db;
-
         mVocabDao = db.vocabDao();
         storyDao = db.storyDao();
-
-
         mVocabListDao = db.vocabListDao();
         mUserDao = db.userDao();
-
         getUserInfoFromRoom();
-
         a1Count = db.vocabDao().count();
-
-
         dataSet = new ArrayList<>();
-
-        registrationVisibility.setValue(View.GONE);
-        passwordErrorVisibility.setValue(View.GONE);
-        emailTakenVisibility.setValue(View.GONE);
-        emailValidVisibility.setValue(View.GONE);
-        errorConnectingToDatabaseVisibility.setValue(View.GONE);
-        showLoadingBar.setValue(View.GONE);
-        showViewPager.setValue(View.VISIBLE);
-        couldNotConnectVisibility.setValue(View.GONE);
+        initialSetters();
 
         //map username to currentuser.username to show username in top left of main screen
         userName = Transformations.map(currentUser, name->{
             if (currentUser.getValue() != null){
                 loginVisibility.setValue(View.GONE);
                 profileVisibility.setValue(View.VISIBLE);
-                System.out.println("^^^^^^^^^^^^^^^^^^^^^^^currentuser is not null");
                 return currentUser.getValue().getUsername();
             }
             loginVisibility.setValue(View.VISIBLE);
             profileVisibility.setValue(View.GONE);
-            System.out.println("^^^^^^^^^^^^^^^^^^^^^^^currentuser IS null");
             return "Log In";
         } );
 
-
-        /*
-        userEmail = Transformations.map(currentUser, name->{
-            if (currentUser.getValue() != null){
-                return currentUser.getValue().getEmail();
-            }
-            return "";
-        } );
-*/
-
+        //map the dialogue to a successful account creation or not
         accountCreation = Transformations.map(allGood, success->{
            if (allGood.getValue()!=null && allGood.getValue()){
                //call api here for registration
                //change allGood back to false?
-               System.out.println("Registration successful.");
                return "Registration successful.";
            }
-            System.out.println("Error: Registration failed");
            return "Error: Registration failed.";
         });
 
-        checkA1();
-        //checkStories();
+        downloadProgressVisibility.setValue(View.GONE);
+        downloadButtonVisibility.setValue(View.VISIBLE);
+        wordsLearnedVisibility.setValue(View.GONE);
+        wordsDownloadedVisibility.setValue(View.GONE);
+        errorDownloadingVisibility.setValue(View.GONE);
 
+        hagButtonVisibility.setValue(View.VISIBLE);
+        hagErrorVisibility.setValue(View.GONE);
+        hagPartsDownloadedVisibility.setValue(View.GONE);
+
+        //Check if the ROOM tables for the lessons and story lists for the recyclerviews have been created
+        checkLessons();
+        checkStories();
+
+        //Check if vocab lessons and stories are fully downloaded from the remote database.
+        A1Downloaded.setValue(0);
+        HAGDownloaded.setValue(0);
+        checkA1();
+        checkHAG();
+
+        //Set the A1 button to say either download or study based on whether or not the A1 data
+        //has been downloaded from the remote database
+        A1DownloadedText = Transformations.map(A1Downloaded, value->{
+           if (A1Downloaded.getValue() == 0){
+               wordsLearnedVisibility.setValue(View.GONE);
+               //wordsDownloadedVisibility.setValue(View.VISIBLE);
+               return "Download";
+           }
+           else{
+               wordsLearnedVisibility.setValue(View.VISIBLE);
+               //wordsDownloadedVisibility.setValue(View.GONE);
+               return "Study";
+           }
+        });
+
+        //Change the text of the button in the HAG activity depending on whether it has been downloaded or not
+        HAGDownloadedText = Transformations.map(HAGDownloaded, value->{
+            if (HAGDownloaded.getValue() == 0){
+                return "Download";
+            }
+            else{
+                return "Read";
+            }
+        });
+
+        //Get all of the vocab lessons and story lessons in a list to display in the recyclerviews in their fragments.
         vocabListItemList = mVocabListDao.getAllVocabLists();
         storiesListItems = storyDao.getAllStoriesLists();
 
     }
 
-    public LiveData<User> getCurrentUser() {
-        return currentUser;
-    }
-
-    public boolean checkEmail(String email){
-        //check the database to see if email exists
-        return false;
-    }
-
-    public boolean checkPassword(String password){
-        //check password to see if
-
-        return false;
-    }
-
-    public VocabDao getmVocabDao() {
-        return mVocabDao;
-    }
-
-    public void getUserInfoFromRoom(){
-        currentUser = mUserDao.getUser();
-    }
 
 
-
-    public void setPasswordErrorVisibility(int i){
-        passwordErrorVisibility.setValue(i);
-    }
-
-    public void setRegistrationVisibility(){
-        loginVisibility.setValue(View.GONE);
-        profileVisibility.setValue(View.GONE);
-        registrationVisibility.setValue(View.VISIBLE);
-        passwordErrorVisibility.setValue(View.INVISIBLE);
-    }
-    public void setRegistrationVisibilityF(){
-        loginVisibility.setValue(View.VISIBLE);
-        profileVisibility.setValue(View.GONE);
-        registrationVisibility.setValue(View.GONE);
-        passwordErrorVisibility.setValue(View.GONE);
-    }
-
-    public void setLoginAndRegistrationVisibilityGone(){
-        loginVisibility.setValue(View.GONE);
-        profileVisibility.setValue(View.GONE);
-        registrationVisibility.setValue(View.GONE);
-        passwordErrorVisibility.setValue(View.GONE);
-    }
-    public MutableLiveData<Integer> getEmailTakenVisibility() {
-        return emailTakenVisibility;
-    }
-
-    public void setEmailTakenVisibility(int i) {
-        this.emailTakenVisibility.setValue(i);
-    }
-
-    public LiveData<Integer> getCouldNotConnectVisibility(){return couldNotConnectVisibility;}
-    public void setCouldNotConnectVisibility(int i){couldNotConnectVisibility.setValue(i);}
-    public LiveData<Integer> getEmailValidVisibility() {
-        return emailValidVisibility;
-    }
-
-    public void setEmailValidVisibility(int i) {
-        this.emailValidVisibility.setValue(i);
-    }
     public void logOut(){
         //deleteUser();
         //deleteAllScores();
         mVocabDao.resetAllScores();
-        //TODO : get save data from local unlogged save
     }
 
-    public LiveData<List<StoriesListItem>> getStoriesListItems(){
-        return storiesListItems;
-    }
 
     /**
      * Called when logging in. Gets the user's save data and inputs it into the ROOM database.
      */
     public void downloadSaveData(String userN){
-        System.out.println("Calling downloadsavedata");
+       // System.out.println("Calling downloadsavedata");
         Call<SaveDataResponse> call = apiService.getSaveData(userN);
         call.enqueue(new Callback<SaveDataResponse>() {
             @Override
             public void onResponse(Call<SaveDataResponse> call, Response<SaveDataResponse> response) {
-                System.out.println("Response to call: ");
-                System.out.println(response);
+              //  System.out.println("Response to call: ");
+              //  System.out.println(response);
                 SaveDataResponse data = response.body();
-                System.out.println("Data body: ");
-                System.out.println(data + " is null?");
+               // System.out.println("Data body: ");
+               // System.out.println(data + " is null?");
 
                 if (data!=null){
                     if (data.getTablename()==null || data.getScore()==null || data.getStudying()==null || data.getFreq()==null){
                        // createNewEntryAndUpload();
                     }else{
-                        System.out.println("Data not null, inputting data");
+                      //  System.out.println("Data not null, inputting data");
                         //Format the score data into an array
                         String[] scores = data.getScore().split(",");
                         String[] studying = data.getStudying().split(",");
@@ -272,57 +228,12 @@ public class Repository {
             }
             @Override
             public void onFailure(Call<SaveDataResponse> call, Throwable t) {
-                System.out.println("Error on call");
+              //  System.out.println("Error on call");
             }
         });
     }
 
-    public LiveData<String> getUserName() {
-        return userName;
-    }
-    public LiveData<String> getUserEmail() {
-        return userEmail;
-    }
 
-    public LiveData<Integer> getA1Count() {
-        return a1Count;
-    }
-    public LiveData<Integer> getPasswordErrorVisibility() {
-        return passwordErrorVisibility;
-    }
-    public LiveData<Integer> getProfileVisibility() {
-        return profileVisibility;
-    }
-    public LiveData<Integer> getRegistrationVisibility() {
-        return registrationVisibility;
-    }
-    public LiveData<Integer> getLoginVisibility() {
-        return loginVisibility;
-    }
-    public LiveData<List<VocabListItem>> getVocabListItems(){
-        return vocabListItemList;
-        //MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
-        //data.setValue(dataSet);
-        //return data;
-    }
-
-    public LiveData<Integer> getShowLoadingBar(){return showLoadingBar;}
-    public LiveData<Integer> getShowViewPager(){return showViewPager;}
-
-    public LiveData<Integer> getA1Max(){
-        return mVocabDao.count();
-    }
-
-    public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
-    public LiveData<Integer> getA1Mastered() {return mVocabDao.countMastered();}
-    public LiveData<Integer> getA1Percent() {return mVocabDao.countLearned();}
-
-   // public LiveData<Integer> getA1Score(){return mVocabDao.getA1Scores();}
-
-
-    //public void insert (VocabModelA1 vocabModelA1) {
-    //    new insertAsyncTask(mVocabDao, mVocabListDao).execute(vocabModelA1);
-    //}
 
     public void insertUser(User user){
         new insertUserAsyncTask(mUserDao).execute(user);
@@ -339,111 +250,158 @@ public class Repository {
     public void deleteAll(){
         new deleteAsyncTask(mVocabDao).execute();
     }
-
     public void deleteAllScores(){new deleteA1AsyncTask(mVocabDao).execute();}
-
     public void resetAllScores(){new resetA1AsyncTask(mVocabDao,showLoadingBar,showViewPager).execute();}
 
-    public LiveData<Integer> count() {
-        return mVocabDao.count();
+
+
+
+
+    //********************************************************************
+
+    public void checkLessons(){
+        new checkLessonAsyncTask(mVocabListDao, "Beginner Level 1", "  A1").execute();
+        //For the future
+        //new checkLessonAsyncTask(mVocabListDao, "Beginner Level 2", "  A2").execute();
+        //new checkLessonAsyncTask(mVocabListDao, "Intermediate Level 1", "  B1").execute();
     }
 
-    public void insertList (VocabListItem vocabListItem){
-        new insertListAsyncTask(mVocabListDao).execute(vocabListItem);
-    }
+    //Async task to check if all of the lesson list items for the recyclerview in
+    // the Vocab fragment on the main page have been inserted into ROOM.
+    //If not, it inserts them
+    private static class checkLessonAsyncTask extends AsyncTask<Void, Void, Integer>{
+        private final VocabListDao mVocabListDao;
+        private final String mLessonName;
+        private final String mImageName;
 
-
-    public void checkStories(){
-        System.out.println("CHECKING STORIES");
-        //new checkStoriesAsyncTask(storyDao,apiService).execute();
-    }
-
-    public void checkA1(){
-        new checkA1AsyncTask(mVocabDao,apiService,mVocabListDao,showLoadingBar,couldNotConnectVisibility,showViewPager,storyDao).execute();
-    }
-    /**
-     * Checks to see if the A1 table has been downloaded to the local database, if not, downloads it.
-     * If it does exist, or after downloading, adds A1 to VocabListItems.
-     */
-    private static class checkA1AsyncTask extends AsyncTask<Void, Void, Integer> {
-        private VocabDao mAsyncTaskDao;
-        private VocabListDao mVocabListDao;
-        private StoryDao storyDao;
-        private DatabaseService apiService;
-        private final MutableLiveData<Integer> muld, muld2, muld3;
-
-        checkA1AsyncTask(VocabDao dao, DatabaseService api, VocabListDao vDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2, MutableLiveData<Integer> mld3,StoryDao storyDao) {
-            mAsyncTaskDao = dao;
-            apiService = api;
-            mVocabListDao = vDao;
-            muld=mld;
-            muld2 = mld2;
-            muld3 = mld3;
-            this.storyDao = storyDao;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            muld2.setValue(View.GONE);
-            //muld3.setValue(View.GONE);
+        checkLessonAsyncTask(VocabListDao vocabListDao, String lessonName, String imageName){
+            mVocabListDao = vocabListDao;
+            mLessonName = lessonName;
+            mImageName = imageName;
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            System.out.println("COUNT : " + mAsyncTaskDao.countA1());
+            int exists = mVocabListDao.vocabLessonExists(mLessonName);
+            System.out.println("DOES " +mLessonName + "  EXIST? " + exists);
+            return exists;
+        }
+
+        @Override
+        protected void onPostExecute(Integer exists){
+            if (exists != 1){
+                System.out.println(mLessonName + " does not exist, adding.");
+                new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem(mLessonName,mImageName,0,0,0));
+            }
+            else{
+                System.out.println(mLessonName + "  exists");
+            }
+
+        }
+
+    }
+    //********************************************************************
+
+    //********************************************************************
+    public void checkStories(){
+        new checkStoryAsyncTask(storyDao, "Hänsel und Gretel", "der Brüder Grimm").execute();
+        //For the future
+        //new checkLessonAsyncTask(mVocabListDao, "Story Title", "Author").execute();
+    }
+
+    //Async task to check if all of the story list items for the recyclerview in
+    // the stories fragment on the main page have been inserted into ROOM.
+    //If not, it inserts them. (This is not the actual story, just the list item.)
+    private static class checkStoryAsyncTask extends AsyncTask<Void, Void, Integer>{
+        private final StoryDao mStoryDao;
+        private final String mStoryName;
+        private final String mAuthorName;
+
+        checkStoryAsyncTask(StoryDao storyDao, String storyName, String authorName){
+            mStoryDao = storyDao;
+            mStoryName = storyName;
+            mAuthorName = authorName;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            int exists = mStoryDao.storyLessonExists(mStoryName);
+            System.out.println("DOES " +mStoryName + "  EXIST? " + exists);
+            return exists;
+        }
+
+        @Override
+        protected void onPostExecute(Integer exists){
+            if (exists != 1){
+                System.out.println(mStoryName + " does not exist, adding.");
+                new insertStoryListAsyncTask(mStoryDao).execute(new StoriesListItem(mStoryName,mAuthorName));
+            }
+            else{
+                System.out.println(mStoryName + "  exists");
+            }
+
+        }
+
+    }
+    //********************************************************************
+
+
+
+    public void checkA1(){
+        new checkA1AsyncTask(mVocabDao, A1Downloaded).execute();
+    }
+    /**
+     * Checks to see if the A1 table has been downloaded to the local database.
+     * Determines whether the button reads "Download" or "Study" by setting mA1Downloaded to 1 or 0
+     */
+    private static class checkA1AsyncTask extends AsyncTask<Void, Void, Integer> {
+        private final VocabDao mAsyncTaskDao;
+        private final MutableLiveData<Integer> mA1Downloaded;
+
+        checkA1AsyncTask(VocabDao dao, MutableLiveData<Integer> a1Downloaded) {
+            mAsyncTaskDao = dao;
+            mA1Downloaded = a1Downloaded;
+        }
+
+
+        @Override
+        protected Integer doInBackground(Void... params) {
             return mAsyncTaskDao.countA1();
         }
 
         @Override
         protected void onPostExecute(Integer vocabCount){
             if (vocabCount!=700){
-                System.out.println("Downloading A1 table");
-                Call<List<VocabModelA1>> call = apiService.vocabList();
-                call.enqueue(new Callback<List<VocabModelA1>>() {
-                    @Override
-                    public void onResponse(Call<List<VocabModelA1>> call, Response<List<VocabModelA1>> response) {
-                        List<VocabModelA1> vocabList = response.body();
-                        VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
-                        //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
-                        new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld,muld3,storyDao,apiService).execute(vocabListArray);
-                    }
-                    @Override
-                    public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
-                        System.out.println("Error on call" + t);
-                        muld2.setValue(View.VISIBLE);
-                        muld3.setValue(View.GONE);
-                        //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
+                //Set the A1 button to be "Download"
+                mA1Downloaded.setValue(0);
 
-                    }
-                });
             }else{
-                System.out.println("Already downloaded");
+                //Set the A1 button to be "Learn"
+                mA1Downloaded.setValue(1);
             }
-
-
         }
     }
 
+    /**
+     * Inserts vocab into the local_tableA1 database and the user-dependent vocab_tableA1 table
+     */
     private static class insertAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
-        private VocabDao mAsyncTaskDao;
-        private VocabListDao mVocabListDao;
-        private StoryDao storyDao;
-        private DatabaseService apiService;
-        private final MutableLiveData<Integer> muld,muld2;
+        private final VocabDao mAsyncTaskDao;
+        private final MutableLiveData<Integer> mDownloadButtonVisibility;
+        private final MutableLiveData<Integer> mA1Downloaded;
+        private final MutableLiveData<Integer> mWordsDownloadedVisibility;
 
-        insertAsyncTask(VocabDao dao, VocabListDao vlDao, MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2,StoryDao storyDao,DatabaseService apiService) {
+        insertAsyncTask(VocabDao dao,  MutableLiveData<Integer> downloadButtonVisibility, MutableLiveData<Integer> a1Downloaded, MutableLiveData<Integer> wordsDownloadedVisibility){
             mAsyncTaskDao = dao;
-            mVocabListDao = vlDao;
-            muld=mld;
-            muld2 = mld2;
-            this.storyDao = storyDao;
-            this.apiService = apiService;
+            mDownloadButtonVisibility = downloadButtonVisibility;
+            mA1Downloaded = a1Downloaded;
+            mWordsDownloadedVisibility = wordsDownloadedVisibility;
         }
 
         @Override
         protected void onPreExecute() {
-            muld.setValue(View.VISIBLE);
-            muld2.setValue(View.GONE);
+            mDownloadButtonVisibility.setValue(View.GONE);
+            mWordsDownloadedVisibility.setValue(View.VISIBLE);
         }
 
         @Override
@@ -459,20 +417,17 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Void v){
-            //Add the vocab list item
-            //muld.setValue(View.GONE);
-            //muld2.setValue(View.VISIBLE);
-            new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 1","  A1",0,0,0));
-
-            new checkStoriesAsyncTask(storyDao,apiService,muld,muld2).execute();
-            // new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Beginner Level 2","  A2",0,0,0));
-          //  new insertVocabListAsyncTask(mVocabListDao).execute(new VocabListItem("Intermediate Level 1","  B1",0,0,0));
+            mDownloadButtonVisibility.setValue(View.VISIBLE);
+            mWordsDownloadedVisibility.setValue(View.GONE);
+            mA1Downloaded.setValue(1);
         }
-
     }
 
+    /**
+     * Inserts a vocab lesson into the vocab_list_table to show in the recyclerview
+     */
     private static class insertVocabListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
-        private VocabListDao mAsyncTaskDao;
+        private final VocabListDao mAsyncTaskDao;
 
         insertVocabListAsyncTask(VocabListDao dao) {
             mAsyncTaskDao = dao;
@@ -485,67 +440,142 @@ public class Repository {
         }
     }
 
-    private static class insertListAsyncTask extends AsyncTask<VocabListItem, Void, Void> {
 
-        private VocabListDao mAsyncTaskDao;
 
-        insertListAsyncTask(VocabListDao dao) {
-            mAsyncTaskDao = dao;
+    public void downloadA1(){
+        new downloadA1AndInsert(apiService,A1Downloaded, mVocabDao, downloadButtonVisibility,  wordsDownloadedVisibility, errorDownloadingVisibility).execute();
+    }
+    /**
+     * AsyncTask to download the A1 data from the remote database on a background thread
+     * Calls insertAsyncTask when the data has been retrieved to input it into the local databases
+     */
+    private static class downloadA1AndInsert extends AsyncTask<Void, Void, Void>{
+        private final DatabaseService apiService;
+        private final MutableLiveData<Integer> mA1Downloaded;
+        private final VocabDao mVocabDao;
+        private final MutableLiveData<Integer> mDownloadButtonVisibility;
+        private final MutableLiveData<Integer> mWordsDownloadedVisibility;
+        private final MutableLiveData<Integer> mErrorDownloadingVisibility;
+
+        downloadA1AndInsert(DatabaseService api, MutableLiveData<Integer> a1Downloaded, VocabDao vocabDao,  MutableLiveData<Integer> downloadButtonVisibility, MutableLiveData<Integer> wordsDownloadedVisibility, MutableLiveData<Integer> errorDownloadingVisibility){
+            apiService = api;
+            mA1Downloaded = a1Downloaded;
+            mVocabDao = vocabDao;
+            mDownloadButtonVisibility = downloadButtonVisibility;
+            mWordsDownloadedVisibility = wordsDownloadedVisibility;
+            mErrorDownloadingVisibility = errorDownloadingVisibility;
         }
 
         @Override
-        protected Void doInBackground(final VocabListItem... params) {
-            mAsyncTaskDao.insert(params[0]);
+        protected Void doInBackground(Void... params) {
+            System.out.println("Downloading A1 from remote");
+            Call<List<VocabModelA1>> call = apiService.vocabList();
+            call.enqueue(new Callback<List<VocabModelA1>>() {
+                @Override
+                public void onResponse(Call<List<VocabModelA1>> call, Response<List<VocabModelA1>> response) {
+                    List<VocabModelA1> vocabList = response.body();
+                    VocabModelA1[] vocabListArray = vocabList.toArray(new VocabModelA1[vocabList.size()]);
+                    //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
+                    new insertAsyncTask(mVocabDao, mDownloadButtonVisibility, mA1Downloaded, mWordsDownloadedVisibility).execute(vocabListArray);
+                    mErrorDownloadingVisibility.setValue(View.GONE);
+                }
+                @Override
+                public void onFailure(Call<List<VocabModelA1>> call, Throwable t) {
+                    mErrorDownloadingVisibility.setValue(View.VISIBLE);
+                }
+
+            });
             return null;
         }
+
     }
 
-    /**
-     * Async task to check whether or not the story data has been downloaded from the remote database.
-     */
-    private static class checkStoriesAsyncTask extends AsyncTask<Void, Void, Integer>{
-        private StoryDao storyDao;
-        private DatabaseService apiService;
-        private final MutableLiveData<Integer> muld,muld2;
 
-        public checkStoriesAsyncTask(StoryDao storyDao, DatabaseService databaseService,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
+
+    public void checkHAG(){
+        new checkHAGAsyncTask(storyDao, HAGDownloaded).execute();
+    }
+    /**
+     * Async task to check whether or not the Hansel and Gretel story data has been downloaded
+     * from the remote database.
+     */
+    private static class checkHAGAsyncTask extends AsyncTask<Void, Void, Integer>{
+        private final StoryDao storyDao;
+        private final MutableLiveData<Integer> mHAGDownloaded;
+
+        public checkHAGAsyncTask(StoryDao storyDao, MutableLiveData<Integer> HAGDownloaded){
             this.storyDao = storyDao;
-            this.apiService = databaseService;
-            muld = mld;
-            muld2 = mld2;
+            mHAGDownloaded = HAGDownloaded;
         }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            System.out.println("COUNT STORIES : " + storyDao.countStories());
-            return storyDao.countStories();
+            return storyDao.countSentences();
         }
 
         @Override
-        protected void onPostExecute(Integer storyCount){
-            if (storyCount!=1){
-                System.out.println("Story count not correct, adding");
-                //Call to download the story here
-                Call<List<Hag_Sentences>> call = apiService.downloadHagSentences();
-                call.enqueue(new Callback<List<Hag_Sentences>>() {
-                    @Override
-                    public void onResponse(Call<List<Hag_Sentences>> call, Response<List<Hag_Sentences>> response) {
-                        List<Hag_Sentences> sentenceList = response.body();
-                        Hag_Sentences[] sentenceListArray = sentenceList.toArray(new Hag_Sentences[sentenceList.size()]);
-                        //insert all of the vocab words into the room database and once finished add the Beginner Level 1 vocab list
-                        new insertSentencesAsyncTask(storyDao,apiService,muld,muld2).execute(sentenceListArray);
-                       // new insertAsyncTask(mAsyncTaskDao,mVocabListDao,muld).execute(vocabListArray);
-                    }
-                    @Override
-                    public void onFailure(Call<List<Hag_Sentences>> call, Throwable t) {
-                        System.out.println("Error on call" + t);
-                        //muld2.setValue(View.VISIBLE);
-                        //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
-
-                    }
-                });
+        protected void onPostExecute(Integer sentenceCount){
+            System.out.println("sent count: " + sentenceCount);
+            if (sentenceCount!=106){
+                System.out.println("HAG has NOT been downloaded");
+                mHAGDownloaded.setValue(0);
+                //Set HAG button to "download"
+            }else{
+                System.out.println("HAG has been downloaded");
+                mHAGDownloaded.setValue(1);
+                //set HAG button to "read"
             }
          }
+    }
+
+    public void downloadHAG(){
+        new downloadAndInsertHAGAsyncTask(apiService, storyDao,HAGDownloaded,hagErrorVisibility,hagButtonVisibility,hagPartsDownloadedVisibility).execute();
+    }
+
+    /**
+     * Download and inserts Hansel and Gretel from the remote database to the local database
+     */
+    private static class downloadAndInsertHAGAsyncTask extends AsyncTask<Void, Void, Void>{
+        private final DatabaseService apiService;
+        private final StoryDao mStoryDao;
+        private final MutableLiveData<Integer> mHAGDownloaded;
+        private final MutableLiveData<Integer> hagErrorVisibility;
+        private final MutableLiveData<Integer> hagButtonVisibility;
+        private final MutableLiveData<Integer> hagPartsDownloadedVisibility;
+
+        downloadAndInsertHAGAsyncTask(DatabaseService api, StoryDao storyDao, MutableLiveData<Integer> HAGDownloaded,
+                                      MutableLiveData<Integer> mHagErrorVisibility, MutableLiveData<Integer> mHagButtonVisibility, MutableLiveData<Integer> mHagPartsDownloadedVisibility){
+            apiService = api;
+            mStoryDao = storyDao;
+            mHAGDownloaded = HAGDownloaded;
+            hagErrorVisibility = mHagErrorVisibility;
+            hagButtonVisibility = mHagButtonVisibility;
+            hagPartsDownloadedVisibility = mHagPartsDownloadedVisibility;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //Call to download the story here
+            System.out.println("Downloading HAG");
+            Call<List<Hag_Sentences>> call = apiService.downloadHagSentences();
+            call.enqueue(new Callback<List<Hag_Sentences>>() {
+                @Override
+                public void onResponse(Call<List<Hag_Sentences>> call, Response<List<Hag_Sentences>> response) {
+                    List<Hag_Sentences> sentenceList = response.body();
+                    Hag_Sentences[] sentenceListArray = sentenceList.toArray(new Hag_Sentences[sentenceList.size()]);
+                    new insertSentencesAsyncTask(mStoryDao,apiService,mHAGDownloaded,hagErrorVisibility,hagButtonVisibility,hagPartsDownloadedVisibility).execute(sentenceListArray);
+                }
+                @Override
+                public void onFailure(Call<List<Hag_Sentences>> call, Throwable t) {
+                     System.out.println("Error on call" + t);
+                    //TODO : ADD ERROR TEXT HERE
+                    hagButtonVisibility.setValue(View.VISIBLE);
+                    hagErrorVisibility.setValue(View.VISIBLE);
+                    hagPartsDownloadedVisibility.setValue(View.GONE);
+                }
+            });
+            return null;
+        }
     }
 
     /**
@@ -553,18 +583,32 @@ public class Repository {
      */
     private static class insertSentencesAsyncTask extends AsyncTask<Hag_Sentences, Void, Void>{
         private final StoryDao storyDao;
-        private DatabaseService apiService;
-        private final MutableLiveData<Integer> muld,muld2;
+        private final DatabaseService apiService;
+        private final MutableLiveData<Integer> mHAGDownloaded;
+        private final MutableLiveData<Integer> hagErrorVisibility;
+        private final MutableLiveData<Integer> hagButtonVisibility;
+        private final MutableLiveData<Integer> hagPartsDownloadedVisibility;
 
-        insertSentencesAsyncTask(StoryDao storyDao,DatabaseService databaseService,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
+        insertSentencesAsyncTask(StoryDao storyDao,DatabaseService databaseService, MutableLiveData<Integer> HAGDownloaded,
+                                 MutableLiveData<Integer> mHagErrorVisibility, MutableLiveData<Integer> mHagButtonVisibility, MutableLiveData<Integer> mHagPartsDownloadedVisibility){
             this.storyDao = storyDao;
             this.apiService = databaseService;
-            muld = mld;
-            muld2 = mld2;
+            mHAGDownloaded = HAGDownloaded;
+            hagErrorVisibility = mHagErrorVisibility;
+            hagButtonVisibility = mHagButtonVisibility;
+            hagPartsDownloadedVisibility = mHagPartsDownloadedVisibility;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            hagButtonVisibility.setValue(View.GONE);
+            hagErrorVisibility.setValue(View.GONE);
+            hagPartsDownloadedVisibility.setValue(View.VISIBLE);
         }
 
         @Override
         protected Void doInBackground(final Hag_Sentences... params) {
+            System.out.println("inserting HAG sentences");
             for (Hag_Sentences model : params){
                 storyDao.insertHagSentence(model);
             }
@@ -573,6 +617,7 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Void v){
+            System.out.println("downloading hag words");
             //Call to download the words here
             Call<List<Hag_Words>> call = apiService.downloadHagWords();
             call.enqueue(new Callback<List<Hag_Words>>() {
@@ -580,13 +625,15 @@ public class Repository {
                 public void onResponse(Call<List<Hag_Words>> call, Response<List<Hag_Words>> response) {
                     List<Hag_Words> wordList = response.body();
                     Hag_Words[] wordListArray = wordList.toArray(new Hag_Words[wordList.size()]);
-                    new insertHagWordsAsyncTask(storyDao,muld,muld2).execute(wordListArray);
+                    new insertHagWordsAsyncTask(storyDao,mHAGDownloaded,hagErrorVisibility,hagButtonVisibility,hagPartsDownloadedVisibility).execute(wordListArray);
 
                 }
                 @Override
                 public void onFailure(Call<List<Hag_Words>> call, Throwable t) {
-                    System.out.println("Error on call" + t);
-                    //muld2.setValue(View.VISIBLE);
+                   System.out.println("Error on call" + t);
+                    hagButtonVisibility.setValue(View.VISIBLE);
+                    hagErrorVisibility.setValue(View.VISIBLE);
+                    hagPartsDownloadedVisibility.setValue(View.GONE);
                     //TODO : create a variable live data for visibility and a button and textview for "could not connect to server, tap to try again"
 
                 }
@@ -598,15 +645,23 @@ public class Repository {
 
     private static class insertHagWordsAsyncTask extends AsyncTask<Hag_Words, Void, Void>{
         private final StoryDao storyDao;
-        private final MutableLiveData<Integer> muld,muld2;
-        insertHagWordsAsyncTask(StoryDao storyDao,MutableLiveData<Integer> mld, MutableLiveData<Integer> mld2){
+        private final MutableLiveData<Integer> mHAGDownloaded;
+        private final MutableLiveData<Integer> hagErrorVisibility;
+        private final MutableLiveData<Integer> hagButtonVisibility;
+        private final MutableLiveData<Integer> hagPartsDownloadedVisibility;
+
+        insertHagWordsAsyncTask(StoryDao storyDao, MutableLiveData<Integer> HAGDownloaded,
+                                MutableLiveData<Integer> mHagErrorVisibility, MutableLiveData<Integer> mHagButtonVisibility, MutableLiveData<Integer> mHagPartsDownloadedVisibility){
             this.storyDao = storyDao;
-            muld = mld;
-            muld2 = mld2;
+            mHAGDownloaded = HAGDownloaded;
+            hagErrorVisibility = mHagErrorVisibility;
+            hagButtonVisibility = mHagButtonVisibility;
+            hagPartsDownloadedVisibility = mHagPartsDownloadedVisibility;
         }
 
         @Override
         protected Void doInBackground(final Hag_Words... params) {
+            System.out.println("Inserting HAG words");
             for (Hag_Words model : params){
                 storyDao.insertHagWord(model);
             }
@@ -614,12 +669,12 @@ public class Repository {
         }
 
         @Override
-        protected void onPostExecute(Void v){
-            muld.setValue(View.GONE);
-            muld2.setValue(View.VISIBLE);
-            new insertStoryListAsyncTask(storyDao).execute(new StoriesListItem("Hänsel und Gretel","der Brüder Grimm"));
+        protected void onPostExecute(Void aVoid) {
+            hagButtonVisibility.setValue(View.VISIBLE);
+            hagErrorVisibility.setValue(View.GONE);
+            hagPartsDownloadedVisibility.setValue(View.GONE);
+            mHAGDownloaded.setValue(1);
         }
-
     }
 
     /**
@@ -635,7 +690,6 @@ public class Repository {
         @Override
         protected Void doInBackground(final StoriesListItem... params) {
             storyDao.insert(params[0]);
-            System.out.println("Added the story!");
             return null;
         }
     }
@@ -670,22 +724,11 @@ public class Repository {
 
         @Override
         protected Void doInBackground(String[]... strings) {
-            /*
-            int[] numArray = new int[700];
-            for (int i =0;i<700;i++){
-                numArray[i] = i+1;
-            }
-            System.out.println("BEGGINING UPDATING SCORES");
-            mAsyncTaskDao.updateVocabScore(strings,numArray);
-            System.out.println("END UPDATING SCORES");
-*/
-
-            //mAsyncTaskDao.resetAllScores();
 
             String[] scoreArray = strings[0];
             String[] studyingArray = strings[1];
             String[] freqArray = strings[2];
-            System.out.println("BEGGINING UPDATING SCORES");
+           // System.out.println("BEGGINING UPDATING SCORES");
             for (int i = 0;i < 700;i++){
                 if (Integer.parseInt(studyingArray[i])==0){break;}
                 try {
@@ -694,22 +737,8 @@ public class Repository {
                     break;
                 }
                 }
-            System.out.println("END UPDATING SCORES");
+           // System.out.println("END UPDATING SCORES");
 
-            /*
-            System.out.println("Getting full empty list");
-            VocabModelA1[] vocabList = mAsyncTaskDao.getFullA1List();
-            System.out.println("finished full empty list get");
-            //String[] scores = strings;
-            for (int i = 0;i < 700;i++){
-                //vocabList[i-1].setId(i);
-                System.out.println("Updating node");
-                vocabList[i].setScore(Integer.parseInt(strings[i]));
-                mAsyncTaskDao.updateVocabScoresOnLogin(vocabList[i]);
-            }
-            System.out.println("$$$$$$ Finshed updating vocablist from remote");
-            return null;
-             */
             return null;
         }
 
@@ -830,4 +859,156 @@ public class Repository {
     }
 
 
+
+
+    //View Visibility setters
+    public void setRegistrationVisibility(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.VISIBLE);
+        passwordErrorVisibility.setValue(View.INVISIBLE);
+    }
+    public void setRegistrationVisibilityF(){
+        loginVisibility.setValue(View.VISIBLE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
+    public void setLoginAndRegistrationVisibilityGone(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
+
+    //Getters and Setters **
+    public void getUserInfoFromRoom(){
+        currentUser = mUserDao.getUser();
+    }
+    public void setPasswordErrorVisibility(int i){
+        passwordErrorVisibility.setValue(i);
+    }
+    public MutableLiveData<Integer> getEmailTakenVisibility() {
+        return emailTakenVisibility;
+    }
+    public void setEmailTakenVisibility(int i) {
+        this.emailTakenVisibility.setValue(i);
+    }
+    public LiveData<Integer> getCouldNotConnectVisibility(){return couldNotConnectVisibility;}
+    public void setCouldNotConnectVisibility(int i){couldNotConnectVisibility.setValue(i);}
+    public LiveData<Integer> getEmailValidVisibility() {
+        return emailValidVisibility;
+    }
+
+    public void setEmailValidVisibility(int i) {
+        this.emailValidVisibility.setValue(i);
+    }
+    public LiveData<List<StoriesListItem>> getStoriesListItems(){
+        return storiesListItems;
+    }
+    public LiveData<User> getCurrentUser() {
+        return currentUser;
+    }
+    public VocabDao getmVocabDao() {
+        return mVocabDao;
+    }
+    public LiveData<String> getUserName() {
+        return userName;
+    }
+    public LiveData<String> getUserEmail() {
+        return userEmail;
+    }
+
+    public LiveData<Integer> getA1Count() {
+        return a1Count;
+    }
+    public LiveData<Integer> getPasswordErrorVisibility() {
+        return passwordErrorVisibility;
+    }
+    public LiveData<Integer> getProfileVisibility() {
+        return profileVisibility;
+    }
+    public LiveData<Integer> getRegistrationVisibility() {
+        return registrationVisibility;
+    }
+    public LiveData<Integer> getLoginVisibility() {
+        return loginVisibility;
+    }
+    public LiveData<List<VocabListItem>> getVocabListItems(){
+        return vocabListItemList;
+        //MutableLiveData<List<VocabListItem>> data = new MutableLiveData<>();
+        //data.setValue(dataSet);
+        //return data;
+    }
+
+    public LiveData<Integer> getShowLoadingBar(){return showLoadingBar;}
+    public LiveData<Integer> getShowViewPager(){return showViewPager;}
+
+    public LiveData<Integer> getA1Max(){
+        return mVocabDao.count();
+    }
+
+    public LiveData<Integer> getA1Learned() {return mVocabDao.countLearned();}
+    public LiveData<Integer> getA1Mastered() {return mVocabDao.countMastered();}
+    public LiveData<Integer> getA1Percent() {return mVocabDao.countLearned();}
+    public LiveData<Integer> count() {
+        return mVocabDao.count();
+    }
+
+    private void initialSetters(){
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+        emailTakenVisibility.setValue(View.GONE);
+        emailValidVisibility.setValue(View.GONE);
+        errorConnectingToDatabaseVisibility.setValue(View.GONE);
+        showLoadingBar.setValue(View.GONE);
+        showViewPager.setValue(View.VISIBLE);
+        couldNotConnectVisibility.setValue(View.GONE);
+    }
+
+    public MutableLiveData<Integer> getA1Downloaded() {
+        return A1Downloaded;
+    }
+
+    public void setA1Downloaded(MutableLiveData<Integer> a1Downloaded) {
+        A1Downloaded = a1Downloaded;
+    }
+
+    public LiveData<String> getA1DownloadedText() {
+        return A1DownloadedText;
+    }
+    public LiveData<Integer> getDownloadProgressVisibility() {
+        return downloadProgressVisibility;
+    }
+    public LiveData<Integer> getWordsLearnedVisibility() {
+        return wordsLearnedVisibility;
+    }
+    public LiveData<Integer> getDownloadButtonVisibility() {
+        return downloadButtonVisibility;
+    }
+
+    public MutableLiveData<Integer> getWordsDownloadedVisibility() {
+        return wordsDownloadedVisibility;
+    }
+    public MutableLiveData<Integer> getErrorDownloadingVisibility() {
+        return errorDownloadingVisibility;
+    }
+    public LiveData<String> getHAGDownloadedText() {
+        return HAGDownloadedText;
+    }
+    public MutableLiveData<Integer> getHAGDownloaded() {
+        return HAGDownloaded;
+    }
+
+    public LiveData<Integer> getHAGPartsDownloaded(){return storyDao.countHAGParts();}
+    public LiveData<Integer> getHAGWordsDownloaded(){return storyDao.countHAGWords();}
+    public LiveData<Integer> getHagErrorVisibility() {
+        return hagErrorVisibility;
+    }
+    public LiveData<Integer> getHagButtonVisibility() {
+        return hagButtonVisibility;
+    }
+    public LiveData<Integer> getHagPartsDownloadedVisibility() {
+        return hagPartsDownloadedVisibility;
+    }
 }

@@ -15,11 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.williammunsch.germanstudyguide.FlashcardActivity;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.StoryActivity;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.viewmodels.StoriesListViewModel;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel;
 
 import java.util.List;
 
@@ -27,6 +26,8 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
     private List<StoriesListItem> mStoriesList;
     private Context mContext;
     private StoriesListViewModel storiesListViewModel;
+    private Integer HAGDownloaded =0, HAGPartsDownloaded = 0,HAGWordsDownloaded =0,HAGErrorVisibility = View.GONE, HAGPartsDownloadedVisibility = View.GONE, HAGButtonVisibility = View.VISIBLE;
+    private String downloadButtonText = "Download";
 
 
     public StoriesRecyclerViewAdapter(Context mContext, StoriesListViewModel storiesListViewModel){
@@ -52,7 +53,14 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
         viewHolder.authorTextView.setText(mStoriesList.get(i).getAuthor());
         if(i==0){
             viewHolder.icon.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_hanselundgretal,null));
+            viewHolder.readButton.setText(downloadButtonText);
+            int hagParts = HAGPartsDownloaded + HAGWordsDownloaded;
+            viewHolder.partsDownloadedTextView.setText("Parts Downloaded: " + hagParts + "/919");//HAGPartsDownloaded + HAGWordsDownloaded);
         }
+
+        viewHolder.readButton.setVisibility(HAGButtonVisibility);
+        viewHolder.partsDownloadedTextView.setVisibility(HAGPartsDownloadedVisibility);
+        viewHolder.errorDownloadingTextView.setVisibility(HAGErrorVisibility);
 
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -74,12 +82,17 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
             @Override
             public void onClick(View view) {
                 if (viewHolder.getAdapterPosition()==0){
-                    //System.out.println("Adding source from recyclerviewadaper88888888888");
-                    //vocabListViewModel.addSource();
-                    Intent intent = new Intent(mContext, StoryActivity.class);
-                    intent.putExtra("story", "hag");
-                    mContext.startActivity(intent);
-                }else if (viewHolder.getAdapterPosition()==1){
+                    if (HAGDownloaded == 0){
+                        storiesListViewModel.downloadHAG();
+                    }
+                    else{
+                        Intent intent = new Intent(mContext, StoryActivity.class);
+                        intent.putExtra("story", "hag");
+                        mContext.startActivity(intent);
+                    }
+
+                }
+                else if (viewHolder.getAdapterPosition()==1){
                 }
             }
         });
@@ -101,12 +114,43 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
         notifyDataSetChanged();
     }
 
+    public void setDownloadButtonText(String s){
+        this.downloadButtonText = s;
+        notifyDataSetChanged();
+    }
+
+    public void setHAGDownloaded(Integer i){
+        this.HAGDownloaded = i;
+        notifyDataSetChanged();
+    }
+
+    public void setHAGPartsDownloaded(Integer i){
+        this.HAGPartsDownloaded = i;
+        notifyDataSetChanged();
+    }
+    public void setHAGWordsDownloaded(Integer i){
+        this.HAGWordsDownloaded=i;
+        notifyDataSetChanged();
+    }
+    public void setHAGErrorVisibility(Integer i){
+        this.HAGErrorVisibility=i;
+        notifyDataSetChanged();
+    }
+    public void setHAGPartsDownloadedVisibility(Integer i){
+        this.HAGPartsDownloadedVisibility=i;
+        notifyDataSetChanged();
+    }
+    public void setHAGButtonVisibility(Integer i){
+        this.HAGButtonVisibility =i;
+        notifyDataSetChanged();
+    }
+
 
     /**
      * Holds each widget in memory for it to be recycled.
      */
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView titleTextView, authorTextView;
+        private TextView titleTextView, authorTextView, partsDownloadedTextView, errorDownloadingTextView;
         private ImageView icon;
         private RelativeLayout parentLayout;
         boolean isExpanded = false;
@@ -120,6 +164,8 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
             parentLayout = itemView.findViewById(R.id.parentRelative_layout);
             buttonLayout = itemView.findViewById(R.id.buttonLayout2);
             readButton = itemView.findViewById(R.id.readButton);
+            partsDownloadedTextView = itemView.findViewById(R.id.partsDownloadedTV);
+            errorDownloadingTextView = itemView.findViewById(R.id.errorDownloadingTV);
         }
     }
 }

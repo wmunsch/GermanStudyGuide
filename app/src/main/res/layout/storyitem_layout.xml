@@ -5,7 +5,7 @@
     <data>
         <variable
             name="storieslistviewmodel"
-            type="com.williammunsch.germanstudyguide.viewmodels.StoriesListViewModel" />
+            type="com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel" />
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -34,10 +34,27 @@
                 android:text="Read"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/readButton" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/partsDownloadedTV"
+                android:text="Parts Downloaded: "
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/errorDownloadingTV"
+                android:text="Error Connecting To Server."
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:background="#ffffff"

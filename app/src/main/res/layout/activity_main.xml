@@ -5,7 +5,7 @@
     <data>
         <variable
             name="mainactivityviewmodel"
-            type="com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel" />
+            type="com.williammunsch.germanstudyguide.activitiesviewmodels.MainActivityViewModel" />
 
         <variable
             name="email_text"

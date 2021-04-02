@@ -38,23 +38,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     // overriding getPageTitle()
     @Override
     public CharSequence getPageTitle(int position) {
-/*
-        // Generate title based on item position
-        Drawable image = context.getResources().getDrawable(imageResId[position]);
-        image.mutate().setColorFilter(Color.BLUE, PorterDuff.Mode.ADD);
-        //image.setTint(R.drawable.tab_selector);
-        //image.setState();
-       // image.setTint(context.getDrawable(R.id.tab));
-        image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
-        // Replace blank spaces with image icon
-        SpannableString sb = new SpannableString("  " + tabTitles[position]);
-        ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
-        sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return sb;
-
- */
-
-
         return tabTitles[position];
     }
 
@@ -71,8 +54,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         }
 
     }
-
-
 
 
     @Override

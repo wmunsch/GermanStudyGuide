@@ -30,8 +30,14 @@ public interface StoryDao {
     @Query("SELECT COUNT() FROM stories_list_table")
     Integer countStories();
 
-    @Query("SELECT COUNT() FROM hag_sentences")
-    Integer countPages();
+    @Query("SELECT COUNT(*) FROM hag_sentences")
+    Integer countSentences();
+
+    @Query("SELECT COUNT(*) FROM hag_sentences")
+    LiveData<Integer> countHAGParts();
+
+    @Query("SELECT COUNT(*) FROM hag_words")
+    LiveData<Integer> countHAGWords();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertHagSentence(Hag_Sentences hag_sentences);
@@ -52,7 +58,8 @@ public interface StoryDao {
     @Query("SELECT * FROM hag_words WHERE german = 'und'")
     Hag_Words getWord3();
 
-
+    @Query("SELECT COUNT(*) FROM stories_list_table WHERE title = :title")
+    Integer storyLessonExists(String title);
 
 
 }

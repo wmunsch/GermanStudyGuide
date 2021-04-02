@@ -6,7 +6,7 @@
     <data>
         <variable
             name="flashcardviewmodel"
-            type="com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel" />
+            type="com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -159,7 +159,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="@{flashcardviewmodel.currentNode.english}"
+            android:text="@{flashcardviewmodel.currentNode.englishSep}"
             android:textAlignment="center"
             android:textSize="20sp"
             android:visibility="@{flashcardviewmodel.englishTextVisibility, default=visible}"

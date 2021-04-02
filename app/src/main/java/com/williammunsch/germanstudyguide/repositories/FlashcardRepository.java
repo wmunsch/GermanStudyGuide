@@ -10,13 +10,11 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.williammunsch.germanstudyguide.CreateUploadDataResponse;
-import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.responses.CreateUploadDataResponse;
+import com.williammunsch.germanstudyguide.DatabasePID;
 import com.williammunsch.germanstudyguide.api.DatabaseService;
-import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
-import com.williammunsch.germanstudyguide.room.UserDao;
 import com.williammunsch.germanstudyguide.room.VocabDao;
 
 import java.util.ArrayList;
@@ -138,7 +136,7 @@ public class FlashcardRepository {
                 cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size()); //This determines the cards left number
 
                 if (mediatorVocabList.getValue().size()>0){
-                    System.out.println("Studying is equal to " + mediatorVocabList.getValue().get(0).getStudying());
+                   // System.out.println("Studying is equal to " + mediatorVocabList.getValue().get(0).getStudying());
                     if (mediatorVocabList.getValue().get(0).getStudying()==0){
                         setUpViewsForNewCard();
                     }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
@@ -191,11 +189,11 @@ public class FlashcardRepository {
 
     public void addSource(){
         if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
-            System.out.println("*\n*\nADDING SOURCE\n*\n*");
+           // System.out.println("*\n*\nADDING SOURCE\n*\n*");
             try {
                 mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
             }catch(Exception e){
-                System.out.println("Error: " + e);
+               // System.out.println("Error: " + e);
 
             }
         }
@@ -207,17 +205,17 @@ public class FlashcardRepository {
      * the mediatorVocabList.
      */
     public void updateAllNodes(boolean login){
-        System.out.println("UPDATING ALL NODES");
+      //  System.out.println("UPDATING ALL NODES");
 
         updateNode(finishedList, login);
         finishedList.clear();
         setAtBeginning = false;
 
-        System.out.println("Finished updating nodes");
+       // System.out.println("Finished updating nodes");
     }
 
     private void setUpViewsForNewCard(){
-        System.out.println("CALLING setupviewsforNEWcard");
+       // System.out.println("CALLING setupviewsforNEWcard");
         englishTextVisibility.setValue(VISIBLE);
         mHintVisibility.setValue(VISIBLE);
         checkmarkVisibility.setValue(INVISIBLE);
@@ -249,7 +247,7 @@ public class FlashcardRepository {
     }
 
     private void setUpViewsForOldCard(){
-        System.out.println("CALLING setupviewsforOLDcard");
+      //  System.out.println("CALLING setupviewsforOLDcard");
         checkButtonText.setValue("Check");
         finished = false;
         //setAnswer("");
@@ -299,7 +297,7 @@ public class FlashcardRepository {
      *  Could this be improved by sending the list as a parameter instead of each vocabModel individually? No
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s, boolean loggedIn){
-        System.out.println("vocabmodea1s sidze = " +vocabModelA1s.size());
+       // System.out.println("vocabmodea1s sidze = " +vocabModelA1s.size());
         if (vocabModelA1s.size()==3){
             new updateNodeAsyncTask(mVocabDao,apiService,mRepository.getUserName().getValue(),loggedIn).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2));
         }else if (vocabModelA1s.size()==4){
@@ -323,7 +321,7 @@ public class FlashcardRepository {
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14),
                     vocabModelA1s.get(15), vocabModelA1s.get(16), vocabModelA1s.get(17), vocabModelA1s.get(18), vocabModelA1s.get(19));
         }else{
-            System.out.println("ERROR UPDATENODE DIDNT WORK");
+           // System.out.println("ERROR UPDATENODE DIDNT WORK");
         }
 
         //new updateNodeAsyncTask(mVocabDao).execute(vocabModelA1s.get(0), vocabModelA1s.get(1), vocabModelA1s.get(2), vocabModelA1s.get(3), vocabModelA1s.get(4));
@@ -343,6 +341,7 @@ public class FlashcardRepository {
         private DatabaseService apiService;
         private String username;
         private boolean loggedIn;
+        private final DatabasePID databasePID = new DatabasePID();
 
         updateNodeAsyncTask(VocabDao dao, DatabaseService api, String username, boolean login) {
             mAsyncTaskDao = dao;
@@ -362,21 +361,21 @@ public class FlashcardRepository {
                 for (VocabModelA1 model : params){
                     mAsyncTaskDao.updateNode(model);
                     mAsyncTaskDao.updateLocalNode(model.getScore(),model.getStudying(),model.getFreq(),model.getId());
-                    System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+                   // System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
                 }
             }else{
                 for (VocabModelA1 model : params){
                     mAsyncTaskDao.updateNode(model);
-                    System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
+                  //  System.out.println("Updating node to " +model.getGerman() + " " +  model.getScore());
                 }
             }
 
             //This works, now just get the entire string with a separator per entry
-            System.out.println("what im looking for: "+ mAsyncTaskDao.getA1Scores());
+           // System.out.println("what im looking for: "+ mAsyncTaskDao.getA1Scores());
             scoreList = mAsyncTaskDao.getA1Scores().toString();
             studyingList = mAsyncTaskDao.getA1Studying().toString();
             freqList = mAsyncTaskDao.getA1Freq().toString();
-            System.out.println(scoreList);
+           // System.out.println(scoreList);
             tempS = scoreList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
             tempS2 = studyingList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
             tempS3 = freqList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
@@ -386,22 +385,22 @@ public class FlashcardRepository {
         @Override
         protected void onPostExecute(Void v){
             if (loggedIn){
-                System.out.println("Finished updating room database, calling to update remote database.");
+               // System.out.println("Finished updating room database, calling to update remote database.");
 
-                Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,tempS3,tempS2);//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
+                Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,tempS3,tempS2,databasePID.getPid());//mRepository.apiService.createSaveData(userName.getValue(),"A1");//mRepository.apiService.uploadData(userName.getValue(),"A1","","","");
                 call.enqueue(new Callback<CreateUploadDataResponse>() {
                     @Override
                     public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
-                        System.out.println("Response to creating save data");
-                        System.out.println(response);
+                       // System.out.println("Response to creating save data");
+                       // System.out.println(response);
                         CreateUploadDataResponse lr = response.body();
-                        System.out.println("Body is : " + lr);
+                       // System.out.println("Body is : " + lr);
 
                     }
 
                     @Override
                     public void onFailure(Call<CreateUploadDataResponse> call, Throwable t) {
-                        System.out.println("Error on call when creating save data" + t);
+                        //System.out.println("Error on call when creating save data" + t);
                     }
                 });
             }

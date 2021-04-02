@@ -11,22 +11,15 @@ import android.graphics.drawable.Drawable;
  */
 @Entity(tableName = "stories_list_table")
 public class StoriesListItem {
-   // private int id;
 
     @PrimaryKey@NonNull
     private String title;
 
     private String author;
-    //private String icon;
-   // private String content;
 
-    public StoriesListItem(String title, String author){//, Drawable nIcon){
+    public StoriesListItem(String title, String author){
         this.title = title;
         this.author = author;
-        //this.content = content;
-       // this.id = id;
-        //this.icon = icon;
-        //this.icon = nIcon;
     }
 
 
@@ -45,14 +38,6 @@ public class StoriesListItem {
     public void setAuthor(String author) {
         this.author = author;
     }
-
-    //public String getIcon() {
-    //    return icon;
-   // }
-
-   // public void setIcon(String icon) {
-   //     this.icon = icon;
-   // }
 
 
 }

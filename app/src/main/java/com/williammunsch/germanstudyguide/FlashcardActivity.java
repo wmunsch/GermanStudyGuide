@@ -1,6 +1,5 @@
 package com.williammunsch.germanstudyguide;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +14,8 @@ import android.view.MenuItem;
 //import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
-import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import java.util.List;
 
@@ -24,19 +23,19 @@ import javax.inject.Inject;
 
 
 /**
+ * Activity for the vocabulary flashcards.
+ *
  * The queue for the flashcards will need to be stored in the repository,
  * and observed from a view model.  (notifydatasetchanged)?
  * After testing a flashcard, the entity's value in the database will be
  * changed directly, and observed by the view model.
  * Queue item removal and move will be called from the activity -> viewmodel -> repository
- * All of the findviewbyid stuff needs to be replaced with databinding.
  */
 public class FlashcardActivity extends AppCompatActivity {
 
     @Inject ViewModelFactory viewModelFactory;
 
     FlashcardViewModel flashcardViewModel;
-    private String tableName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +43,12 @@ public class FlashcardActivity extends AppCompatActivity {
         ActivityLearnBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_learn);
         binding.setLifecycleOwner(this);
 
-       // Toolbar myToolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(myToolbar);
-
         setSupportActionBar(binding.toolbar);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
         flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
         binding.setFlashcardviewmodel(flashcardViewModel);
 
-        Intent bIntent = getIntent();
-        tableName =bIntent.getStringExtra("table");
-
-
-        //shortAnimationDuration = 500;
+       // Intent bIntent = getIntent();
 
 
 
@@ -72,7 +64,7 @@ public class FlashcardActivity extends AppCompatActivity {
             public void onChanged(List<VocabModelA1> vocabModelA1s) {
                 if (vocabModelA1s != null) {
                     for (int i = 0; i < vocabModelA1s.size(); i++){
-                        System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i).getGerman() + " " + vocabModelA1s.get(i).getScore() + " " + vocabModelA1s.get(i).getGsentence());// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
+                       // System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i).getGerman() + " " + vocabModelA1s.get(i).getScore() + " " + vocabModelA1s.get(i).getGsentence());// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
 
                     }
                 }

@@ -14,13 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.williammunsch.germanstudyguide.FlashcardActivity;
 import com.williammunsch.germanstudyguide.NounGenderActivity;
 import com.williammunsch.germanstudyguide.R;
-import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
-import com.williammunsch.germanstudyguide.viewmodels.NounGenderViewModel;
-
-import javax.inject.Inject;
 
 public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRecyclerViewAdapter.ViewHolder> {
     private Context mContext;
@@ -62,7 +57,7 @@ public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRec
         viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                System.out.println("Clicked on button");
+               // System.out.println("Clicked on button");
 
                 if (viewHolder.getAdapterPosition()==0){
                    // System.out.println("Adding source from recyclerviewadaper88888888888");

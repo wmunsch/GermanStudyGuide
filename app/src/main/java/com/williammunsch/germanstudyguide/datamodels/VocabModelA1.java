@@ -46,6 +46,10 @@ public class VocabModelA1 {
        // return _id+ " " + german+ " " +english;
     }
 
+    public String getEnglishSep(){
+        return english.replace(",",", ");
+    }
+
     public String getAnswer(int score){
         if (score < 50){
             return english;

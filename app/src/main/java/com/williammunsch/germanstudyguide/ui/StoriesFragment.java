@@ -19,8 +19,8 @@ import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.adapters.StoriesRecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.viewmodels.StoriesListViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import javax.inject.Inject;
 
 public class StoriesFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private StoriesListViewModel storiesViewModel;
+    private StoriesListViewModel storiesListViewModel;
     private StoriesRecyclerViewAdapter mAdapter;
 
     @Inject
@@ -52,9 +52,7 @@ public class StoriesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initializing the view model
-        storiesViewModel = ViewModelProviders.of(this,viewModelFactory).get(StoriesListViewModel.class);
-
-
+        storiesListViewModel = ViewModelProviders.of(this,viewModelFactory).get(StoriesListViewModel.class);
 
     }
 
@@ -62,18 +60,60 @@ public class StoriesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
-        storiesViewModel.getStoriesListItems().observe(this, new Observer<List<StoriesListItem>>() {
+        //Observe all of the LiveData objects so they will be updated in the view
+        storiesListViewModel.getStoriesListItems().observe(getViewLifecycleOwner(), new Observer<List<StoriesListItem>>() {
             @Override
             public void onChanged(@Nullable List<StoriesListItem> storiesListItems) {
                 mAdapter.setStoriesList(storiesListItems);
-                //mAdapter.notifyDataSetChanged();
+            }
+        });
+        storiesListViewModel.getHAGDownloadedText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mAdapter.setDownloadButtonText(s);
+            }
+        });
+        storiesListViewModel.getHAGDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagPartsDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGPartsDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagWordsDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGWordsDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagErrorVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGErrorVisibility(integer);
+            }
+        });
+        storiesListViewModel.getHagPartsDownloadedVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGPartsDownloadedVisibility(integer);
+            }
+        });
+        storiesListViewModel.getHagButtonVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGButtonVisibility(integer);
             }
         });
 
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mAdapter = new StoriesRecyclerViewAdapter(getContext(),storiesViewModel);
+        mAdapter = new StoriesRecyclerViewAdapter(getContext(),storiesListViewModel);
         recyclerView.setAdapter(mAdapter);
 
         try {
@@ -82,15 +122,6 @@ public class StoriesFragment extends Fragment {
             //throw new Error
         }
 
-        /*
-        final TextView textView = root.findViewById(R.id.section_label);
-        pageViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        */
         return root;
     }
 }

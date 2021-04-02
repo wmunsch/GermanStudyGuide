@@ -4,23 +4,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.room.Room;
-import android.content.Context;
+
 import android.os.AsyncTask;
 import android.view.View;
 
-import androidx.core.content.res.ResourcesCompat;
-
 import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
-import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.room.GermanDatabase;
 import com.williammunsch.germanstudyguide.room.StoryDao;
-import com.williammunsch.germanstudyguide.viewmodels.StoriesListViewModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,8 +101,6 @@ public class StoriesRepository {
         addSource2();
     }
 
-
-
     public void pageForward(){
         if (pageOn<105){//mediatorSentence.getValue().size()-1){
             pageOn++;
@@ -137,11 +127,11 @@ public class StoriesRepository {
 
     public void addSource(){
         if (mediatorSentence.getValue()==null){
-            System.out.println("*\n*\nADDING SOURCE\n*\n*");
+           // System.out.println("*\n*\nADDING SOURCE\n*\n*");
             try {
                 mediatorSentence.addSource(sentenceLiveData, value -> mediatorSentence.setValue(value));
             }catch(Exception e){
-                System.out.println("Error: " + e);
+              //  System.out.println("Error: " + e);
 
             }
         }
@@ -152,11 +142,11 @@ public class StoriesRepository {
      */
     public void addSource2(){
         if (mHagWord.getValue()==null){
-            System.out.println("*\n*\nADDING SOURCE\n*\n*");
+          //  System.out.println("*\n*\nADDING SOURCE\n*\n*");
             try {
                 mHagWord.addSource(hagWord, value -> mHagWord.setValue(value));
             }catch(Exception e){
-                System.out.println("Error: " + e);
+           //     System.out.println("Error: " + e);
 
             }
         }
@@ -169,7 +159,7 @@ public class StoriesRepository {
      * The mediatorLiveData is changed in an asyncTask which queries the ROOM database.
      */
     public void updateHagWord(String german){
-        System.out.println("UPDATING HAGWORD");
+      //  System.out.println("UPDATING HAGWORD");
         String tempString;
         try{
             if (german != null){
@@ -177,11 +167,11 @@ public class StoriesRepository {
             }else{
                 tempString ="";
             }
-            System.out.println("looking for : " + tempString);
+          //  System.out.println("looking for : " + tempString);
             new getHagWordAsyncTask(storyDao,mHagWord).execute(tempString);
         }
         catch(Exception e){
-            System.out.println("EXCEPTION");
+           // System.out.println("EXCEPTION");
             mHagWord.setValue(new Hag_Words("","",""));
         }
 
@@ -211,10 +201,10 @@ public class StoriesRepository {
 
         @Override
         protected Void doInBackground(String... params) {
-            System.out.println("running search for " + params[0]);
+           // System.out.println("running search for " + params[0]);
             hagWord = storyDao.getWord(params[0]);
             if (hagWord == null) {
-                System.out.println("First was null, running again in lower case");
+               // System.out.println("First was null, running again in lower case");
                 String tempS= "";
                 tempS = params[0].toLowerCase();
                 hagWord = storyDao.getWord(tempS);
@@ -224,19 +214,21 @@ public class StoriesRepository {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            System.out.println(hagWord);
+          //  System.out.println(hagWord);
             mld.setValue(hagWord);
         }
     }
 
+
+
+
+    //Getters and setters
     public LiveData<Hag_Words> getHagWordLive() {
         return hagWordLive;
     }
-
     public LiveData<List<String>> getCurrentSentenceWordList() {
         return currentSentenceWordList;
     }
-
     public void setStoryName(String storyName){
         this.storyName = storyName;
    }
@@ -249,7 +241,6 @@ public class StoriesRepository {
     public int getPageOn() {
         return pageOn;
     }
-
     public void setPageOn(int pageOn) {
         this.pageOn = pageOn;
     }
@@ -259,14 +250,12 @@ public class StoriesRepository {
     public void setEnglishVisibility(int i){this.englishVisibility.setValue(i);}
     public void setNotesVisibility(int i){this.notesVisibility.setValue(i);}
     public void setTranslationVisibility(int i){this.translationVisibility.setValue(i);}
-
     public LiveData<Integer> getEnglishVisibility() {
         return englishVisibility;
     }
     public LiveData<Integer> getNotesVisibility() {
         return notesVisibility;
     }
-
     public LiveData<Integer> getTranslationVisibility() {
         return translationVisibility;
     }

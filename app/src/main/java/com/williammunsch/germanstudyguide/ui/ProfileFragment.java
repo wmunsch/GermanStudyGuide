@@ -12,9 +12,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
-import com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
-import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.MainActivityViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import javax.inject.Inject;
 

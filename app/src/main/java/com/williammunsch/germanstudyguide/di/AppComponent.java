@@ -8,7 +8,6 @@ import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.MainActivity;
 import com.williammunsch.germanstudyguide.NounGenderActivity;
 import com.williammunsch.germanstudyguide.StoryActivity;
-import com.williammunsch.germanstudyguide.adapters.GrammarRecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
@@ -17,11 +16,11 @@ import com.williammunsch.germanstudyguide.ui.GrammarFragment;
 import com.williammunsch.germanstudyguide.ui.ProfileFragment;
 import com.williammunsch.germanstudyguide.ui.StoriesFragment;
 import com.williammunsch.germanstudyguide.ui.VocabFragment;
-import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.NounGenderViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.StoriesListViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewModel;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.MainActivityViewModel;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.NounGenderViewModel;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.VocabListViewModel;
 
 import javax.inject.Singleton;
 

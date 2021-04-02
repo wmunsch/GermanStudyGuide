@@ -58,23 +58,19 @@ public interface VocabDao {
     //List<VocabModelA1>getVocabQueue();
 
 
-    /**
-     * Update the vocabModel word with the new score.
-     */
+
+     //Update the vocabModel word with the new score.
     @Update
     void updateNode(VocabModelA1... vocabModelA1s);
-   // @Query("UPDATE vocab_table SET score = score")
-   // void updateNode(VocabModelA1 vocabModel);
 
-    /**
-     * Update the local save Model word with the new score.
-     */
+
+
+    //Update the local save Model word with the new score.
     @Query("UPDATE local_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
     void updateLocalNode(int score, int studying, int freq, int id);
 
-    /**
-     * Called when logging in.
-     */
+
+    //Called when logging in.
     @Update
     void updateVocabScoresOnLogin(VocabModelA1... vocabModelA1s);
 
@@ -83,9 +79,9 @@ public interface VocabDao {
 
     @Query("SELECT * FROM local_tableA1")
     LocalSaveA1[] getFullLocalSaveList();
-    /**
-     *Better way of updating vocab scores when logging in
-     */
+
+
+     //Better way of updating vocab scores when logging in
     @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
     void updateVocabScore(int score, int studying, int freq, int id);
 

@@ -52,7 +52,7 @@ public class NounGenderRepository {
                 }
 
                 accuracyText.setValue("Accuracy: " + (int)((wordsCorrect/wordsTotal)*100) +"%"); //This determines the cards left number
-                System.out.println(wordsCorrect + " / " + wordsTotal);
+               // System.out.println(wordsCorrect + " / " + wordsTotal);
                 //for (int i = 0;i<mediatorVocabList.getValue().size();i++){
                //     System.out.println(mediatorVocabList.getValue().get(i).getGerman());
                // }
@@ -62,7 +62,7 @@ public class NounGenderRepository {
                     //setupViews();
                     return mediatorVocabList.getValue().get(0);
                 }else{
-                    System.out.println("EMPTY");
+                   // System.out.println("EMPTY");
                     //vocabList = mRepository.getmVocabDao().getNounQueue();
                     //return mediatorVocabList.getValue().get(0);
                     //mediatorVocabList.getValue().add(mRepository.getmVocabDao().getOneNoun());
@@ -88,11 +88,11 @@ public class NounGenderRepository {
 
     public void addSource(){
         if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
-            System.out.println("*\n*\nADDING SOURCE\n*\n*");
+           // System.out.println("*\n*\nADDING SOURCE\n*\n*");
             try {
                 mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
             }catch(Exception e){
-                System.out.println("Error: " + e);
+              //  System.out.println("Error: " + e);
 
             }
         }

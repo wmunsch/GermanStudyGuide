@@ -8,12 +8,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityNoungenderBinding;
-import com.williammunsch.germanstudyguide.viewmodels.FlashcardViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.NounGenderViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.NounGenderViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import javax.inject.Inject;
 
+/**
+ * Activity for the noun gender lessons
+ */
 public class NounGenderActivity extends AppCompatActivity {
 
     @Inject
@@ -26,7 +28,6 @@ public class NounGenderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityNoungenderBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_noungender);
         binding.setLifecycleOwner(this);
-       // setSupportActionBar(binding.toolbar);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this); //Need to add the inject method in AppComponent for this to work.
         nounGenderViewModel = ViewModelProviders.of(this,viewModelFactory).get(NounGenderViewModel.class);
         binding.setNoungenderviewmodel(nounGenderViewModel);
