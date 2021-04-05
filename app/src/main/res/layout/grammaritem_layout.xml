@@ -31,12 +31,18 @@
                 android:textColor="#ffffff"
                 android:textSize="16sp"
                 android:textAllCaps="false"
-                android:text="Practice"
+                android:text="@string/practice"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/learnButton" />
 
-
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/downloadFirstTV"
+                android:text="@string/download_vocab_first"
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
 
 
         </LinearLayout>

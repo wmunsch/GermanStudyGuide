@@ -36,8 +36,6 @@ import retrofit2.Response;
 
 
 /**
- *  A Repository class handles data operations. It provides a clean API to the rest of the app for app data.
- *
  *  Base repository that handles api calls and ROOM updates.
  *
  */
@@ -84,8 +82,6 @@ public class Repository {
 
     GermanDatabase db;
 
-    private LiveData<Integer> a1Percent;
-
 
     private LiveData<Integer> a1Count;
 
@@ -99,6 +95,9 @@ public class Repository {
     private MutableLiveData<Integer> hagErrorVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> hagButtonVisibility = new MutableLiveData<>();
     private MutableLiveData<Integer> hagPartsDownloadedVisibility = new MutableLiveData<>();
+
+    private MutableLiveData<Integer> genderButtonVisibility = new MutableLiveData<>(View.VISIBLE);
+    private MutableLiveData<Integer> genderTextVisibility = new MutableLiveData<>(View.GONE);
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -148,6 +147,8 @@ public class Repository {
         hagErrorVisibility.setValue(View.GONE);
         hagPartsDownloadedVisibility.setValue(View.GONE);
 
+
+
         //Check if the ROOM tables for the lessons and story lists for the recyclerviews have been created
         checkLessons();
         checkStories();
@@ -163,11 +164,15 @@ public class Repository {
         A1DownloadedText = Transformations.map(A1Downloaded, value->{
            if (A1Downloaded.getValue() == 0){
                wordsLearnedVisibility.setValue(View.GONE);
+               genderButtonVisibility.setValue(View.GONE);
+               genderTextVisibility.setValue(View.VISIBLE);
                //wordsDownloadedVisibility.setValue(View.VISIBLE);
                return "Download";
            }
            else{
                wordsLearnedVisibility.setValue(View.VISIBLE);
+               genderButtonVisibility.setValue(View.VISIBLE);
+               genderTextVisibility.setValue(View.GONE);
                //wordsDownloadedVisibility.setValue(View.GONE);
                return "Study";
            }
@@ -1010,5 +1015,11 @@ public class Repository {
     }
     public LiveData<Integer> getHagPartsDownloadedVisibility() {
         return hagPartsDownloadedVisibility;
+    }
+    public LiveData<Integer> getGenderButtonVisibility() {
+        return genderButtonVisibility;
+    }
+    public LiveData<Integer> getGenderTextVisibility() {
+        return genderTextVisibility;
     }
 }

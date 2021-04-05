@@ -1,7 +1,7 @@
 package com.williammunsch.germanstudyguide.ui;
 
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -52,7 +52,7 @@ public class StoriesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initializing the view model
-        storiesListViewModel = ViewModelProviders.of(this,viewModelFactory).get(StoriesListViewModel.class);
+        storiesListViewModel = new ViewModelProvider(this,viewModelFactory).get(StoriesListViewModel.class);
 
     }
 

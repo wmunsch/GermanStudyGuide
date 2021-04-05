@@ -8,6 +8,7 @@ import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.MainActivity;
 import com.williammunsch.germanstudyguide.NounGenderActivity;
 import com.williammunsch.germanstudyguide.StoryActivity;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.GrammarListViewModel;
 import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
@@ -75,6 +76,7 @@ public interface AppComponent {
 
     void inject(StoryActivity storyActivity);
 
+    void inject(GrammarListViewModel grammarListViewModel);
 
 
 

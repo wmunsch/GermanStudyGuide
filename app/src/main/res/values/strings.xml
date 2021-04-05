@@ -24,4 +24,6 @@
     <string name="email_valid">*Email is not valid.</string>
     <string name="outOf700">/700</string>
     <string name="loading">loading</string>
+    <string name="download_vocab_first">Download vocab first!</string>
+    <string name="practice">Practice</string>
 </resources>

@@ -7,6 +7,7 @@ import com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewMode
 import com.williammunsch.germanstudyguide.activitiesviewmodels.MainActivityViewModel;
 import com.williammunsch.germanstudyguide.activitiesviewmodels.NounGenderViewModel;
 import com.williammunsch.germanstudyguide.activitiesviewmodels.StoryViewModel;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.GrammarListViewModel;
 import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel;
 import com.williammunsch.germanstudyguide.recyclerviewviewmodels.VocabListViewModel;
 
@@ -51,6 +52,10 @@ public abstract class ViewModelModule {
     @ViewModelKey(StoryViewModel.class)
     abstract ViewModel bindStoryViewModel(StoryViewModel storyViewModel);
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(GrammarListViewModel.class)
+    abstract ViewModel bindGrammarListViewModel(GrammarListViewModel grammarListViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(ViewModelFactory viewModelFactory);

@@ -20,7 +20,8 @@ import com.williammunsch.germanstudyguide.R;
 public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRecyclerViewAdapter.ViewHolder> {
     private Context mContext;
    // private NounGenderViewModel nounGenderViewModel;
-
+    private Integer genderButtonVisibility = View.VISIBLE;
+    private Integer genderTextVisibility = View.GONE;
 
     public GrammarRecyclerViewAdapter(Context mContext){
         this.mContext = mContext;
@@ -37,6 +38,9 @@ public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRec
 
     @Override
     public void onBindViewHolder(@NonNull GrammarRecyclerViewAdapter.ViewHolder viewHolder, int position) {
+        viewHolder.learnButton.setVisibility(genderButtonVisibility);
+        viewHolder.downloadFirst.setVisibility(genderTextVisibility);
+
         //On click, expand the layout by increase vertical size and showing buttons
         viewHolder.parentLayout.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -82,12 +86,20 @@ public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRec
         return 1;
     }
 
+    public void setGenderButtonVisibility(Integer i){
+        this.genderButtonVisibility = i;
+        notifyDataSetChanged();
+    }
+    public void setGenderTextVisibility(Integer i){
+        this.genderTextVisibility = i;
+        notifyDataSetChanged();
+    }
 
     /**
      * Holds each widget in memory for it to be recycled.
      */
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView listItemName, wordsLearned, image;
+        private TextView listItemName, wordsLearned, image, downloadFirst;
         private ProgressBar progressBar;
         private RelativeLayout parentLayout;
         boolean isExpanded = false;
@@ -100,6 +112,7 @@ public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRec
             parentLayout = itemView.findViewById(R.id.parent_layout);
             buttonLayout = itemView.findViewById(R.id.buttonLayout);
             learnButton = itemView.findViewById(R.id.learnButton);
+            downloadFirst = itemView.findViewById(R.id.downloadFirstTV);
             //learnButton = itemView.findViewById(R.id.learnButton2);
         }
     }
