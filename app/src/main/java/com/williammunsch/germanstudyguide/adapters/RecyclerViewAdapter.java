@@ -32,15 +32,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             a1WordsDownloadedVisibility = View.GONE, a1ErrorDownloadingVisibility = View.GONE;
     private String a1ButtonText= "";
     private String a1DownloadText = "Words learned : ";
-    private Context mContext;
-    private VocabListViewModel vocabListViewModel;
-    //private MainActivityViewModel mainActivityViewModel;
-   // private int a1Max;
+    private final Context mContext;
+    private final VocabListViewModel vocabListViewModel;
 
     public RecyclerViewAdapter(Context mContext, VocabListViewModel viewModel){
         this.mContext = mContext;
         this.vocabListViewModel = viewModel;
-        //mainActivityViewModel = mainViewModel;
     }
 
 
@@ -60,6 +57,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         viewHolder.progressBar.setSecondaryProgress(a1Percent);
         viewHolder.wordsDownloaded.setText("Words Downloaded: " + a1Max + "/700");
 
+        //Changes the text once every word as been seen once
         if (i==0){
             viewHolder.learnButton.setText(a1ButtonText);
             if (a1Learned < a1Max){
@@ -77,7 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
 
 
-
+        //Changes the picture for each vocab lesson
         if (i==0 || i ==1){
             if (a1Learned<a1Max){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle1,null));}//a1circle1
             else{
@@ -92,6 +90,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ccircle,null));
         }
 
+        //Starts the activity for each lesson when clicking on the button
         viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -101,13 +100,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                         vocabListViewModel.downloadA1();
                     }
                     else{
-                        vocabListViewModel.addSource();
                         Intent intent = new Intent(mContext, FlashcardActivity.class);
                         intent.putExtra("table", "A1");
                         mContext.startActivity(intent);
                     }
-
-
 
                 }else if (viewHolder.getAdapterPosition()==1){
                     Intent intent = new Intent(mContext, FlashcardActivity.class);
@@ -147,7 +143,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     /**
-     * This function allows the recyclerview to be updated with livedata in the fragment while observing
+     * Allows the recyclerview to be updated with livedata in the fragment while observing
      */
     public void setVocabList(List<VocabListItem> vocabList){
         this.mVocabList = vocabList;
@@ -161,7 +157,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setA1Learned(Integer i ){
         this.a1Learned = i;
-        //TODO change the 14 back to 700
         a1Percent = (int)(((double)a1Learned/700)*100); //Sets the progress bar for the main page activities A1, etc.
 
         notifyDataSetChanged();
@@ -169,7 +164,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void setA1Mastered(Integer i){
         this.a1Mastered = i;
-        //TODO change the 14 back to 700
         a1MasteredPercent = (int)(((double)a1Mastered/700)*100); //Sets the progress bar for the main page activities A1, etc.
         notifyDataSetChanged();
     }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityNoungenderBinding;
 import com.williammunsch.germanstudyguide.activitiesviewmodels.NounGenderViewModel;
@@ -29,7 +29,7 @@ public class NounGenderActivity extends AppCompatActivity {
         ActivityNoungenderBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_noungender);
         binding.setLifecycleOwner(this);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this); //Need to add the inject method in AppComponent for this to work.
-        nounGenderViewModel = ViewModelProviders.of(this,viewModelFactory).get(NounGenderViewModel.class);
+        nounGenderViewModel =  new ViewModelProvider(this,viewModelFactory).get(NounGenderViewModel.class);
         binding.setNoungenderviewmodel(nounGenderViewModel);
     }
 }

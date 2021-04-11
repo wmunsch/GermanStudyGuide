@@ -1,4 +1,4 @@
-package com.williammunsch.germanstudyguide;
+package com.williammunsch.germanstudyguide.datamodels;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;

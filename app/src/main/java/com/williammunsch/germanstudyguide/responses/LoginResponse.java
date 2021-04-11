@@ -1,9 +1,8 @@
 package com.williammunsch.germanstudyguide.responses;
 
-import android.util.Log;
-
-import java.util.List;
-
+/**
+ * Used to get login response data from JSON
+ */
 public class LoginResponse {
     //The name of these values must match the values given by JSON in the PHP API
     private String error;

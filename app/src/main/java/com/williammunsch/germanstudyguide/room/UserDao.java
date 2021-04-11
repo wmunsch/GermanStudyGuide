@@ -5,7 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.datamodels.User;
 
 /**
  * The data access object responsible for retrieving user accounts from the local ROOM database.

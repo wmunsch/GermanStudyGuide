@@ -6,7 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityReadBinding;
 import com.williammunsch.germanstudyguide.activitiesviewmodels.StoryViewModel;
@@ -31,7 +31,7 @@ public class StoryActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
         // setSupportActionBar(binding.toolbar);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this); //Need to add the inject method in AppComponent for this to work.
-        storyViewModel = ViewModelProviders.of(this,viewModelFactory).get(StoryViewModel.class);
+        storyViewModel =  new ViewModelProvider(this,viewModelFactory).get(StoryViewModel.class);
         binding.setStoryviewmodel(storyViewModel);
 
         Intent bIntent = getIntent();

@@ -1,7 +1,6 @@
 package com.williammunsch.germanstudyguide.room;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -10,8 +9,6 @@ import androidx.room.Query;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
 import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.datamodels.Story;
-import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 
 import java.util.List;
 

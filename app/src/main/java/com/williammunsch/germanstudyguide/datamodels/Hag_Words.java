@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Table for storing each unique word for the Hansel and Gretel story
+ */
 @Entity(tableName = "hag_words")
 public class Hag_Words {
 

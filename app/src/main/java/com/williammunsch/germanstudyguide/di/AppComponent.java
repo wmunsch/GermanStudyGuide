@@ -9,10 +9,7 @@ import com.williammunsch.germanstudyguide.MainActivity;
 import com.williammunsch.germanstudyguide.NounGenderActivity;
 import com.williammunsch.germanstudyguide.StoryActivity;
 import com.williammunsch.germanstudyguide.recyclerviewviewmodels.GrammarListViewModel;
-import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
-import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
-import com.williammunsch.germanstudyguide.repositories.StoriesRepository;
 import com.williammunsch.germanstudyguide.ui.GrammarFragment;
 import com.williammunsch.germanstudyguide.ui.ProfileFragment;
 import com.williammunsch.germanstudyguide.ui.StoriesFragment;
@@ -42,13 +39,7 @@ public interface AppComponent {
 
     }
 
-    VocabListViewModel getViewModel();
-
-    FlashcardViewModel getFlashcardViewModel();
-
     void inject(Repository repository);
-
-    void inject(FlashcardRepository flashcardRepository);
 
     void inject(MainActivity mainActivity);
 
@@ -66,11 +57,7 @@ public interface AppComponent {
 
     void inject(NounGenderViewModel nounGenderViewModel);
 
-    void inject(NounGenderRepository nounGenderRepository);
-
     void inject(StoriesListViewModel storiesListViewModel);
-
-    void inject(StoriesRepository storiesRepository);
 
     void inject(StoriesFragment storiesFragment);
 
@@ -78,9 +65,4 @@ public interface AppComponent {
 
     void inject(GrammarListViewModel grammarListViewModel);
 
-
-
-   // void inject(VocabTestActivity vocabTestActivity);
-
-    //SharedPreferences getSharedPrefs();
 }

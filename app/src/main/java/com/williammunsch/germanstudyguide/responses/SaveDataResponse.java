@@ -1,5 +1,8 @@
 package com.williammunsch.germanstudyguide.responses;
 
+/**
+ * Used to get save data response from JSON
+ */
 public class SaveDataResponse {
     private String error;
     private String tablename;

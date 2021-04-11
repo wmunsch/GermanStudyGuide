@@ -6,11 +6,13 @@ import android.view.View;
 import androidx.databinding.Observable;
 import androidx.databinding.PropertyChangeRegistry;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
-import com.williammunsch.germanstudyguide.repositories.NounGenderRepository;
+import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +20,10 @@ import java.util.Random;
 
 import javax.inject.Inject;
 /**
- * Handles all of the view data for the noun gender activity.
+ * Handles all of the livedata objects and logic for the noun gender activity.
  */
 public class NounGenderViewModel extends ViewModel implements Observable {
-    private NounGenderRepository nounGenderRepository;
+   // private NounGenderRepository nounGenderRepository;
     private PropertyChangeRegistry propertyChangeRegistry = new PropertyChangeRegistry();
     private Random random = new Random();
     private final MutableLiveData<Integer> checkDerVisibility = new MutableLiveData<>(View.GONE);
@@ -36,20 +38,70 @@ public class NounGenderViewModel extends ViewModel implements Observable {
     private final MutableLiveData<Integer> dieButtonVisibility = new MutableLiveData<>(View.VISIBLE);
     int numberOfWordsTried =0;
 
-
+    private final MutableLiveData<String> accuracyText = new MutableLiveData<>();
+    private final LiveData<List<VocabModelA1>> vocabList;
+    private final MediatorLiveData<List<VocabModelA1>> mediatorVocabList = new MediatorLiveData<>();
+    private Repository mRepository;
+    private final LiveData<VocabModelA1> currentNode;
+    private boolean setAtBeginning = false;
+    private double totalWords = 20;
+    private double wordsCorrect =0;
+    private double wordsTotal = 0;
 
     private boolean checkedCorrect = false;
     private boolean gotItWrong = false;
 
     @Inject
-    public NounGenderViewModel(NounGenderRepository nounGenderRepository){
-        this.nounGenderRepository = nounGenderRepository;
+    public NounGenderViewModel(Repository repository){
+        this.mRepository = repository;
+        vocabList = mRepository.getNounQueue();
+         /*
+        Every time the mediatorVocabList changes, the currentNode is set to the first entry,
+        and the values for the top progress bar and text are set,
+        and the visibility for the different card types are set up.
+         */
+        currentNode = Transformations.map(mediatorVocabList, value -> {
+            if (mediatorVocabList.getValue() != null){
+                if (!setAtBeginning && mediatorVocabList.getValue().size() !=0){
+                    totalWords =mediatorVocabList.getValue().size();
+                    List<VocabModelA1> list = mediatorVocabList.getValue();
+                    Collections.shuffle(list);
+                    mediatorVocabList.setValue(list);
+                    setAtBeginning=true;
+                }
+
+                accuracyText.setValue("Accuracy: " + (int)((wordsCorrect/wordsTotal)*100) +"%"); //This determines the cards left number
+                if (mediatorVocabList.getValue().size()>0){
+                    return mediatorVocabList.getValue().get(0);
+                }
+                return null;
+            }else{
+                return null;
+            }
+        });
+
+        addSource();
     }
 
+    public void addSource(){
+        if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
+            try {
+                mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+            }catch(Exception e){
+                //  System.out.println("Error: " + e);
+
+            }
+        }
+    }
+
+    /**
+     * Checks to see if Der was the correct choice for the given noun,
+     * then hides the other buttons for 1 sec if correct and pops the node
+     */
     public void checkAnswerDer(){
-        if (nounGenderRepository.getCurrentNode()!= null && nounGenderRepository.getCurrentNode().getValue()!= null && nounGenderRepository.getCurrentNode().getValue().getArticle() != null && !checkedCorrect){
+        if (currentNode!= null && currentNode.getValue()!= null && currentNode.getValue().getArticle() != null && !checkedCorrect){
             String der = "der";
-            if (der.equalsIgnoreCase(nounGenderRepository.getCurrentNode().getValue().getArticle())){
+            if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                 checkedCorrect = true;
                // System.out.println("CORRECT!");
                 checkDerVisibility.setValue(View.VISIBLE);
@@ -78,10 +130,14 @@ public class NounGenderViewModel extends ViewModel implements Observable {
         }
     }
 
+    /**
+     * Checks to see if Die was the correct choice for the given noun,
+     * then hides the other buttons for 1 sec if correct and pops the node
+     */
     public void checkAnswerDie(){
-        if (nounGenderRepository.getCurrentNode()!= null && nounGenderRepository.getCurrentNode().getValue()!= null && nounGenderRepository.getCurrentNode().getValue().getArticle() != null  && !checkedCorrect){
+        if (currentNode!= null && currentNode.getValue()!= null && currentNode.getValue().getArticle() != null  && !checkedCorrect){
             String der = "die";
-            if (der.equalsIgnoreCase(nounGenderRepository.getCurrentNode().getValue().getArticle())){
+            if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                  checkedCorrect = true;
               //  System.out.println("CORRECT!");
                 checkDieVisibility.setValue(View.VISIBLE);
@@ -110,10 +166,14 @@ public class NounGenderViewModel extends ViewModel implements Observable {
         }
     }
 
+    /**
+     * Checks to see if Das was the correct choice for the given noun,
+     * then hides the other buttons for 1 sec if correct and pops the node
+     */
     public void checkAnswerDas(){
-        if (nounGenderRepository.getCurrentNode()!= null && nounGenderRepository.getCurrentNode().getValue()!= null && nounGenderRepository.getCurrentNode().getValue().getArticle() != null  && !checkedCorrect){
+        if (currentNode!= null && currentNode.getValue()!= null && currentNode.getValue().getArticle() != null  && !checkedCorrect){
             String der = "das";
-            if (der.equalsIgnoreCase(nounGenderRepository.getCurrentNode().getValue().getArticle())){
+            if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                 checkedCorrect = true;
                // System.out.println("CORRECT!");
                 checkDasVisibility.setValue(View.VISIBLE);
@@ -143,8 +203,9 @@ public class NounGenderViewModel extends ViewModel implements Observable {
     }
 
 
+
     private void popNode(){
-        List<VocabModelA1> list = nounGenderRepository.getMediatorVocabList().getValue();
+        List<VocabModelA1> list = mediatorVocabList.getValue();
         try {
             VocabModelA1 temp = list.get(0);
             list.remove(0);
@@ -160,19 +221,18 @@ public class NounGenderViewModel extends ViewModel implements Observable {
         }
 
         if (!gotItWrong) {
-            nounGenderRepository.addWordCorrect();
+            wordsCorrect++;
         }
-        nounGenderRepository.addWordTotal();
-        nounGenderRepository.setMediatorVocabListValue(list);
+        wordsTotal++;
+        mediatorVocabList.setValue(list);
         checkedCorrect = false;
-       // System.out.println("Size is : " + list.size());
         gotItWrong = false;
 
     }
 
     //Move the node down a random number
     private void moveNode(){
-        List<VocabModelA1> list = nounGenderRepository.getMediatorVocabList().getValue();
+        List<VocabModelA1> list = mediatorVocabList.getValue();
         try{
             if (list.size()>1){
                 VocabModelA1 temp = list.get(0);
@@ -184,7 +244,7 @@ public class NounGenderViewModel extends ViewModel implements Observable {
         }catch(Exception e){
           //  System.out.println("null");
         }
-        nounGenderRepository.setMediatorVocabListValue(list);
+        mediatorVocabList.setValue(list);
     }
 
     public void resetViews(){
@@ -196,14 +256,16 @@ public class NounGenderViewModel extends ViewModel implements Observable {
         exDieVisibility.setValue(View.GONE);
     }
 
+    //Getters and setters
+
     public MutableLiveData<Integer> getCheckDerVisibility() {
         return checkDerVisibility;
     }
     public LiveData<VocabModelA1> getCurrentNode(){
-        return nounGenderRepository.getCurrentNode();
+        return currentNode;
     }
     public LiveData<String> getAccuracyText() {
-        return nounGenderRepository.getAccuracyText();
+        return accuracyText;
     }
 
     public MutableLiveData<Integer> getCheckDieVisibility() {

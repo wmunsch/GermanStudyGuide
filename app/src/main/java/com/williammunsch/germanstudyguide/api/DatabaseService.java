@@ -26,7 +26,6 @@ public interface DatabaseService {
 
     @GET("api/dbscript.php")
     Call<List<VocabModelA1>> vocabList();
-    //Call<VocabModelA1[]> vocabList();
 
     @FormUrlEncoded
     @POST("api/login.php")

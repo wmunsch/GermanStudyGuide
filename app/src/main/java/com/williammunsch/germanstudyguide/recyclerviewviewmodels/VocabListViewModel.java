@@ -1,11 +1,12 @@
 package com.williammunsch.germanstudyguide.recyclerviewviewmodels;
 
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
-import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
-import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import java.util.List;
@@ -19,30 +20,31 @@ import javax.inject.Inject;
  */
 public class VocabListViewModel extends ViewModel {
 
-    private Repository mRepository;//injected
-    private FlashcardRepository flashcardRepository;//injected
+    private final Repository mRepository;//injected
 
-    private LiveData<List<VocabModelA1>> mAllVocab;
-    private LiveData<List<VocabListItem>> mVocabListItems;
-    private LiveData<Integer> a1Max;
-    private LiveData<Integer> a1Learned;
-    private LiveData<Integer> a1Mastered;
-    private LiveData<Integer> a1Percent;
+    private final LiveData<List<VocabListItem>> mVocabListItems;
+    private final LiveData<Integer> a1Max;
+    private final LiveData<Integer> a1Learned;
+    private final LiveData<Integer> a1Mastered;
 
+    private final MutableLiveData<Integer> downloadProgressVisibility = new MutableLiveData<>(View.GONE);
+    private final MutableLiveData<Integer> downloadButtonVisibility = new MutableLiveData<>(View.VISIBLE);
 
-    //TODO : in case where studying all words, or less than 5 are not studying, replace with studying=1 words for full 20
 
     @Inject
-    public VocabListViewModel(Repository repository, FlashcardRepository flashcardRepository){
+    public VocabListViewModel(Repository repository){
        this.mRepository = repository;
-       this.flashcardRepository = flashcardRepository;
-
-       mVocabListItems = mRepository.getVocabListItems();
+       mVocabListItems = mRepository.getAllVocabLists();
        a1Max = mRepository.getA1Max();
        a1Learned = mRepository.getA1Learned();
        a1Mastered = mRepository.getA1Mastered();
-       a1Percent = mRepository.getA1Percent();
-       //A1DownloadedText = mRepository.getA1DownloadedText();
+
+        //Check if the ROOM tables for the lessons and story lists for the recyclerviews have been created
+       repository.checkLessons();
+
+        //Check if vocab lessons and stories are fully downloaded from the remote database.
+       repository.checkA1();
+
     }
 
     /**
@@ -50,11 +52,7 @@ public class VocabListViewModel extends ViewModel {
      * a background thread
      */
     public void downloadA1(){
-        mRepository.downloadA1();
-    }
-
-    public void addSource(){
-        flashcardRepository.addSource();
+        mRepository.downloadA1(downloadButtonVisibility);
     }
 
 
@@ -74,16 +72,16 @@ public class VocabListViewModel extends ViewModel {
 
     public LiveData<Integer> getA1Downloaded() {return mRepository.getA1Downloaded();}
 
-    //public LiveData<String> getA1DownloadedText() { return A1DownloadedText; }
     public LiveData<String> getA1DownloadedText() { return mRepository.getA1DownloadedText(); }
+
     public LiveData<Integer> getDownloadProgressVisibility() {
-        return mRepository.getDownloadProgressVisibility();
+        return downloadProgressVisibility;
     }
     public LiveData<Integer> getWordsLearnedVisibility() {
         return mRepository.getWordsLearnedVisibility();
     }
     public LiveData<Integer> getDownloadButtonVisibility() {
-        return mRepository.getDownloadButtonVisibility();
+        return downloadButtonVisibility;
     }
 
     public LiveData<Integer> getA1WordsDownloadedVisibility(){

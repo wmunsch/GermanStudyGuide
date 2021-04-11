@@ -22,20 +22,20 @@ import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListView
 
 import java.util.List;
 
+/**
+ * Adapter for the stories list on the main activity page (3rd tab)
+ */
 public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecyclerViewAdapter.ViewHolder>{
     private List<StoriesListItem> mStoriesList;
-    private Context mContext;
-    private StoriesListViewModel storiesListViewModel;
+    private final Context mContext;
+    private final StoriesListViewModel storiesListViewModel;
     private Integer HAGDownloaded =0, HAGPartsDownloaded = 0,HAGWordsDownloaded =0,HAGErrorVisibility = View.GONE, HAGPartsDownloadedVisibility = View.GONE, HAGButtonVisibility = View.VISIBLE;
     private String downloadButtonText = "Download";
-
 
     public StoriesRecyclerViewAdapter(Context mContext, StoriesListViewModel storiesListViewModel){
         this.storiesListViewModel = storiesListViewModel;
         this.mContext = mContext;
     }
-
-
 
 
     @NonNull
@@ -51,6 +51,8 @@ public class StoriesRecyclerViewAdapter extends RecyclerView.Adapter<StoriesRecy
     public void onBindViewHolder(@NonNull final StoriesRecyclerViewAdapter.ViewHolder viewHolder, final int i) {
         viewHolder.titleTextView.setText(mStoriesList.get(i).getTitle());
         viewHolder.authorTextView.setText(mStoriesList.get(i).getAuthor());
+
+        //Sets the image and parts downloaded text for each lesson
         if(i==0){
             viewHolder.icon.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.ic_hanselundgretal,null));
             viewHolder.readButton.setText(downloadButtonText);

@@ -3,6 +3,9 @@ package com.williammunsch.germanstudyguide.datamodels;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+/**
+ * Table for storing each page of the Hansel and Gretel story
+ */
 @Entity(tableName = "hag_sentences")
 public class Hag_Sentences {
 

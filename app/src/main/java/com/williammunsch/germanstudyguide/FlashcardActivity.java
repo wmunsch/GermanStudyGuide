@@ -5,13 +5,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 
 import android.view.Menu;
 import android.view.MenuItem;
 
-//import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewModel;
@@ -45,7 +44,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
         ((GermanApp) getApplicationContext()).getAppComponent().inject(this);
-        flashcardViewModel = ViewModelProviders.of(this,viewModelFactory).get(FlashcardViewModel.class);
+        flashcardViewModel =  new ViewModelProvider(this,viewModelFactory).get(FlashcardViewModel.class);
         binding.setFlashcardviewmodel(flashcardViewModel);
 
        // Intent bIntent = getIntent();

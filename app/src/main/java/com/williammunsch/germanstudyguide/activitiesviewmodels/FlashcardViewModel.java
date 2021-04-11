@@ -5,11 +5,14 @@ import androidx.databinding.Observable;
 import androidx.databinding.PropertyChangeRegistry;
 import androidx.databinding.library.baseAdapters.BR;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.SingleLiveEvent;
+import com.williammunsch.germanstudyguide.datamodels.User;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
-import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import java.util.List;
@@ -18,68 +21,192 @@ import java.util.Random;
 import javax.inject.Inject;
 
 import static android.view.View.GONE;
+import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 /**
- * Contains the core business logic for the flashcard activity.
+ * Handles all of the livedata objects and logic for the flashcard activity.
  */
 public class FlashcardViewModel extends ViewModel implements Observable {
-    private FlashcardRepository mFlashcardRepository;
-    private Repository mRepository;
+    private final Repository mRepository;
 
-    private PropertyChangeRegistry propertyChangeRegistry = new PropertyChangeRegistry();
+    private final PropertyChangeRegistry propertyChangeRegistry = new PropertyChangeRegistry();
 
     private String answer = "";
-    private Random random = new Random();
+    private final Random random = new Random();
 
-    private SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
+    private final SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
 
-    private SingleLiveEvent<Boolean> addSourceEvent = new SingleLiveEvent<>();
-    private LiveData<Integer> a1Learned;
-    private LiveData<String> userName;
+    private final LiveData<String> userName;
+    private final LiveData<User> currentUser;
+
+    private LiveData<List<VocabModelA1>> vocabList;
+    private final MediatorLiveData<List<VocabModelA1>> mediatorVocabList = new MediatorLiveData<>();
+    private final LiveData<VocabModelA1> currentNode;
+    private double newWords = 5;
+
+    private final MutableLiveData<Integer> cardsFinished = new MutableLiveData<>();
+    private final MutableLiveData<String> cardsFinishedText = new MutableLiveData<>();
+
+    private final MutableLiveData<Integer> mHintVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> checkmarkVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> xmarkVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> iwasrightVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> correctLayoutVisibility = new MutableLiveData<>();
+    private final MutableLiveData<String> checkButtonText = new MutableLiveData<>();
+    private final MutableLiveData<Integer> editTextVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> hintButtonVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> englishTextVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> finishButtonVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> checkButtonVisibility = new MutableLiveData<>();
+    //End of activity views
+    private final MutableLiveData<Integer> goodJobVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> tv_wordsLearnedVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> progressBar_wordsLearnedVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> textView_wordsLearnedOutOfVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> textView_wordsMasteredVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> progressBar_wordsMasteredVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> textView_wordsMasteredOutOfVisibility = new MutableLiveData<>();
+
+    private boolean finished = false;
+    private boolean correct = false;
+    private final LiveData<Integer> wordsMax;
+    private final LiveData<Integer> wordsLearned;
+    private final LiveData<Integer> wordsMastered;
+    private final MutableLiveData<Integer> wordsLearnedPercent = new MutableLiveData<>();
+    private final LiveData<Integer> wordsLearnedP;
+    private final LiveData<Integer> wordsMasteredP;
+
     /**
      * Keeps track of the order of flashcards in the live data here,
      * moves the index positions around and removes them when necessary.
      */
     @Inject
-    public FlashcardViewModel(FlashcardRepository flashcardRepository, Repository repository) {
-        this.mFlashcardRepository = flashcardRepository;
+    public FlashcardViewModel(Repository repository) {
         this.mRepository = repository;
-        userName=mRepository.getUserName();
 
-        a1Learned = mFlashcardRepository.getA1Learned();
+        currentUser = repository.getUserInfoFromRoom();
+        wordsMax = repository.countWordsMax();
+        wordsLearned = repository.countLearned();
+        wordsMastered = repository.countMastered();
+
+        //map username to currentuser.username to show username in top left of main screen
+        userName = Transformations.map(currentUser, name->{
+            if (currentUser.getValue() != null){
+                return currentUser.getValue().getUsername();
+            }
+            return "Log In";
+        } );
+
+        vocabList = mRepository.getVocabQueue();
+        addSource();
+        /*
+        Every time the mediatorVocabList changes, the currentNode is set to the first entry,
+        and the values for the top progress bar and text are set,
+        and the visibility for the different card types are set up.
+         */
+        currentNode = Transformations.map(mediatorVocabList, value -> {
+            if (mediatorVocabList.getValue() != null){
+                //reset the number of total cards for the activity (necessary for the progress bar because 1st time there are only 5 cards, then 10, then 15 then 20)
+                if (!mRepository.isSetAtBeginning() && mediatorVocabList.getValue().size() !=0){
+                    newWords =mediatorVocabList.getValue().size();
+                    mRepository.setAtBeginning(true);
+                }
+                cardsFinished.setValue((int)(100 - (((double)mediatorVocabList.getValue().size())/newWords)*100)); //This determines the percentage bar for flashcard actvity
+
+                cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size()); //This determines the cards left number
+
+                if (mediatorVocabList.getValue().size()>0){
+                    if (mediatorVocabList.getValue().get(0).getStudying()==0){
+                        setUpViewsForNewCard();
+                    }else if (mediatorVocabList.getValue().get(0).getStudying()==1){
+                        setUpViewsForOldCard();
+                    }
+                    return mediatorVocabList.getValue().get(0);
+                }
+                return null;
+            }else{
+                return null;
+            }
+        });
+
+        /*
+         * Every time a new word is set to learned in the room database,
+         * the wordsLearnedP livedata gets updated to reflect this.
+         * wordsLearnedP is the percentage of words learned out of all A1 words.
+         */
+        wordsLearnedP = Transformations.map(wordsLearned, value -> {
+            if (wordsLearned.getValue() != null){
+                return (int)(((double)wordsLearned.getValue()/700)*100);
+            }
+            return 0;
+
+        });
+
+        wordsMasteredP = Transformations.map(wordsMastered, value -> {
+            if (wordsMastered.getValue() != null){
+                return (int)(((double)wordsMastered.getValue()/700)*100);
+            }
+            return 0;
+
+        });
+
 
     }
 
+    /**
+     * Observes the vocabList livedata to retrieve values in transformations
+     */
+    public void addSource(){
+        if (mediatorVocabList.getValue()==null || mediatorVocabList.getValue().isEmpty()){
+            try {
+                mediatorVocabList.addSource(vocabList, value -> mediatorVocabList.setValue(value));
+            }catch(Exception e){
+                // System.out.println("Error: " + e);
 
+            }
+        }
+    }
+
+    public void removeMediatorSource(){
+        mediatorVocabList.removeSource(vocabList);
+    }
 
     public void finishActivity(){
         navigateToMainActivity.call();
-        //mFlashcardRepository.addSource();
+    }
+
+    public void setMediatorVocabListValue(List<VocabModelA1> list) {
+        this.mediatorVocabList.setValue(list);
     }
 
 
+    /**
+     * Resets the score for a card that was initially wrong but pressed I was right button
+     */
     public void iWasright(){
-        mFlashcardRepository.getCurrentNode().getValue().fixScore();
-        mFlashcardRepository.setCorrect(true);
+        if (currentNode.getValue()!=null){
+            currentNode.getValue().fixScore();
+        }
+        correct=true;
         moveToNextNode();
     }
 
+    /**
+     * Tests the answer against possible answers, sets the views, and moves to the next card
+     */
     public void checkAnswer(){
-        //TODO
-
-        if (!mFlashcardRepository.isFinished()&& mFlashcardRepository.getCurrentNode().getValue()!=null && mFlashcardRepository.getCurrentNode().getValue().getStudying() != 0){
+        if (!finished && currentNode.getValue()!=null && currentNode.getValue().getStudying() != 0){
             boolean test = false;
             //test entered answer against all possible answers in the VocabModelA1
-            if (mFlashcardRepository.getCurrentNode().getValue().getScore()>50){
+            if (currentNode.getValue().getScore()>50){
                 //Test english -> german
-                if ( mFlashcardRepository.getCurrentNode().getValue().getGerman().equalsIgnoreCase(answer)){
+                if ( currentNode.getValue().getGerman().equalsIgnoreCase(answer)){
                     test = true;
                 }
             }else{
                 //Test german -> english
-                for (String s : mFlashcardRepository.getCurrentNode().getValue().getEnglishStringsArray()){//mediatorVocabList.getValue().get(0).getEnglishStringsArray()){
-                   // System.out.println("Testing " + s + " against: "+ answer);
+                for (String s : currentNode.getValue().getEnglishStringsArray()){
                     if (s.equalsIgnoreCase(answer)) {
                         test = true;
                         break;
@@ -87,24 +214,19 @@ public class FlashcardViewModel extends ViewModel implements Observable {
                 }
             }
 
-
-
             if (test && !answer.equals("")) {
-               // System.out.println("CORRECT");
-                 mFlashcardRepository.getCurrentNode().getValue().increaseScore();
-                mFlashcardRepository.setCorrect(true);
+                currentNode.getValue().increaseScore();
+                correct=true;
                 setUpCorrectAnswerViews();
             } else if (!test && !answer.equals("")) {
-              //  System.out.println("INCORRECT");
-                mFlashcardRepository.getCurrentNode().getValue().decreaseScore();
-                mFlashcardRepository.setCorrect(false);
+                currentNode.getValue().decreaseScore();
+                correct=false;
                 setUpIncorrectAnswerViews();
 
             }else{
                 //Do nothing because the edit text is empty. Prevents misclicks.
             }
         }else{
-          //  System.out.println("Moving to next node");
             moveToNextNode();
         }
 
@@ -112,33 +234,88 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     }
 
     private void setUpIncorrectAnswerViews(){
-      //  System.out.println("calling setupincorrectanswerviews");
-        mFlashcardRepository.setXmarkVisibility(VISIBLE);
-        mFlashcardRepository.setIwasrightVisibility(VISIBLE);
-        mFlashcardRepository.setCorrectLayoutVisibility(VISIBLE);
-        mFlashcardRepository.setCheckButtonText("Next");
-        mFlashcardRepository.setFinished(true);
+        xmarkVisibility.setValue(VISIBLE);
+        iwasrightVisibility.setValue(VISIBLE);
+        correctLayoutVisibility.setValue(VISIBLE);
+        checkButtonText.setValue("Next");
+        finished=true;
     }
 
     private void setUpCorrectAnswerViews(){
-       // System.out.println("calling setupcorrectanswerviews");
-        mFlashcardRepository.setCheckmarkVisibility(VISIBLE);
-        mFlashcardRepository.setXmarkVisibility(GONE);
+        checkmarkVisibility.setValue(VISIBLE);
+        xmarkVisibility.setValue(GONE);
         //TODO : set linearLayout_correct to visible to show other answers?
 
-        mFlashcardRepository.setCheckButtonText("Next");
-        mFlashcardRepository.setFinished(true);
-
+        checkButtonText.setValue("Next");
+        finished=true;
     }
 
-    private void moveToNextNode(){
-        //TODO
+    private void setUpViewsForNewCard(){
+        englishTextVisibility.setValue(VISIBLE);
+        mHintVisibility.setValue(VISIBLE);
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        checkButtonText.setValue("Next");
+        iwasrightVisibility.setValue(GONE);
+        correctLayoutVisibility.setValue(GONE);
+        editTextVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(GONE);
+        finishButtonVisibility.setValue(INVISIBLE);
+        checkButtonVisibility.setValue(VISIBLE);
+        goodJobVisibility.setValue(GONE);
+        tv_wordsLearnedVisibility.setValue(GONE);
+        progressBar_wordsLearnedVisibility.setValue(GONE);
+        textView_wordsLearnedOutOfVisibility.setValue(GONE);
+        textView_wordsMasteredVisibility.setValue(GONE);
+        progressBar_wordsMasteredVisibility.setValue(GONE);
+        textView_wordsMasteredOutOfVisibility.setValue(GONE);
+        correct = false;
 
-        if (mFlashcardRepository.getCurrentNode().getValue() != null && mFlashcardRepository.getCurrentNode().getValue().getStudying()==0){
-            mFlashcardRepository.getCurrentNode().getValue().setStudying(1);
+
+        goodJobVisibility.setValue(INVISIBLE);
+        tv_wordsLearnedVisibility.setValue(INVISIBLE);
+        progressBar_wordsLearnedVisibility.setValue(INVISIBLE);
+        textView_wordsLearnedOutOfVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredVisibility.setValue(INVISIBLE);
+        progressBar_wordsMasteredVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredOutOfVisibility.setValue(INVISIBLE);
+    }
+
+    private void setUpViewsForOldCard(){
+        checkButtonText.setValue("Check");
+        finished = false;
+        goodJobVisibility.setValue(INVISIBLE);
+        tv_wordsLearnedVisibility.setValue(INVISIBLE);
+        progressBar_wordsLearnedVisibility.setValue(INVISIBLE);
+        textView_wordsLearnedOutOfVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredVisibility.setValue(INVISIBLE);
+        progressBar_wordsMasteredVisibility.setValue(INVISIBLE);
+        textView_wordsMasteredOutOfVisibility.setValue(INVISIBLE);
+
+        checkmarkVisibility.setValue(INVISIBLE);
+        xmarkVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        mHintVisibility.setValue(INVISIBLE);
+        hintButtonVisibility.setValue(VISIBLE);
+        editTextVisibility.setValue(VISIBLE);
+        englishTextVisibility.setValue(INVISIBLE);
+        correctLayoutVisibility.setValue(INVISIBLE);
+        iwasrightVisibility.setValue(GONE);
+        finishButtonVisibility.setValue(INVISIBLE);
+        checkButtonVisibility.setValue(VISIBLE);
+        correct = false;
+    }
+
+    /**
+     * Sets the current word's studying value to 1, then either moves the card down the queue if wrong
+     * or pops the node if correct.
+     */
+    private void moveToNextNode(){
+        if (currentNode.getValue() != null && currentNode.getValue().getStudying()==0){
+            currentNode.getValue().setStudying(1);
         }
 
-        if (mFlashcardRepository.isCorrect()){
+        if (correct){
             popNode();
         }else{
             moveNode();
@@ -147,37 +324,35 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         setAnswer("");
 
         //Activity is finished, update the local ROOM database
-        if (mFlashcardRepository.getMediatorVocabList().getValue()!= null &&mFlashcardRepository.getMediatorVocabList().getValue().size()<=0){
-            mFlashcardRepository.setEditTextVisibility(GONE);
-            mFlashcardRepository.setHintButtonVisibility(GONE);
-            mFlashcardRepository.setCheckButtonVisibility(GONE);
-          //  System.out.println("Setting finishedwithactivity to true");
-            mFlashcardRepository.setCheckmarkVisibility(GONE);
-            mFlashcardRepository.setCorrectLayoutVisibility(GONE);
-            mFlashcardRepository.setIwasrightVisibility(GONE);
-            mFlashcardRepository.setXmarkVisibility(GONE);
-            mFlashcardRepository.removeMediatorSource();
-            mFlashcardRepository.setFinishButtonVisibility(VISIBLE);
-           // mFlashcardRepository.updateAllNodes();
+        if (mediatorVocabList.getValue() != null && mediatorVocabList.getValue().size()<=0){
+            editTextVisibility.setValue(GONE);
+            hintButtonVisibility.setValue(GONE);
+            checkButtonVisibility.setValue(GONE);
+            checkmarkVisibility.setValue(GONE);
+            correctLayoutVisibility.setValue(GONE);
+            iwasrightVisibility.setValue(GONE);
+            xmarkVisibility.setValue(GONE);
+            removeMediatorSource();
+            finishButtonVisibility.setValue(VISIBLE);
 
             //If logged in, update remote database too
-            if (mRepository.getCurrentUser().getValue()!=null){
+            if (currentUser.getValue()!=null){
                // update with remote database call
-                mFlashcardRepository.updateAllNodes(true);
+                mRepository.updateAllNodes(true,userName);
             }else{
                 //update without remote database call
-                mFlashcardRepository.updateAllNodes(false);
+                mRepository.updateAllNodes(false,userName);
             }
+            mRepository.setAtBeginning(false);
 
-            //TODO : Display stats from the activity.
-            mFlashcardRepository.setGoodJobVisibility(VISIBLE);
-            mFlashcardRepository.setTv_wordsLearnedVisibility(VISIBLE);
-            mFlashcardRepository.setProgressBar_wordsLearnedVisibility(VISIBLE);
-            mFlashcardRepository.setTextView_wordsLearnedOutOfVisibility(VISIBLE);
+            goodJobVisibility.setValue(VISIBLE);
+            tv_wordsLearnedVisibility.setValue(VISIBLE);
+            progressBar_wordsLearnedVisibility.setValue(VISIBLE);
+            textView_wordsLearnedOutOfVisibility.setValue(VISIBLE);
 
-            mFlashcardRepository.setTextView_wordsMasteredVisibility(VISIBLE);
-            mFlashcardRepository.setProgressBar_wordsMasteredVisibility(VISIBLE);
-            mFlashcardRepository.setTextView_wordsMasteredOutOfVisibility(VISIBLE);
+            textView_wordsMasteredVisibility.setValue(VISIBLE);
+            progressBar_wordsMasteredVisibility.setValue(VISIBLE);
+            textView_wordsMasteredOutOfVisibility.setValue(VISIBLE);
         }
     }
 
@@ -186,33 +361,35 @@ public class FlashcardViewModel extends ViewModel implements Observable {
      * Removes the top item from the mediatorLiveData list
      */
     private void popNode(){
-        List<VocabModelA1> list = mFlashcardRepository.getMediatorVocabList().getValue();//mediatorVocabList.getValue();
+        List<VocabModelA1> list = mediatorVocabList.getValue();
         try {
-            mFlashcardRepository.getCurrentNode().getValue().increaseFrequency();
-            mFlashcardRepository.getFinishedList().add(mFlashcardRepository.getCurrentNode().getValue());//finishedList.add(currentNode.getValue());
+            if (currentNode.getValue()!=null){
+                currentNode.getValue().increaseFrequency();
+            }
+
+            mRepository.getFinishedList().add(currentNode.getValue());
+            assert list != null;
             list.remove(0);
         }catch(NullPointerException e){
          //   System.out.println("List is null");
         }
-        mFlashcardRepository.setMediatorVocabListValue(list);
+        mediatorVocabList.setValue(list);
     }
 
     /**
      * Moves the item in the mediatorLiveData list down a random number of indexes
      */
-
     private void moveNode(){
-        List<VocabModelA1> list =mFlashcardRepository.getMediatorVocabList().getValue();// mediatorVocabList.getValue();
-      //  System.out.println("Size is " + list.size());
-
+        List<VocabModelA1> list =mediatorVocabList.getValue();
+        assert list != null;
         VocabModelA1 temp = list.get(0);
         int ranNum = 0;
 
         if (list.size() > 5){
-           ranNum = 5;// ranNum = random.nextInt(3)+3;  //index 0-5+  between 3 and 5
+           ranNum = 5;  //index 0-5+  between 3 and 5
         }
         else if (list.size() == 5){
-           ranNum = 4;// ranNum = random.nextInt(2)+3;   //index 0-4 between 3 and 4
+           ranNum = 4;  //index 0-4 between 3 and 4
         }
         else if (list.size() == 4){
             ranNum = random.nextInt(2)+2; //index 0-3   between 2 and 3
@@ -231,103 +408,106 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
         list.set(ranNum,temp); //move the currentNode to the random position chosen earlier
 
-        mFlashcardRepository.setMediatorVocabListValue(list);
+        mediatorVocabList.setValue(list);
     }
 
 
-    public LiveData<Integer> getWordsLearned(){return mFlashcardRepository.getWordsLearned();}
-    public LiveData<Integer> getWordsLearnedP(){ return mFlashcardRepository.getWordsLearnedP();}
-    public LiveData<Integer> getWordsMasteredP(){ return mFlashcardRepository.getWordsMasteredP();}
+    //Getters and setters
+
+    public LiveData<Integer> getWordsLearned(){return wordsLearned;}
+    public LiveData<Integer> getWordsLearnedP(){ return wordsLearnedP;}
+    public LiveData<Integer> getWordsMasteredP(){ return wordsMasteredP;}
 
     public LiveData<Integer> getWordsMax() {
-        return mFlashcardRepository.getWordsMax();
+        return wordsMax;
     }
     public LiveData<Integer> getWordsLearnedPercent() {
-        return mFlashcardRepository.getWordsLearnedPercent();
+        return wordsLearnedPercent;
     }
     public LiveData<Integer> getWordsMastered() {
-        return mFlashcardRepository.getWordsMastered();
+        return wordsMastered;
     }
 
     public LiveData<Integer> getCheckButtonVisibility() {
-        return mFlashcardRepository.getCheckButtonVisibility();
+        return checkButtonVisibility;
     }
     public LiveData<Integer> getCardsFinished() {
-        return mFlashcardRepository.getCardsFinished();
+        return cardsFinished;
     }
 
     public LiveData<String> getCardsFinishedText() {
-        return mFlashcardRepository.getCardsFinishedText();
+        return cardsFinishedText;
     }
     public LiveData<Boolean> getNavigateToMainActivity(){
         return navigateToMainActivity;
     }
     public LiveData<Integer> getFinishButtonVisibility(){
-        return mFlashcardRepository.getFinishButtonVisibility();
+        return finishButtonVisibility;
     }
     public LiveData<Integer> getTv_wordsLearnedVisibility(){
-        return mFlashcardRepository.getTv_wordsLearnedVisibility();
+        return tv_wordsLearnedVisibility;
     }
     public LiveData<Integer> getGoodJobVisibility(){
-        return mFlashcardRepository.getGoodJobVisibility();
+        return goodJobVisibility;
     }
     public LiveData<Integer> getEnglishTextVisibility(){
-        return mFlashcardRepository.getEnglishTextVisibility();
+        return englishTextVisibility;
     }
     public LiveData<Integer> getHintButtonVisibility(){
-        return mFlashcardRepository.getHintButtonVisibility();
+        return hintButtonVisibility;
     }
     public LiveData<Integer> getEditTextVisibility(){
-        return mFlashcardRepository.getEditTextVisibility();
+        return editTextVisibility;
     }
     public LiveData<Integer> getTextView_wordsMasteredVisibility(){
-        return mFlashcardRepository.getTextView_wordsMasteredVisibility();
+        return textView_wordsMasteredVisibility;
     }
     public LiveData<Integer> getProgressBar_wordsMasteredVisibility(){
-        return mFlashcardRepository.getProgressBar_wordsMasteredVisibility();
+        return progressBar_wordsMasteredVisibility;
     }
     public LiveData<Integer> getTextView_wordsMasteredOutOfVisibility(){
-        return mFlashcardRepository.getTextView_wordsMasteredOutOfVisibility();
+        return textView_wordsMasteredOutOfVisibility;
     }
 
     public LiveData<Integer> getTextView_wordsLearnedOutOfVisibility(){
-        return mFlashcardRepository.getTextView_wordsLearnedOutOfVisibility();
+        return textView_wordsLearnedOutOfVisibility;
     }
     public LiveData<String> getCheckButtonText(){
-        return mFlashcardRepository.getCheckButtonText();
+        return checkButtonText;
     }
     public LiveData<Integer> getIwasrightVisibility(){
-        return mFlashcardRepository.getIwasrightVisibility();
+        return iwasrightVisibility;
     }
     public LiveData<Integer> getCorrectLayoutVisibility(){
-        return mFlashcardRepository.getCorrectLayoutVisibility();
+        return correctLayoutVisibility;
     }
     public LiveData<Integer> getXmarkVisibility(){
-        return mFlashcardRepository.getXmarkVisibility();
+        return xmarkVisibility;
     }
     public LiveData<Integer> getCheckmarkVisibility(){
-        return mFlashcardRepository.getCheckmarkVisibility();
+        return checkmarkVisibility;
     }
     public LiveData<Integer> getHintVisibility(){
-        return mFlashcardRepository.getHintVisibility();
+        return mHintVisibility;
     }
 
     public LiveData<Integer> getProgressBar_wordsLearnedVisibility(){
-        return mFlashcardRepository.getProgressBar_wordsLearnedVisibility();
+        return progressBar_wordsLearnedVisibility;
     }
 
     public void showSentence(){
-        mFlashcardRepository.showSentence();
+        if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == VISIBLE){mHintVisibility.setValue(INVISIBLE);}
+        else if (mHintVisibility.getValue() != null && mHintVisibility.getValue() == INVISIBLE){mHintVisibility.setValue(VISIBLE);}
     }
 
     public LiveData<List<VocabModelA1>> getMediatorVocabList(){
-        return mFlashcardRepository.getMediatorVocabList();
+        return mediatorVocabList;
     }
 
 
 
     public LiveData<VocabModelA1> getCurrentNode(){
-        return mFlashcardRepository.getCurrentNode();
+        return currentNode;
     }
 
     //Two-way binding to allow reading of the edit text

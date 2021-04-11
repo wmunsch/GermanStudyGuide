@@ -22,7 +22,7 @@ public class AppModule {
     @Singleton
     @Provides
     public DatabaseService provideDatabaseService(){
-        return new Retrofit.Builder().baseUrl("http://96.37.216.151/")//"http://96.37.220.94/")
+        return new Retrofit.Builder().baseUrl("http://00.00.00.00/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(DatabaseService.class);

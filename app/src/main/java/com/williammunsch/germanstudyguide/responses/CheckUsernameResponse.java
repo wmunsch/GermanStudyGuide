@@ -1,5 +1,8 @@
 package com.williammunsch.germanstudyguide.responses;
 
+/**
+ * Class for verifying username when returning a Json object
+ */
 public class CheckUsernameResponse {
 
     //The name of these values must match the values given by JSON in the PHP API

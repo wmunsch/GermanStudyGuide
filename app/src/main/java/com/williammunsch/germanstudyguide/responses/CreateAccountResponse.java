@@ -1,5 +1,8 @@
 package com.williammunsch.germanstudyguide.responses;
 
+/**
+ * Used when returning info from JSON when creating an account.
+ */
 public class CreateAccountResponse {
     String response;
 

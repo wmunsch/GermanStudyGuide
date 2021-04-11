@@ -399,8 +399,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
 
-    <!-- android:text="@{flashcardviewmodel.currentNode.toSentence()}"
-     android:text="@{flashcardviewmodel.currentNode.answer}"
-
-
-    -->

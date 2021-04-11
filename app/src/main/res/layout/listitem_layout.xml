@@ -122,12 +122,5 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!--  android:progress="@{vocablistviewmodel.a1Learned, default = 0}" -->
-
-
-
-
-
-
 </RelativeLayout>
 </layout>

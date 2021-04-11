@@ -5,13 +5,13 @@ import android.view.View;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.williammunsch.germanstudyguide.responses.CheckUsernameResponse;
 import com.williammunsch.germanstudyguide.responses.CreateUploadDataResponse;
 import com.williammunsch.germanstudyguide.responses.LoginResponse;
-import com.williammunsch.germanstudyguide.User;
-import com.williammunsch.germanstudyguide.repositories.FlashcardRepository;
+import com.williammunsch.germanstudyguide.datamodels.User;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
 import javax.inject.Inject;
@@ -19,24 +19,41 @@ import javax.inject.Inject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+/**
+ * Handles all of the livedata objects and logic for the main screen activity.
+ */
 public class MainActivityViewModel extends ViewModel {
-    private Repository mRepository;//injected
-    private FlashcardRepository mFlashcardRepository;
-    private MutableLiveData<Integer> errorCode = new MutableLiveData<>();
-    private LiveData<String> userName;
-    private LiveData<String> userEmail;
+    private final Repository mRepository;//injected
+    private final MutableLiveData<Integer> errorCode = new MutableLiveData<>();
     private LoginResponse loginResponse;
 
+    private final LiveData<User> currentUser;
+    private final LiveData<String> userName;
+    private final MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> registrationVisibility = new MutableLiveData<>(View.GONE);
+    private final MutableLiveData<Integer> passwordErrorVisibility = new MutableLiveData<>(View.GONE);
+    private final MutableLiveData<Integer> emailTakenVisibility = new MutableLiveData<>(View.GONE);
+    private final MutableLiveData<Integer> emailValidVisibility = new MutableLiveData<>(View.GONE);
+    private final MutableLiveData<Integer> couldNotConnectVisibility = new MutableLiveData<>(View.GONE);
 
     @Inject
-    public MainActivityViewModel(Repository repository, FlashcardRepository flashcardRepository){
+    public MainActivityViewModel(Repository repository){
         this.mRepository = repository;
-        this.mFlashcardRepository = flashcardRepository;
-        userName=mRepository.getUserName();
-        userEmail=mRepository.getUserEmail();
-    }
+        currentUser = mRepository.getUserInfoFromRoom();
 
+        //map username to currentuser.username to show username in top left of main screen
+        userName = Transformations.map(currentUser, name->{
+            if (currentUser.getValue() != null){
+                loginVisibility.setValue(View.GONE);
+                profileVisibility.setValue(View.VISIBLE);
+                return currentUser.getValue().getUsername();
+            }
+            loginVisibility.setValue(View.VISIBLE);
+            profileVisibility.setValue(View.GONE);
+            return "Log In";
+        } );
+    }
 
 
     /**
@@ -45,10 +62,9 @@ public class MainActivityViewModel extends ViewModel {
      * @param username The username typed into the edit text.
      * @param password The password typed into the edit text.
      */
-
     public void logIn(Editable username, Editable password){
         //Reset the flashcard activity data so nothing gets messed up when changing accounts.
-        mFlashcardRepository.resetEverything();
+        mRepository.resetEverything();
 
         Call<LoginResponse> call = mRepository.apiService.logIn(username.toString().toLowerCase().trim(),password.toString().toLowerCase().trim());
         call.enqueue(new Callback<LoginResponse>() {
@@ -60,8 +76,6 @@ public class MainActivityViewModel extends ViewModel {
                     if (!loginResponse.getIsError()){
                         //add user to ROOM database
                         mRepository.insertUser(new User(loginResponse.getUsername(),loginResponse.getPassword()));
-
-                        //TODO : reset the ROOM database scores and reload them with new values
                         mRepository.downloadSaveData(loginResponse.getUsername());
                     }
 
@@ -74,15 +88,18 @@ public class MainActivityViewModel extends ViewModel {
         });
     }
 
+    /**
+     * Checks to see if the username and password are using correct characters/length, then registers if good
+     */
     public void checkEmailAndPassword(Editable password, Editable username){
         boolean passGood = false;
         char[] pwa = password.toString().toCharArray();
         if (password.length()<8 || password.length()>20){
             //error
-            mRepository.setPasswordErrorVisibility(View.VISIBLE);
+            setPasswordErrorVisibility(View.VISIBLE);
             passGood = false;
         }else{
-            mRepository.setPasswordErrorVisibility(View.GONE);
+            setPasswordErrorVisibility(View.GONE);
             passGood = true;
         }
 
@@ -112,8 +129,8 @@ public class MainActivityViewModel extends ViewModel {
 
     }
 
-    /*
-      Function to register an account only using the username and password.
+    /**
+     * Function to register an account only using the username and password.
      */
     //TODO : Fix this so its not a call within a call
     public void registerAccount(String username, String pw){
@@ -124,23 +141,17 @@ public class MainActivityViewModel extends ViewModel {
         call.enqueue(new Callback<CheckUsernameResponse>() {
             @Override
             public void onResponse(Call<CheckUsernameResponse> call, Response<CheckUsernameResponse> response) {
-             //   System.out.println("Response to checkUsername call: ");
-              //  System.out.println(response);
                 CheckUsernameResponse checkResponse = response.body();
-              //  System.out.println(checkResponse);
 
                 if (checkResponse!=null && checkResponse.getExists()==1){ //Username is taken
-                    mRepository.setEmailTakenVisibility(View.VISIBLE);
+                    setEmailTakenVisibility(View.VISIBLE);
                 }else{ //Username not taken, create another call to register the account
-                    mRepository.setEmailTakenVisibility(View.GONE);
+                    setEmailTakenVisibility(View.GONE);
 
-                    //Call within a call?***********************************************************
                     Call<CreateUploadDataResponse> call2 = mRepository.apiService.createAccount(username,pw);
                     call2.enqueue(new Callback<CreateUploadDataResponse>() {
                         @Override
                         public void onResponse(Call<CreateUploadDataResponse> call2, Response<CreateUploadDataResponse> response2) {
-                            CreateUploadDataResponse lr = response2.body();
-
                             mRepository.insertUser(new User(username, pw));
                             errorCode.setValue(4);
                             setLoginAndRegistrationVisibilityGone();
@@ -160,40 +171,16 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     /**
-     * Function to retry downloading the base database data, such as A1 vocab
-     * when the initial download failed. Called by the linear layout containing
-     * the error message in the middle of the screen in activity_main.xml
+     * Called when logging out, deletes the user, scores, and resets flashcard activity data.
      */
-    public void retryDownloads(){
-        mRepository.checkA1();
-        //mRepository.checkStories();
-    }
-
-
-
-
-
     public void logOut(){
         mRepository.deleteAllUsers();
         mRepository.resetAllScores();
-        mFlashcardRepository.resetEverything();
+        mRepository.resetEverything();
     }
-
-    public LiveData<Integer> getEmailValidVisibility() {
-        return mRepository.getEmailValidVisibility();
-    }
-    public void setUpRegistration(){
-        mRepository.setRegistrationVisibility();
-    }
-    public void setUpRegistrationF(){
-        mRepository.setRegistrationVisibilityF();
-    }
-    public void setLoginAndRegistrationVisibilityGone(){mRepository.setLoginAndRegistrationVisibilityGone();}
 
     public LiveData<Integer> getShowLoadingBar(){return mRepository.getShowLoadingBar();}
     public LiveData<Integer> getShowViewPager(){return mRepository.getShowViewPager();}
-
-    public LiveData<Integer> getCouldNotConnectVisibility(){return mRepository.getCouldNotConnectVisibility();}
 
     public LiveData<Integer> getA1Count() {
         return mRepository.getA1Count();
@@ -203,27 +190,59 @@ public class MainActivityViewModel extends ViewModel {
         return userName;
     }
 
-    public LiveData<String> getUserEmail() {
-        return userEmail;
-    }
 
     public LiveData<Integer> getErrorCode(){
         return errorCode;
     }
-    public LiveData<Integer> getPasswordErrorVisibility() {
-        return mRepository.getPasswordErrorVisibility();
-    }
     public LiveData<Integer> getProfileVisibility() {
-        return mRepository.getProfileVisibility();
-    }
-
-    public LiveData<Integer> getEmailTakenVisibility() {
-        return mRepository.getEmailTakenVisibility();
+        return profileVisibility;
     }
 
 
-    public LiveData<Integer> getLoginVisibility() {return mRepository.getLoginVisibility();}
+    public LiveData<Integer> getLoginVisibility() {return loginVisibility;}
 
-    public LiveData<Integer> getRegistrationVisibility() {return mRepository.getRegistrationVisibility();}
 
+    //View Visibility setters
+    public void setUpRegistration(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.VISIBLE);
+        passwordErrorVisibility.setValue(View.INVISIBLE);
+    }
+    public void setUpRegistrationF(){
+        loginVisibility.setValue(View.VISIBLE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
+    public void setLoginAndRegistrationVisibilityGone(){
+        loginVisibility.setValue(View.GONE);
+        profileVisibility.setValue(View.GONE);
+        registrationVisibility.setValue(View.GONE);
+        passwordErrorVisibility.setValue(View.GONE);
+    }
+    public void setPasswordErrorVisibility(int i){
+        passwordErrorVisibility.setValue(i);
+    }
+    public LiveData<Integer> getPasswordErrorVisibility() {
+        return passwordErrorVisibility;
+    }
+    public LiveData<Integer> getRegistrationVisibility() {
+        return registrationVisibility;
+    }
+    public MutableLiveData<Integer> getEmailTakenVisibility() {
+        return emailTakenVisibility;
+    }
+    public void setEmailTakenVisibility(int i) {
+        this.emailTakenVisibility.setValue(i);
+    }
+    public LiveData<Integer> getCouldNotConnectVisibility(){return couldNotConnectVisibility;}
+    public void setCouldNotConnectVisibility(int i){couldNotConnectVisibility.setValue(i);}
+    public LiveData<Integer> getEmailValidVisibility() {
+        return emailValidVisibility;
+    }
+
+    public void setEmailValidVisibility(int i) {
+        this.emailValidVisibility.setValue(i);
+    }
 }

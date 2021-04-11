@@ -17,15 +17,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.williammunsch.germanstudyguide.NounGenderActivity;
 import com.williammunsch.germanstudyguide.R;
 
+/**
+ * Adapter for the main page grammar list
+ */
 public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRecyclerViewAdapter.ViewHolder> {
     private Context mContext;
-   // private NounGenderViewModel nounGenderViewModel;
     private Integer genderButtonVisibility = View.VISIBLE;
     private Integer genderTextVisibility = View.GONE;
 
     public GrammarRecyclerViewAdapter(Context mContext){
         this.mContext = mContext;
-        //this.nounGenderViewModel = nounGenderViewModel;
     }
 
 
@@ -58,25 +59,14 @@ public class GrammarRecyclerViewAdapter  extends RecyclerView.Adapter<GrammarRec
             }
         });
 
+        //Sets the grammar button in each lesson to start the activity
         viewHolder.learnButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-               // System.out.println("Clicked on button");
-
                 if (viewHolder.getAdapterPosition()==0){
-                   // System.out.println("Adding source from recyclerviewadaper88888888888");
-                   // vocabListViewModel.addSource();
-                   // nounGenderViewModel.addSource();
                     Intent intent = new Intent(mContext, NounGenderActivity.class);
-                    //intent.putExtra("table", "A1");
                     mContext.startActivity(intent);
                 }
-                /*else if (viewHolder.getAdapterPosition()==1){
-
-                    Intent intent = new Intent(mContext, FlashcardActivity.class);
-                    intent.putExtra("table", "A2");
-                    mContext.startActivity(intent);
-                }*/
             }
         });
     }

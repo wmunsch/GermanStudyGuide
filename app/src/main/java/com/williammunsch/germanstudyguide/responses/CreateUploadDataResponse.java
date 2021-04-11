@@ -1,7 +1,9 @@
 package com.williammunsch.germanstudyguide.responses;
 
-import java.util.List;
 
+/**
+ * Used to get a response from JSON when uploading data
+ */
 public class CreateUploadDataResponse {
     String response;
 
