@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
-import com.williammunsch.germanstudyguide.viewmodels.MainActivityViewModel;
-import com.williammunsch.germanstudyguide.viewmodels.ViewModelFactory;
-import com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel;
+import com.williammunsch.germanstudyguide.activitiesviewmodels.MainActivityViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import javax.inject.Inject;
 
@@ -35,7 +35,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mainActivityViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel.class);
 
     }
 

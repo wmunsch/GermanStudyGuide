@@ -7,7 +7,7 @@
     <data>
         <variable
             name="vocablistviewmodel"
-            type="com.williammunsch.germanstudyguide.viewmodels.VocabListViewModel" />
+            type="com.williammunsch.germanstudyguide.recyclerviewviewmodels.VocabListViewModel" />
     </data>
 <RelativeLayout
     android:layout_width="match_parent"
@@ -26,6 +26,8 @@
         android:visibility="gone"
         android:id="@+id/buttonLayout">
 
+
+
         <Button
             android:layout_width="100dp"
             android:layout_height="30dp"
@@ -33,7 +35,8 @@
             android:textColor="#ffffff"
             android:textSize="16sp"
             android:textAllCaps="false"
-            android:text="Learn"
+            android:text="@string/loading"
+
             android:layout_gravity="center_horizontal"
             android:id="@+id/learnButton" />
 
@@ -42,6 +45,22 @@
             android:layout_height="wrap_content"
             android:id="@+id/wordsLearnedTV"
             android:text="Words Learned : "
+            android:textAlignment="gravity"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="30dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/wordsDownloadedTV"
+            android:text="Words Downloaded: "
+            android:textAlignment="gravity"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="30dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/errorDownloadingTV"
+            android:text="Error Connecting To Server."
             android:textAlignment="gravity"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="30dp"/>
@@ -102,13 +121,6 @@
                 android:secondaryProgressTintMode="src_over"/>
         </LinearLayout>
     </LinearLayout>
-
-    <!--  android:progress="@{vocablistviewmodel.a1Learned, default = 0}" -->
-
-
-
-
-
 
 </RelativeLayout>
 </layout>

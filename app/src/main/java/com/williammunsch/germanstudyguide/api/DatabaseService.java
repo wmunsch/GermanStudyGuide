@@ -1,10 +1,12 @@
 package com.williammunsch.germanstudyguide.api;
-import com.williammunsch.germanstudyguide.CheckEmailResponse;
-import com.williammunsch.germanstudyguide.CheckUsernameResponse;
-import com.williammunsch.germanstudyguide.CreateAccountResponse;
-import com.williammunsch.germanstudyguide.CreateUploadDataResponse;
-import com.williammunsch.germanstudyguide.LoginResponse;
-import com.williammunsch.germanstudyguide.SaveDataResponse;
+import com.williammunsch.germanstudyguide.responses.CheckEmailResponse;
+import com.williammunsch.germanstudyguide.responses.CheckUsernameResponse;
+import com.williammunsch.germanstudyguide.responses.CreateAccountResponse;
+import com.williammunsch.germanstudyguide.responses.CreateUploadDataResponse;
+import com.williammunsch.germanstudyguide.responses.LoginResponse;
+import com.williammunsch.germanstudyguide.responses.SaveDataResponse;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
 import java.util.List;
@@ -24,7 +26,6 @@ public interface DatabaseService {
 
     @GET("api/dbscript.php")
     Call<List<VocabModelA1>> vocabList();
-    //Call<VocabModelA1[]> vocabList();
 
     @FormUrlEncoded
     @POST("api/login.php")
@@ -94,7 +95,14 @@ public interface DatabaseService {
             @Field("table_name") String table_name,
             @Field("score_list") String score_list,
             @Field("freq_list") String freq_list,
-            @Field("studying_list") String studying_list
+            @Field("studying_list") String studying_list,
+            @Field("pid") String pid
     );
+
+    @GET("api/downloadhagsentences.php")
+    Call<List<Hag_Sentences>> downloadHagSentences();
+
+    @GET("api/downloadhagwords.php")
+    Call<List<Hag_Words>> downloadHagWords();
 
 }

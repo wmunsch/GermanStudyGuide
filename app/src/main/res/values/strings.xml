@@ -20,7 +20,10 @@
     <string name="already_registered">Already registered? Click here to log in.</string>
     <string name="enter">Register for an account. \nRequires email activation.</string>
     <string name="incorrect_password">*Password must be between 8 and 20 characters.</string>
-    <string name="email_taken">*Account with this email already exists.</string>
+    <string name="email_taken">*Account with this user name already exists.</string>
     <string name="email_valid">*Email is not valid.</string>
     <string name="outOf700">/700</string>
+    <string name="loading">loading</string>
+    <string name="download_vocab_first">Download vocab first!</string>
+    <string name="practice">Practice</string>
 </resources>

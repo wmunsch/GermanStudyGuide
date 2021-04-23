@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.williammunsch.germanstudyguide.datamodels.LocalSaveA1;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 
@@ -20,68 +21,65 @@ import java.util.List;
 @Dao
 public interface VocabDao {
     @Query("SELECT * FROM vocab_tableA1")
-    LiveData<List<VocabModelA1>> getAllVocabs();   //ROOM does not support MutableLiveData
+    LiveData<List<VocabModelA1>> getAllVocabs();
 
     @Query("SELECT * FROM vocab_tableA1 LIMIT 1;")
     LiveData<VocabModelA1> getOneVocab();
 
-
-
-    //@Query("SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5;")// + "SELECT * FROM vocab_table WHERE studying = 1 ODER BY _id LIMIT 5")
-   // List<VocabModelA1> getFiveNewVocab();
-
-
-
     //Gets # of new vocab and # of old vocab for review combined
-    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score,freq LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY score ASC")
+    @Query("SELECT * FROM ( SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score,freq LIMIT 15) UNION SELECT * FROM (SELECT * FROM vocab_tableA1 WHERE studying = 0 ORDER BY _id LIMIT 5) ORDER BY studying,score,freq ASC")
     LiveData<List<VocabModelA1>> getVocabQueue();
 
     //Gets 20 learned vocab for review after learning all
     @Query("SELECT * FROM vocab_tableA1 WHERE studying = 1 ORDER BY score LIMIT 20")
     LiveData<List<VocabModelA1>> getVocabQueueFinished();
 
+    //Gets 20 nouns for the noun gender activity
+    @Query("SELECT * FROM vocab_tableA1 WHERE article!=''")
+    LiveData<List<VocabModelA1>> getNounQueue();
 
-    //Gets all studying from ROOM for uploading to remote database
-   // @Query("SELECT studying FROM vocab_tableA1 ORDER BY _id")
-   // LiveData<String> getStudyingData();
+    //Gets 1 noun to add for the noun gender activity
+    @Query("SELECT * FROM vocab_tableA1 WHERE article!='' LIMIT 1")
+    LiveData<VocabModelA1> getOneNoun();
 
-    //Gets # of new vocab and # of old vocab for review combined
-   // @Query("SELECT * FROM ( SELECT * FROM vocab_table WHERE studying = 0 LIMIT 3) UNION SELECT * FROM (SELECT * FROM vocab_table WHERE studying = 1 LIMIT 2) ORDER BY _id DESC")
-    //List<VocabModelA1>getVocabQueue();
+    @Query("SELECT COUNT(*) FROM vocab_tableA1 WHERE studying = 1")
+    Integer getCountStudyingA1();
 
 
-    /**
-     * Update the vocabModel word with the new score.
-     */
+     //Update the vocabModel word with the new score.
     @Update
     void updateNode(VocabModelA1... vocabModelA1s);
-   // @Query("UPDATE vocab_table SET score = score")
-   // void updateNode(VocabModelA1 vocabModel);
 
 
-    /**
-     * Called when logging in.
-     */
+
+    //Update the local save Model word with the new score.
+    @Query("UPDATE local_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
+    void updateLocalNode(int score, int studying, int freq, int id);
+
+
+    //Called when logging in.
     @Update
     void updateVocabScoresOnLogin(VocabModelA1... vocabModelA1s);
 
     @Query("SELECT * FROM vocab_tableA1")
     VocabModelA1[] getFullA1List();
 
+    @Query("SELECT * FROM local_tableA1")
+    LocalSaveA1[] getFullLocalSaveList();
 
-    /**
-     *Better way of updating vocab scores when logging in
-     */
+
+     //Better way of updating vocab scores when logging in
     @Query("UPDATE vocab_tableA1 SET score = :score, studying = :studying, freq = :freq WHERE _id = :id")
     void updateVocabScore(int score, int studying, int freq, int id);
-
-   // @Query("UPDATE vocab_tableA1 SET score = :score WHERE _id = :id")
-   // void updateVocabScore(int score, int id);
 
 
     //Inserts the A1 data, will replace unique constraints in case of a non-fully downloaded previous attempt
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(VocabModelA1 vocabModelA1);
+
+    //Inserts the A1 local savedata, will replace unique constraints in case of a non-fully downloaded previous attempt
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertLocal(LocalSaveA1 localSaveA1);
 
     //Deletes everything in the A1 table
     @Query("DELETE FROM vocab_tableA1")
@@ -91,14 +89,9 @@ public interface VocabDao {
     @Query("UPDATE vocab_tableA1 SET studying = 0, score=0,freq=0")
     void resetAllScores();
 
-
-
-
-
-   // @Query("SELECT * FROM vocab_TableA1 WHERE studying = 1 ORDER BY score;")
-    //List<VocabModelA1> getFiveOldVocab();
-
-
+    //Resets scores, freqs, and studying to 0 when logging out.
+    @Query("UPDATE vocab_tableA1 SET studying = :studying, score= :score,freq=:freq WHERE _id = :id")
+    void resetAllScoresToLocal(int studying, int score, int freq, int id);
 
 
     /**
@@ -114,7 +107,6 @@ public interface VocabDao {
     @Query("SELECT score FROM vocab_tableA1")
     List<Integer> getA1Scores();
 
-    //@Query("SELECT * FROM vocab_table WHERE ")
 
     @Query("SELECT COUNT(*) FROM  vocab_tableA1")
     Integer countA1();

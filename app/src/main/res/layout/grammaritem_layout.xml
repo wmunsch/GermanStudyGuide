@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="vocablistviewmodel"
+            type="com.williammunsch.germanstudyguide.recyclerviewviewmodels.VocabListViewModel" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="#ffffff"
+        android:id="@+id/parent_layout">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/imageandlayout"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:id="@+id/buttonLayout">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/button_selector"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:text="@string/practice"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/learnButton" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/downloadFirstTV"
+                android:text="@string/download_vocab_first"
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="#ffffff"
+            android:id="@+id/imageandlayout">
+
+
+            <TextView
+                android:id="@+id/imageView"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/noungendercircle"
+                android:text="   Noun"
+                android:gravity="center"
+                android:layout_margin="0dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/imageView"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp"
+            android:id="@+id/name_progressbar_layout">
+            <TextView
+                android:id="@+id/item_name_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="31dp"
+                android:layout_gravity="center_vertical"
+                android:text="Noun Genders"
+                android:textSize="20sp" />
+            <TextView
+                android:id="@+id/item_name_textview2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="31dp"
+                android:layout_gravity="center_vertical"
+                android:text="Der, Die, Das"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

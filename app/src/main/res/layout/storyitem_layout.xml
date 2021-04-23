@@ -1,56 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:background="#ffffff">
-
-    <LinearLayout
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="storieslistviewmodel"
+            type="com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel" />
+    </data>
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:padding="10dp"
         android:background="#ffffff"
-        android:id="@+id/imageandlayout">
-
-
-
-        <ImageView
-            android:id="@+id/story_imageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:textAlignment="center"
-            android:gravity="center_vertical"
-            android:layout_margin="10dp"/>
+        android:id="@+id/parentRelative_layout">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/story_imageView"
-            android:orientation="vertical"
-            android:layout_centerVertical="false"
-            android:layout_marginTop="12dp"
-            android:id="@+id/name_progressbar_layout">
+            android:orientation="horizontal"
+            android:layout_below="@id/imageandlayout"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:id="@+id/buttonLayout2">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/button_selector"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:text="Read"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/readButton" />
 
             <TextView
-                android:id="@+id/title_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="31dp"
-                android:text="Title"
-                android:textColor="#404040"
-                android:textSize="18sp" />
-
+                android:id="@+id/partsDownloadedTV"
+                android:text="Parts Downloaded: "
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
             <TextView
-                android:id="@+id/author_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="31dp"
-                android:text="Author"
-                android:textSize="14sp" />
-
-
+                android:id="@+id/errorDownloadingTV"
+                android:text="Error Connecting To Server."
+                android:textAlignment="gravity"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"/>
         </LinearLayout>
-    </LinearLayout>
 
-</RelativeLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="#ffffff"
+            android:id="@+id/imageandlayout">
+
+            <ImageView
+                android:id="@+id/story_imageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:layout_margin="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/story_imageView"
+                android:orientation="vertical"
+                android:layout_centerVertical="false"
+                android:layout_marginTop="12dp"
+                android:id="@+id/name_progressbar_layout">
+
+                <TextView
+                    android:id="@+id/title_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="31dp"
+                    android:text="Title"
+                    android:textColor="#404040"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/author_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="31dp"
+                    android:text="Author"
+                    android:textSize="14sp" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

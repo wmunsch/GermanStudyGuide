@@ -1,7 +1,9 @@
 package com.williammunsch.germanstudyguide.ui;
 
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
+
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,17 +15,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.williammunsch.germanstudyguide.GermanApp;
 import com.williammunsch.germanstudyguide.R;
 import com.williammunsch.germanstudyguide.adapters.StoriesRecyclerViewAdapter;
 import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
-import com.williammunsch.germanstudyguide.viewmodels.StoriesViewModel;
+import com.williammunsch.germanstudyguide.recyclerviewviewmodels.StoriesListViewModel;
+import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class StoriesFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private StoriesViewModel storiesViewModel;
+    private StoriesListViewModel storiesListViewModel;
     private StoriesRecyclerViewAdapter mAdapter;
+
+    @Inject
+    ViewModelFactory viewModelFactory;
 
     public static StoriesFragment newInstance(int index) {
         StoriesFragment fragment = new StoriesFragment();
@@ -34,19 +43,16 @@ public class StoriesFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        ((GermanApp) context.getApplicationContext()).getAppComponent().inject(this);
+        super.onAttach(context);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Initializing the view model
-
-        storiesViewModel = ViewModelProviders.of(this).get(StoriesViewModel.class);
-        storiesViewModel.init();//retrieve data from repository
-
-        storiesViewModel.getStoriesListItems().observe(this, new Observer<List<StoriesListItem>>() {
-            @Override
-            public void onChanged(@Nullable List<StoriesListItem> storiesListItems) {
-                mAdapter.notifyDataSetChanged();
-            }
-        });
+        storiesListViewModel = new ViewModelProvider(this,viewModelFactory).get(StoriesListViewModel.class);
 
     }
 
@@ -54,9 +60,60 @@ public class StoriesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+        //Observe all of the LiveData objects so they will be updated in the view
+        storiesListViewModel.getStoriesListItems().observe(getViewLifecycleOwner(), new Observer<List<StoriesListItem>>() {
+            @Override
+            public void onChanged(@Nullable List<StoriesListItem> storiesListItems) {
+                mAdapter.setStoriesList(storiesListItems);
+            }
+        });
+        storiesListViewModel.getHAGDownloadedText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mAdapter.setDownloadButtonText(s);
+            }
+        });
+        storiesListViewModel.getHAGDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagPartsDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGPartsDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagWordsDownloaded().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGWordsDownloaded(integer);
+            }
+        });
+        storiesListViewModel.getHagErrorVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGErrorVisibility(integer);
+            }
+        });
+        storiesListViewModel.getHagPartsDownloadedVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGPartsDownloadedVisibility(integer);
+            }
+        });
+        storiesListViewModel.getHagButtonVisibility().observe(getViewLifecycleOwner(), new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                mAdapter.setHAGButtonVisibility(integer);
+            }
+        });
+
         final RecyclerView recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new StoriesRecyclerViewAdapter(getContext(),storiesViewModel.getStoriesListItems().getValue());
+
+        mAdapter = new StoriesRecyclerViewAdapter(getContext(),storiesListViewModel);
         recyclerView.setAdapter(mAdapter);
 
         try {
@@ -65,15 +122,6 @@ public class StoriesFragment extends Fragment {
             //throw new Error
         }
 
-        /*
-        final TextView textView = root.findViewById(R.id.section_label);
-        pageViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        */
         return root;
     }
 }

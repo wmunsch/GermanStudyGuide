@@ -1,22 +1,28 @@
 package com.williammunsch.germanstudyguide.room;
 
-import androidx.lifecycle.MutableLiveData;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.williammunsch.germanstudyguide.User;
+import com.williammunsch.germanstudyguide.datamodels.User;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Sentences;
+import com.williammunsch.germanstudyguide.datamodels.Hag_Words;
+import com.williammunsch.germanstudyguide.datamodels.LocalSaveA1;
 import com.williammunsch.germanstudyguide.datamodels.ScoreModelA1;
-import com.williammunsch.germanstudyguide.datamodels.Story;
+import com.williammunsch.germanstudyguide.datamodels.StoriesListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabListItem;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelA2;
+import com.williammunsch.germanstudyguide.datamodels.VocabModelB1;
 
 /**
- * The ROOM database which stores vocab, sentences, score, frequency, and isStudying
+ * The ROOM database which stores usernames, stories, and vocab data.
  */
 
-@Database(entities = {VocabModelA1.class, Story.class, VocabListItem.class, User.class, ScoreModelA1.class}, version = 4, exportSchema = false)
+@Database(entities = {VocabModelA1.class, VocabModelA2.class, VocabModelB1.class, VocabListItem.class, User.class, ScoreModelA1.class, StoriesListItem.class,
+        Hag_Sentences.class, Hag_Words.class, LocalSaveA1.class}, version = 2)
 public abstract class GermanDatabase extends RoomDatabase {
-    //private static GermanDatabase instance;
 
     public abstract VocabDao vocabDao();
 
@@ -26,52 +32,5 @@ public abstract class GermanDatabase extends RoomDatabase {
 
     public abstract UserDao userDao();
 
-    private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
-
-    /*
-    public static synchronized GermanDatabase getInstance(Context context){
-        if (instance == null){
-            instance = Room.databaseBuilder(context.getApplicationContext(),
-                    GermanDatabase.class, "german_database")
-                    .fallbackToDestructiveMigration()
-                    .addCallback(roomCallback)
-                    .build();
-        }
-        return instance;
-    }
-
-*/
-
-    /**
-     * Populate the database with the vocab list items when created
-     */
-    /*
-    private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback() {
-        @Override
-        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-            super.onCreate(db);
-            new PopulateDbAsyncTask(instance).execute();
-        }
-    };
-*/
-    /**
-     * Async task to insert the vocab list items into the database
-     */
-    /*
-    private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void>{
-        private VocabListDao vocabListDao;
-
-        private PopulateDbAsyncTask(GermanDatabase db){
-            vocabListDao = db.vocabListDao();
-        }
-        @Override
-        protected Void doInBackground(Void... voids) {
-            vocabListDao.insert(new VocabListItem("Beginner Level 1","A1",0,0,0));
-            vocabListDao.insert(new VocabListItem("Beginner Level 2","A2",0,0,0));
-            vocabListDao.insert(new VocabListItem("Intermediate Level 1","B1",0,0,0));
-            return null;
-        }
-    }
-    */
 
 }

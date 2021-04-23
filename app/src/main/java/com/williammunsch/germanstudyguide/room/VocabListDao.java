@@ -17,6 +17,8 @@ public interface VocabListDao {
     @Query("SELECT * FROM vocab_list_table")
     LiveData<List<VocabListItem>> getAllVocabLists();
 
+    @Query("SELECT COUNT(*) FROM vocab_list_table WHERE name = :name")
+    Integer vocabLessonExists(String name);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(VocabListItem vocabListItem);

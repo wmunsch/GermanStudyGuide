@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="noungenderviewmodel"
+            type="com.williammunsch.germanstudyguide.activitiesviewmodels.NounGenderViewModel" />
+        <import type="android.graphics.Color"/>
+        <variable name="txtColor" type="String"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:background="?attr/colorPrimary"
+            android:elevation="2dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{noungenderviewmodel.accuracyText}"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="#2c2c2c"
+            android:text="Select the correct gender for the given noun."
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <LinearLayout
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView1"
+            app:layout_constraintBottom_toTopOf="@id/scrollviewbuttons">
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{noungenderviewmodel.currentNode.article + ' '}"
+                android:textColor="#2c2c2c"
+                android:textSize="22sp"
+                android:visibility="@{noungenderviewmodel.articleVisibility}" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{noungenderviewmodel.currentNode.german}"
+                android:textColor="#2c2c2c"
+                android:textSize="22sp" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scrollviewbuttons"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="25dp"
+            android:fadeScrollbars="false"
+            android:maxHeight="200dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="1dp"
+            android:paddingBottom="20dp"
+            android:scrollbarSize="4dp"
+            android:scrollbarStyle="insideInset"
+            android:scrollbarThumbVertical="@drawable/scrollbarstyle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView7"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+
+            <LinearLayout
+                android:id="@+id/buttonlayout3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center_horizontal">
+
+                <LinearLayout
+                    android:id="@+id/derLinear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView7"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <Button
+                        android:id="@+id/buttonDer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="false"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:visibility="@{noungenderviewmodel.derButtonVisibility}"
+                        android:onClick="@{() -> noungenderviewmodel.checkAnswerDer()}"
+                        android:background="@drawable/button_selector"
+                        android:text="Der" />
+
+                    <ImageView
+                        android:id="@+id/checkDer"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        app:srcCompat="@drawable/checkmark"
+                        android:visibility="@{noungenderviewmodel.checkDerVisibility, default=gone}"/>
+                    <ImageView
+                        android:id="@+id/xDer"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/xmark"
+                        android:visibility="@{noungenderviewmodel.exDerVisibility, default=gone}"/>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/dieLinear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintStart_toEndOf="@id/derLinear"
+                    app:layout_constraintEnd_toStartOf="@id/dasLinear"
+                    app:layout_constraintTop_toBottomOf="@+id/textView7"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <Button
+                        android:id="@+id/buttonDie"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Die"
+                        android:textAllCaps="false"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:visibility="@{noungenderviewmodel.dieButtonVisibility}"
+                        android:onClick="@{() -> noungenderviewmodel.checkAnswerDie()}"
+                        android:background="@drawable/button_selector2" />
+
+                    <ImageView
+                        android:id="@+id/checkDie"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        app:srcCompat="@drawable/checkmark"
+                        android:visibility="@{noungenderviewmodel.checkDieVisibility, default=gone}"/>
+                    <ImageView
+                        android:id="@+id/xDie"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/xmark"
+                        android:visibility="@{noungenderviewmodel.exDieVisibility, default=gone}"/>
+
+                </LinearLayout>
+
+
+
+
+                <LinearLayout
+                    android:id="@+id/dasLinear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView7"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <Button
+                        android:id="@+id/buttonDas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="false"
+                        android:textColor="#ffffff"
+                        android:textSize="20sp"
+                        android:visibility="@{noungenderviewmodel.dasButtonVisibility}"
+                        android:background="@drawable/button_selector3"
+                        android:onClick="@{() -> noungenderviewmodel.checkAnswerDas()}"
+                        android:text="Das"/>
+
+                    <ImageView
+                        android:id="@+id/checkDas"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        app:srcCompat="@drawable/checkmark"
+                        android:visibility="@{noungenderviewmodel.checkDasVisibility, default=gone}"/>
+                    <ImageView
+                        android:id="@+id/xDas"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/xmark"
+                        android:visibility="@{noungenderviewmodel.exDasVisibility, default=gone}"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
