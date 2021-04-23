@@ -62,10 +62,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             viewHolder.learnButton.setText(a1ButtonText);
             if (a1Learned < a1Max){
                 viewHolder.wordsLearned.setText(a1DownloadText + a1Learned + "/" + a1Max);
-                //viewHolder.learnButton.setText("Learn");
             }else{
                 viewHolder.wordsLearned.setText("Words mastered: " + a1Mastered + "/" + a1Max);
-                //viewHolder.learnButton.setText("Study");
             }
 
             viewHolder.learnButton.setVisibility(a1DownloadButtonVisibility);
@@ -77,7 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         //Changes the picture for each vocab lesson
         if (i==0 || i ==1){
-            if (a1Learned<a1Max){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle1,null));}//a1circle1
+            if (a1Learned<a1Max || a1Learned ==0 || a1Max == 0){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle1,null));}//a1circle1
             else{
                 if (a1Mastered<a1Max){viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle2,null));} //a1circle2
                 else{viewHolder.image.setBackground(ResourcesCompat.getDrawable(mContext.getResources(),R.drawable.a1circle3,null));}//a1circle3

@@ -15,6 +15,7 @@ import com.williammunsch.germanstudyguide.datamodels.User;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
 import com.williammunsch.germanstudyguide.repositories.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,13 +38,11 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     private final SingleLiveEvent<Boolean> navigateToMainActivity = new SingleLiveEvent<>();
 
-    private final LiveData<String> userName;
-    private final LiveData<User> currentUser;
-
     private LiveData<List<VocabModelA1>> vocabList;
     private final MediatorLiveData<List<VocabModelA1>> mediatorVocabList = new MediatorLiveData<>();
     private final LiveData<VocabModelA1> currentNode;
     private double newWords = 5;
+    private boolean setAtBeginning = false;
 
     private final MutableLiveData<Integer> cardsFinished = new MutableLiveData<>();
     private final MutableLiveData<String> cardsFinishedText = new MutableLiveData<>();
@@ -70,12 +69,13 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     private boolean finished = false;
     private boolean correct = false;
-    private final LiveData<Integer> wordsMax;
     private final LiveData<Integer> wordsLearned;
     private final LiveData<Integer> wordsMastered;
-    private final MutableLiveData<Integer> wordsLearnedPercent = new MutableLiveData<>();
     private final LiveData<Integer> wordsLearnedP;
     private final LiveData<Integer> wordsMasteredP;
+
+    private final MutableLiveData<Boolean> showKeyBoard = new MutableLiveData<>(false);
+    private final ArrayList<VocabModelA1> finishedList = new ArrayList<>();
 
     /**
      * Keeps track of the order of flashcards in the live data here,
@@ -84,19 +84,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     @Inject
     public FlashcardViewModel(Repository repository) {
         this.mRepository = repository;
-
-        currentUser = repository.getUserInfoFromRoom();
-        wordsMax = repository.countWordsMax();
         wordsLearned = repository.countLearned();
         wordsMastered = repository.countMastered();
-
-        //map username to currentuser.username to show username in top left of main screen
-        userName = Transformations.map(currentUser, name->{
-            if (currentUser.getValue() != null){
-                return currentUser.getValue().getUsername();
-            }
-            return "Log In";
-        } );
 
         vocabList = mRepository.getVocabQueue();
         addSource();
@@ -108,12 +97,11 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         currentNode = Transformations.map(mediatorVocabList, value -> {
             if (mediatorVocabList.getValue() != null){
                 //reset the number of total cards for the activity (necessary for the progress bar because 1st time there are only 5 cards, then 10, then 15 then 20)
-                if (!mRepository.isSetAtBeginning() && mediatorVocabList.getValue().size() !=0){
+                if (!setAtBeginning && mediatorVocabList.getValue().size() !=0){
                     newWords =mediatorVocabList.getValue().size();
-                    mRepository.setAtBeginning(true);
+                    setAtBeginning= true;
                 }
                 cardsFinished.setValue((int)(100 - (((double)mediatorVocabList.getValue().size())/newWords)*100)); //This determines the percentage bar for flashcard actvity
-
                 cardsFinishedText.setValue("Cards Remaining: " + mediatorVocabList.getValue().size()); //This determines the cards left number
 
                 if (mediatorVocabList.getValue().size()>0){
@@ -153,6 +141,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
 
     }
+
 
     /**
      * Observes the vocabList livedata to retrieve values in transformations
@@ -245,6 +234,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         checkmarkVisibility.setValue(VISIBLE);
         xmarkVisibility.setValue(GONE);
         //TODO : set linearLayout_correct to visible to show other answers?
+       // correctLayoutVisibility.setValue(VISIBLE);
+
 
         checkButtonText.setValue("Next");
         finished=true;
@@ -299,7 +290,6 @@ public class FlashcardViewModel extends ViewModel implements Observable {
         hintButtonVisibility.setValue(VISIBLE);
         editTextVisibility.setValue(VISIBLE);
         englishTextVisibility.setValue(INVISIBLE);
-        correctLayoutVisibility.setValue(INVISIBLE);
         iwasrightVisibility.setValue(GONE);
         finishButtonVisibility.setValue(INVISIBLE);
         checkButtonVisibility.setValue(VISIBLE);
@@ -323,6 +313,12 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
         setAnswer("");
 
+        //Show the keyboard for all cards that have entry text (and not on the final good job page)
+        if (currentNode.getValue() != null && currentNode.getValue().getStudying()!=0 &&
+                mediatorVocabList.getValue() != null && mediatorVocabList.getValue().size()>0){
+            showKeyBoard.setValue(true);
+        }
+
         //Activity is finished, update the local ROOM database
         if (mediatorVocabList.getValue() != null && mediatorVocabList.getValue().size()<=0){
             editTextVisibility.setValue(GONE);
@@ -336,14 +332,15 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             finishButtonVisibility.setValue(VISIBLE);
 
             //If logged in, update remote database too
-            if (currentUser.getValue()!=null){
+            if (mRepository.getCurrentUser().getValue()!=null){
                // update with remote database call
-                mRepository.updateAllNodes(true,userName);
+                mRepository.updateAllNodes(true,mRepository.getUserName(),finishedList);
             }else{
                 //update without remote database call
-                mRepository.updateAllNodes(false,userName);
+                mRepository.updateAllNodes(false,mRepository.getUserName(),finishedList);
             }
-            mRepository.setAtBeginning(false);
+
+            setAtBeginning=false;
 
             goodJobVisibility.setValue(VISIBLE);
             tv_wordsLearnedVisibility.setValue(VISIBLE);
@@ -354,6 +351,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
             progressBar_wordsMasteredVisibility.setValue(VISIBLE);
             textView_wordsMasteredOutOfVisibility.setValue(VISIBLE);
         }
+
+
     }
 
 
@@ -367,7 +366,8 @@ public class FlashcardViewModel extends ViewModel implements Observable {
                 currentNode.getValue().increaseFrequency();
             }
 
-            mRepository.getFinishedList().add(currentNode.getValue());
+           // mRepository.getFinishedList().add(currentNode.getValue());
+            finishedList.add(currentNode.getValue());
             assert list != null;
             list.remove(0);
         }catch(NullPointerException e){
@@ -418,12 +418,7 @@ public class FlashcardViewModel extends ViewModel implements Observable {
     public LiveData<Integer> getWordsLearnedP(){ return wordsLearnedP;}
     public LiveData<Integer> getWordsMasteredP(){ return wordsMasteredP;}
 
-    public LiveData<Integer> getWordsMax() {
-        return wordsMax;
-    }
-    public LiveData<Integer> getWordsLearnedPercent() {
-        return wordsLearnedPercent;
-    }
+
     public LiveData<Integer> getWordsMastered() {
         return wordsMastered;
     }
@@ -508,6 +503,14 @@ public class FlashcardViewModel extends ViewModel implements Observable {
 
     public LiveData<VocabModelA1> getCurrentNode(){
         return currentNode;
+    }
+
+    public MutableLiveData<Boolean> getShowKeyBoard() {
+        return showKeyBoard;
+    }
+
+    public void setShowKeyBoard(boolean b){
+        showKeyBoard.setValue(b);
     }
 
     //Two-way binding to allow reading of the edit text

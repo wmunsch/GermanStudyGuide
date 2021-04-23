@@ -1,5 +1,6 @@
 package com.williammunsch.germanstudyguide;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,8 +9,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.williammunsch.germanstudyguide.databinding.ActivityLearnBinding;
 import com.williammunsch.germanstudyguide.datamodels.VocabModelA1;
@@ -17,6 +24,7 @@ import com.williammunsch.germanstudyguide.activitiesviewmodels.FlashcardViewMode
 import com.williammunsch.germanstudyguide.viewmodelhelpers.ViewModelFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -47,7 +55,21 @@ public class FlashcardActivity extends AppCompatActivity {
         flashcardViewModel =  new ViewModelProvider(this,viewModelFactory).get(FlashcardViewModel.class);
         binding.setFlashcardviewmodel(flashcardViewModel);
 
-       // Intent bIntent = getIntent();
+        //Set the soft keyboard enter to call checkAnswer() so the user doesn't have to close the keyboard for each card
+        EditText editTextEntry = (EditText) findViewById(R.id.editText_entry);
+        editTextEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_DONE){
+                    flashcardViewModel.checkAnswer();
+                    hideKeyboard();
+                    handled=true;
+                }
+                return handled;
+            }
+        });
+
 
 
 
@@ -61,11 +83,16 @@ public class FlashcardActivity extends AppCompatActivity {
         flashcardViewModel.getMediatorVocabList().observe(this, new Observer<List<VocabModelA1>>() {
             @Override
             public void onChanged(List<VocabModelA1> vocabModelA1s) {
-                if (vocabModelA1s != null) {
-                    for (int i = 0; i < vocabModelA1s.size(); i++){
-                       // System.out.println(vocabModelA1s.get(i).getId() + " " + vocabModelA1s.get(i).getGerman() + " " + vocabModelA1s.get(i).getScore() + " " + vocabModelA1s.get(i).getGsentence());// + " " + vocabModelA1s.get(i).getScore()+" " + vocabModelA1s.get(i).getStudying());
-
-                    }
+                //System.out.println("Changed mediatorvocab list");
+            }
+        });
+        flashcardViewModel.getShowKeyBoard().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean){
+                    //Only show keyboard on new cards after the initial new 5
+                    showKeyboard();
+                    flashcardViewModel.setShowKeyBoard(false);
                 }
             }
         });
@@ -73,47 +100,22 @@ public class FlashcardActivity extends AppCompatActivity {
 
     }
 
-    /*
-    private void delayButtonCheck(){
-        buttonCheck.setEnabled(false);
-        new CountDownTimer(2100, 10) { //Set Timer for 5 seconds
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                buttonCheck.setEnabled(true);
-            }
-        }.start();
-    }
-
-
-    private void fadeIn(View view, int time){
-        view.animate()
-                .alpha(1f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
-                .setStartDelay(time);
-    }
-
-    //Unused useful methods
-    private void fadeOut(View view){
-        view.animate()
-                .alpha(0f)
-                .setDuration(shortAnimationDuration)
-                .setListener(null)
-                .setStartDelay(0);
-    }
-    private void showKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
-    }
     private void hideKeyboard(){
         InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(entryText.getWindowToken(), 0);
+        //imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+        assert imm != null;
+        imm.hideSoftInputFromWindow(Objects.requireNonNull(this.getCurrentFocus()).getWindowToken(), 0);
     }
 
-     */
+    private void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getApplicationContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        //EditText editTextEntry = (EditText) findViewById(R.id.editText_entry);
+       // editTextEntry.requestFocus();
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu){

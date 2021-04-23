@@ -27,10 +27,6 @@ public class MainActivityViewModel extends ViewModel {
     private final MutableLiveData<Integer> errorCode = new MutableLiveData<>();
     private LoginResponse loginResponse;
 
-    private final LiveData<User> currentUser;
-    private final LiveData<String> userName;
-    private final MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
-    private final MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
     private final MutableLiveData<Integer> registrationVisibility = new MutableLiveData<>(View.GONE);
     private final MutableLiveData<Integer> passwordErrorVisibility = new MutableLiveData<>(View.GONE);
     private final MutableLiveData<Integer> emailTakenVisibility = new MutableLiveData<>(View.GONE);
@@ -40,20 +36,9 @@ public class MainActivityViewModel extends ViewModel {
     @Inject
     public MainActivityViewModel(Repository repository){
         this.mRepository = repository;
-        currentUser = mRepository.getUserInfoFromRoom();
-
-        //map username to currentuser.username to show username in top left of main screen
-        userName = Transformations.map(currentUser, name->{
-            if (currentUser.getValue() != null){
-                loginVisibility.setValue(View.GONE);
-                profileVisibility.setValue(View.VISIBLE);
-                return currentUser.getValue().getUsername();
-            }
-            loginVisibility.setValue(View.VISIBLE);
-            profileVisibility.setValue(View.GONE);
-            return "Log In";
-        } );
     }
+
+
 
 
     /**
@@ -63,8 +48,6 @@ public class MainActivityViewModel extends ViewModel {
      * @param password The password typed into the edit text.
      */
     public void logIn(Editable username, Editable password){
-        //Reset the flashcard activity data so nothing gets messed up when changing accounts.
-        mRepository.resetEverything();
 
         Call<LoginResponse> call = mRepository.apiService.logIn(username.toString().toLowerCase().trim(),password.toString().toLowerCase().trim());
         call.enqueue(new Callback<LoginResponse>() {
@@ -74,7 +57,7 @@ public class MainActivityViewModel extends ViewModel {
                 if(loginResponse != null) {
                     errorCode.setValue(loginResponse.checkError());
                     if (!loginResponse.getIsError()){
-                        //add user to ROOM database
+                        //add user to ROOM database, downloadSaveData() is called via the transformation map in the repository
                         mRepository.insertUser(new User(loginResponse.getUsername(),loginResponse.getPassword()));
                         mRepository.downloadSaveData(loginResponse.getUsername());
                     }
@@ -176,7 +159,6 @@ public class MainActivityViewModel extends ViewModel {
     public void logOut(){
         mRepository.deleteAllUsers();
         mRepository.resetAllScores();
-        mRepository.resetEverything();
     }
 
     public LiveData<Integer> getShowLoadingBar(){return mRepository.getShowLoadingBar();}
@@ -187,7 +169,7 @@ public class MainActivityViewModel extends ViewModel {
     }
 
     public LiveData<String> getUserName(){
-        return userName;
+        return mRepository.getUserName();
     }
 
 
@@ -195,29 +177,29 @@ public class MainActivityViewModel extends ViewModel {
         return errorCode;
     }
     public LiveData<Integer> getProfileVisibility() {
-        return profileVisibility;
+        return mRepository.getProfileVisibility();
     }
 
 
-    public LiveData<Integer> getLoginVisibility() {return loginVisibility;}
+    public LiveData<Integer> getLoginVisibility() {return mRepository.getLoginVisibility();}
 
 
     //View Visibility setters
     public void setUpRegistration(){
-        loginVisibility.setValue(View.GONE);
-        profileVisibility.setValue(View.GONE);
+        mRepository.setLoginVisibility(View.GONE);
+        mRepository.setProfileVisibility(View.GONE);
         registrationVisibility.setValue(View.VISIBLE);
         passwordErrorVisibility.setValue(View.INVISIBLE);
     }
     public void setUpRegistrationF(){
-        loginVisibility.setValue(View.VISIBLE);
-        profileVisibility.setValue(View.GONE);
+        mRepository.setLoginVisibility(View.VISIBLE);
+        mRepository.setProfileVisibility(View.GONE);
         registrationVisibility.setValue(View.GONE);
         passwordErrorVisibility.setValue(View.GONE);
     }
     public void setLoginAndRegistrationVisibilityGone(){
-        loginVisibility.setValue(View.GONE);
-        profileVisibility.setValue(View.GONE);
+        mRepository.setLoginVisibility(View.GONE);
+        mRepository.setProfileVisibility(View.GONE);
         registrationVisibility.setValue(View.GONE);
         passwordErrorVisibility.setValue(View.GONE);
     }

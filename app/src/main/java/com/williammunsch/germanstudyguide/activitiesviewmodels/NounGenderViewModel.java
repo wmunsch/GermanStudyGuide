@@ -103,7 +103,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
             String der = "der";
             if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                 checkedCorrect = true;
-               // System.out.println("CORRECT!");
                 checkDerVisibility.setValue(View.VISIBLE);
                 dieButtonVisibility.setValue(View.INVISIBLE);
                 dasButtonVisibility.setValue(View.INVISIBLE);
@@ -123,7 +122,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
                     }
                 }.start();
             }else{
-               // System.out.println("WRONG!");
                 exDerVisibility.setValue(View.VISIBLE);
                 gotItWrong = true;
             }
@@ -139,7 +137,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
             String der = "die";
             if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                  checkedCorrect = true;
-              //  System.out.println("CORRECT!");
                 checkDieVisibility.setValue(View.VISIBLE);
                 derButtonVisibility.setValue(View.INVISIBLE);
                 dasButtonVisibility.setValue(View.INVISIBLE);
@@ -159,7 +156,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
                     }
                 }.start();
             }else{
-              //  System.out.println("WRONG!");
                 exDieVisibility.setValue(View.VISIBLE);
                 gotItWrong = true;
             }
@@ -175,7 +171,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
             String der = "das";
             if (der.equalsIgnoreCase(currentNode.getValue().getArticle())){
                 checkedCorrect = true;
-               // System.out.println("CORRECT!");
                 checkDasVisibility.setValue(View.VISIBLE);
                 derButtonVisibility.setValue(View.INVISIBLE);
                 dieButtonVisibility.setValue(View.INVISIBLE);
@@ -195,7 +190,6 @@ public class NounGenderViewModel extends ViewModel implements Observable {
                     }
                 }.start();
             }else{
-               // System.out.println("WRONG!");
                 exDasVisibility.setValue(View.VISIBLE);
                 gotItWrong = true;
             }

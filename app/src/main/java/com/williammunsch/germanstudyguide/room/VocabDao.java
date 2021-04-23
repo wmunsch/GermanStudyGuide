@@ -42,6 +42,9 @@ public interface VocabDao {
     @Query("SELECT * FROM vocab_tableA1 WHERE article!='' LIMIT 1")
     LiveData<VocabModelA1> getOneNoun();
 
+    @Query("SELECT COUNT(*) FROM vocab_tableA1 WHERE studying = 1")
+    Integer getCountStudyingA1();
+
 
      //Update the vocabModel word with the new score.
     @Update

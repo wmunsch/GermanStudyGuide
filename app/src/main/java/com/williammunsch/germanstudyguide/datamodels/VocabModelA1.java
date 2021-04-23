@@ -52,7 +52,7 @@ public class VocabModelA1 {
 
     public String getAnswer(int score){
         if (score < 50){
-            return english;
+            return english.replace(",",", ");
         }else{
             return german;
         }

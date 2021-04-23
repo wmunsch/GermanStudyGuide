@@ -29,6 +29,7 @@ import com.williammunsch.germanstudyguide.room.VocabListDao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,9 +60,15 @@ public class Repository {
     private final MutableLiveData<Integer> genderButtonVisibility = new MutableLiveData<>(View.VISIBLE);
     private final MutableLiveData<Integer> genderTextVisibility = new MutableLiveData<>(View.GONE);
 
+    private final LiveData<User> currentUser;
+    private final LiveData<String> userName;
 
-    private final ArrayList<VocabModelA1> finishedList = new ArrayList<>();
-    private boolean setAtBeginning = false;
+
+    private final MutableLiveData<Integer> profileVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> loginVisibility = new MutableLiveData<>();
+    private final MutableLiveData<Integer> needToDownloadSaveData = new MutableLiveData<>(0);
+
+    private int pageOn = 0;//Keep this in the repository so the page number on is saved between activities
 
     /**
      * Main page repository that handles updates and stores info for the vocab fragment (0/700 and name) and story fragment (title and author).
@@ -71,6 +78,22 @@ public class Repository {
         this.apiService = apiService;
         this.db = db;
         a1Count = db.vocabDao().count();
+        currentUser = getUserInfoFromRoom();
+
+
+        //map username to currentuser.username to show username in top left of main screen and for saving vocab
+        userName = Transformations.map(currentUser, name->{
+            if (currentUser.getValue() != null){
+                loginVisibility.setValue(View.GONE);
+                profileVisibility.setValue(View.VISIBLE);
+                return currentUser.getValue().getUsername();
+            }
+            loginVisibility.setValue(View.VISIBLE);
+            profileVisibility.setValue(View.GONE);
+            return "Log In";
+        } );
+
+
 
         wordsLearnedVisibility.setValue(View.GONE);
         wordsDownloadedVisibility.setValue(View.GONE);
@@ -90,6 +113,12 @@ public class Repository {
                wordsLearnedVisibility.setValue(View.VISIBLE);
                genderButtonVisibility.setValue(View.VISIBLE);
                genderTextVisibility.setValue(View.GONE);
+
+               //Call to download the save data after downloading A1 IF the user is logged in
+               if (A1Downloaded.getValue() == 2 && currentUser.getValue()!=null && currentUser.getValue().getUsername()!= null){
+                   downloadSaveData(currentUser.getValue().getUsername());
+               }
+
                return "Study";
            }
            else{
@@ -99,7 +128,56 @@ public class Repository {
                return "Error Loading";
            }
         });
+
+
     }
+
+    /**
+     * Called every time the app opens
+     * If the local database has more progress than remote db, save to remote
+     */
+    //TODO :
+    /*
+    public void checkLocalSaveToRemote(){
+        //Check if local database has more progress than remote db by getting studying on #
+        new checkLocalToRemoteAsyncTask(db.vocabDao()).execute();
+    }
+
+    private void updateRemoteDatabaseFromLocal(){
+        DatabasePID databasePID = new DatabasePID();
+        String scoreList = db.vocabDao().getA1Scores().toString();
+        String studyingList = db.vocabDao().getA1Studying().toString();
+        String freqList = db.vocabDao().getA1Freq().toString();
+        String tempS = scoreList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
+        String tempS2 = studyingList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
+        String tempS3 = freqList.replaceAll("\\s","").replaceAll("\\[","").replaceAll("\\]","");
+
+        apiService.uploadData(userName.getValue(),"A1",tempS,tempS3,tempS2,databasePID.getPid());
+    }
+
+    private static class checkLocalToRemoteAsyncTask extends AsyncTask<Void, Void, Void> {
+        private final VocabDao mAsyncTaskDao;
+
+        checkLocalToRemoteAsyncTask(VocabDao dao){
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            int localStudyingCountA1 = mAsyncTaskDao.getCountStudyingA1();
+            int remoteStudyingCountA1 = 0;
+            if (localStudyingCountA1 > remoteStudyingCountA1){
+
+            }
+
+            return null;
+        }
+
+
+    }
+
+     */
+
 
 
     /**
@@ -275,8 +353,10 @@ public class Repository {
         protected void onPostExecute(Void v){
             mDownloadButtonVisibility.setValue(View.VISIBLE);
             mWordsDownloadedVisibility.setValue(View.GONE);
-            mA1Downloaded.setValue(1);
+            //Set to 2 so it calls downloadSaveData()
+            mA1Downloaded.setValue(2);
         }
+
     }
 
     /**
@@ -323,7 +403,7 @@ public class Repository {
 
         @Override
         protected Void doInBackground(Void... params) {
-            //System.out.println("Downloading A1 from remote");
+            //Downloading A1 from remote
             Call<List<VocabModelA1>> call = apiService.vocabList();
             call.enqueue(new Callback<List<VocabModelA1>>() {
                 @Override
@@ -369,13 +449,12 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Integer sentenceCount){
-            //System.out.println("sent count: " + sentenceCount);
             if (sentenceCount!=106){
-                //System.out.println("HAG has NOT been downloaded");
+                //HAG has NOT been downloaded
                 mHAGDownloaded.setValue(0);
                 //Set HAG button to "download"
             }else{
-               // System.out.println("HAG has been downloaded");
+               //HAG has been downloaded
                 mHAGDownloaded.setValue(1);
                 //set HAG button to "read"
             }
@@ -409,7 +488,6 @@ public class Repository {
         @Override
         protected Void doInBackground(Void... voids) {
             //Call to download the story here
-           // System.out.println("Downloading HAG");
             Call<List<Hag_Sentences>> call = apiService.downloadHagSentences();
             call.enqueue(new Callback<List<Hag_Sentences>>() {
                 @Override
@@ -460,7 +538,7 @@ public class Repository {
 
         @Override
         protected Void doInBackground(final Hag_Sentences... params) {
-            //System.out.println("inserting HAG sentences");
+            //inserting HAG sentences
             for (Hag_Sentences model : params){
                 storyDao.insertHagSentence(model);
             }
@@ -469,7 +547,6 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Void v){
-            //System.out.println("downloading hag words");
             //Call to download the words here
             Call<List<Hag_Words>> call = apiService.downloadHagWords();
             call.enqueue(new Callback<List<Hag_Words>>() {
@@ -510,7 +587,7 @@ public class Repository {
 
         @Override
         protected Void doInBackground(final Hag_Words... params) {
-            System.out.println("Inserting HAG words");
+            //Inserting HAG words
             for (Hag_Words model : params){
                 storyDao.insertHagWord(model);
             }
@@ -574,7 +651,7 @@ public class Repository {
             String[] scoreArray = strings[0];
             String[] studyingArray = strings[1];
             String[] freqArray = strings[2];
-           // System.out.println("BEGGINING UPDATING SCORES");
+           //Begin updating scores
             for (int i = 0;i < 700;i++){
                 if (Integer.parseInt(studyingArray[i])==0){break;}
                 try {
@@ -582,8 +659,7 @@ public class Repository {
                 }catch(Exception e){
                     break;
                 }
-                }
-           // System.out.println("END UPDATING SCORES");
+            }
 
             return null;
         }
@@ -773,20 +849,6 @@ public class Repository {
     public LiveData<List<VocabModelA1>> getVocabQueue(){
         return  db.vocabDao().getVocabQueue();
     }
-    public ArrayList<VocabModelA1> getFinishedList() {
-        return finishedList;
-    }
-
-    public void resetEverything(){
-        finishedList.clear();
-        setAtBeginning = false;
-    }
-    public boolean isSetAtBeginning() {
-        return setAtBeginning;
-    }
-    public void setAtBeginning(boolean b){
-        setAtBeginning = b;
-    }
 
 
 
@@ -795,9 +857,9 @@ public class Repository {
      * based on a finished List that all words are sent to after being popped from
      * the mediatorVocabList.
      */
-    public void updateAllNodes(boolean login, LiveData<String> userName){
+    public void updateAllNodes(boolean login, LiveData<String> userName, ArrayList<VocabModelA1> finishedList ){
         updateNode(finishedList, login,userName);
-        finishedList.clear();
+        //finishedList.clear();
     }
 
 
@@ -805,7 +867,6 @@ public class Repository {
      * Creates an updateNodeAsyncTask and executes it.
      * @param vocabModelA1s The list of all the nodes that will be updated.
      *  This needs to add every node to the execute portion manually.
-     *  Could this be improved by sending the list as a parameter instead of each vocabModel individually? No
      */
     private void updateNode(List<VocabModelA1> vocabModelA1s, boolean loggedIn, LiveData<String> userName){
         if (vocabModelA1s.size()==3){
@@ -830,8 +891,6 @@ public class Repository {
                     vocabModelA1s.get(5), vocabModelA1s.get(6), vocabModelA1s.get(7), vocabModelA1s.get(8), vocabModelA1s.get(9),
                     vocabModelA1s.get(10), vocabModelA1s.get(11), vocabModelA1s.get(12), vocabModelA1s.get(13), vocabModelA1s.get(14),
                     vocabModelA1s.get(15), vocabModelA1s.get(16), vocabModelA1s.get(17), vocabModelA1s.get(18), vocabModelA1s.get(19));
-        }else{
-            // System.out.println("ERROR UPDATENODE DIDNT WORK");
         }
 
     }
@@ -839,6 +898,7 @@ public class Repository {
     /**
      * AsyncTask to update each vocabulary word in the ROOM database on a separate thread
      * at the end of the activity, once every flashcard has been finished.
+     * Updates the remote database if logged in after.
      */
     private static class updateNodeAsyncTask extends AsyncTask<VocabModelA1, Void, Void> {
 
@@ -862,7 +922,7 @@ public class Repository {
             if (!loggedIn){
                 for (VocabModelA1 model : params){
                     mAsyncTaskDao.updateNode(model);
-                    mAsyncTaskDao.updateLocalNode(model.getScore(),model.getStudying(),model.getFreq(),model.getId());
+                    mAsyncTaskDao.updateLocalNode(model.getScore(),model.getStudying(),model.getFreq(),model.getId()); //Updates the local save for when user is not logged in
                 }
             }else{
                 for (VocabModelA1 model : params){
@@ -881,17 +941,17 @@ public class Repository {
 
         @Override
         protected void onPostExecute(Void v){
+            //Saving to remote
             if (loggedIn){
                 //Update remote database with account data
                 Call<CreateUploadDataResponse> call = apiService.uploadData(username,"A1",tempS,tempS3,tempS2,databasePID.getPid());
                 call.enqueue(new Callback<CreateUploadDataResponse>() {
                     @Override
                     public void onResponse(Call<CreateUploadDataResponse> call, Response<CreateUploadDataResponse> response) {
-                        // System.out.println("Response to creating save data");
-                        // System.out.println(response);
-                        CreateUploadDataResponse lr = response.body();
-                        // System.out.println("Body is : " + lr);
-
+                         //System.out.println("Response to creating save data");
+                         //System.out.println(response);
+                        //CreateUploadDataResponse lr = response.body();
+                         //System.out.println("Body is : " + lr);
                     }
 
                     @Override
@@ -903,6 +963,9 @@ public class Repository {
 
         }
     }
+
+
+
 
 
     //NounGender
@@ -955,7 +1018,7 @@ public class Repository {
         protected Void doInBackground(String... params) {
             hagWord = storyDao.getWord(params[0]);
             if (hagWord == null) {
-                // System.out.println("First was null, running again in lower case");
+                // First was null, running again in lower case
                 String tempS= "";
                 tempS = params[0].toLowerCase();
                 hagWord = storyDao.getWord(tempS);
@@ -967,5 +1030,35 @@ public class Repository {
         protected void onPostExecute(Void aVoid) {
             mld.setValue(hagWord);
         }
+    }
+
+
+
+    public LiveData<User> getCurrentUser() {
+        return currentUser;
+    }
+    public LiveData<String> getUserName() {
+        return userName;
+    }
+
+    public MutableLiveData<Integer> getProfileVisibility() {
+        return profileVisibility;
+    }
+    public MutableLiveData<Integer> getLoginVisibility() {
+        return loginVisibility;
+    }
+    public void setLoginVisibility(Integer i){
+        loginVisibility.setValue(i);
+    }
+    public void setProfileVisibility(Integer i){
+        profileVisibility.setValue(i);
+    }
+
+    public int getPageOn() {
+        return pageOn;
+    }
+
+    public void setPageOn(int pageOn) {
+        this.pageOn = pageOn;
     }
 }

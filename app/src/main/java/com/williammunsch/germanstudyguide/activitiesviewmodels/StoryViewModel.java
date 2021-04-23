@@ -23,7 +23,7 @@ import javax.inject.Inject;
 public class StoryViewModel extends ViewModel {
     Repository mRepository;
     private String storyName;
-    private int pageOn = 0;
+   // private int pageOn = 0;
     private final LiveData<Hag_Words> hagWordLive;
     private final MutableLiveData<String> pageNumberText = new MutableLiveData<>();
     private final LiveData<String> currentEnglishSentence;
@@ -49,16 +49,16 @@ public class StoryViewModel extends ViewModel {
         //Maps the current page of text
         currentEnglishSentence = Transformations.map(mediatorSentence, value -> {
             if (mediatorSentence.getValue() != null){
-                return mediatorSentence.getValue().get(pageOn).getEnglish();
+                return mediatorSentence.getValue().get(mRepository.getPageOn()).getEnglish();
             }
             return null;
         });
 
         //Gets the current page text and returns it as an array of words for word lookup
         currentSentenceWordList = Transformations.map(mediatorSentence, value -> {
-            pageNumberText.setValue(pageOn+1 + " / 106");
+            pageNumberText.setValue(mRepository.getPageOn()+1 + " / 106");
             if (mediatorSentence.getValue() != null){
-                String tempString = mediatorSentence.getValue().get(pageOn).getGerman();
+                String tempString = mediatorSentence.getValue().get(mRepository.getPageOn()).getGerman();
                 String[] wordArray = tempString.split(" ");
                 if (wordArray.length < 77){
                     wordArray = Arrays.copyOf(wordArray,77);
@@ -83,8 +83,9 @@ public class StoryViewModel extends ViewModel {
      * Moves the page forward when clicked
      */
     public void pageForward(){
-        if (pageOn<105){
-            pageOn++;
+        if (mRepository.getPageOn()<105){
+            mRepository.setPageOn(mRepository.getPageOn()+1);
+           // pageOn++;
         }
         mediatorSentence.setValue(mediatorSentence.getValue());
         englishVisibility.setValue(View.GONE);
@@ -96,8 +97,9 @@ public class StoryViewModel extends ViewModel {
      * Moves the page back when clicked
      */
     public void pageBack(){
-        if (pageOn>0){
-            pageOn--;
+        if (mRepository.getPageOn()>0){
+            mRepository.setPageOn(mRepository.getPageOn()-1);
+           // pageOn--;
         }
         mediatorSentence.setValue(mediatorSentence.getValue());
         englishVisibility.setValue(View.GONE);
